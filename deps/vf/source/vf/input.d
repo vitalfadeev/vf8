@@ -5,16 +5,14 @@ import importc;
 
 struct
 Input {
-    Event event;
-
     void
     open () {
         //SDL_Init (SDL_INIT_EVENTS);
     }
 
     bool 
-    read () {
-        return (SDL_WaitEvent (&event) == 1);
+    read (Event* event) {
+        return (SDL_WaitEvent (event) == 1);
     }
 
     //void

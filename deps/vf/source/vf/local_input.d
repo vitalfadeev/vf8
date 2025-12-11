@@ -8,8 +8,7 @@ import importc;
 //
 struct
 Local_input {
-    Array!Local_event s;
-    Local_event       event;
+    Array!Event s;
 
     void
     open () {
@@ -17,8 +16,8 @@ Local_input {
     }
 
     void
-    read () {
-        event = s[0];
+    read (Event* event) {
+        *event = s[0];
         s.remove_at (0);
     }
 
@@ -28,40 +27,19 @@ Local_input {
     }
 
     void
-    put (Local_event* evt) {
+    put (Event* evt) {
         s.add (*evt);
     }
 
     void
     put_reg (typeof(Event.type) _reg) {
-        s.add (Local_event (_reg));
-    }
-
-    void
-    put_reg (typeof(Event.type) _reg, void* e) {
-        s.add (Local_event (_reg,e));
-    }
-}
-
-struct
-Local_event {
-    Event event;
-    void* e;
-
-    this (typeof(Event.type) _reg) {
+        Event event;
         event.type           = SDL_USEREVENT;
         event.user.code      = _reg;
         event.user.data1     = null;
         event.user.data2     = null;
         event.user.timestamp = SDL_GetTicks ();
-    }
 
-    this (typeof(Event.type) _reg, void* _e) {
-        event.type           = SDL_USEREVENT;
-        event.user.code      = _reg;
-        event.user.data1     = null;
-        event.user.data2     = null;
-        event.user.timestamp = SDL_GetTicks ();
-        e                    = _e;
+        s.add (event);
     }
 }

@@ -40,6 +40,12 @@ Video {
         // SDL_RenderDrawRect (renderer,&rect);
         // ...
 
+        SDL_SetRenderDrawColor (renderer, 0x00, 0x00, 0x00, 0xFF);
+        SDL_RenderClear (renderer);
+        SDL_SetRenderDrawColor (renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+        auto rect = SDL_Rect (100,100,200,200);
+        SDL_RenderDrawRect (renderer,&rect);
+
         // Rasterize
         SDL_RenderPresent (renderer);
     }

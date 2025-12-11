@@ -1,17 +1,17 @@
 {
-	"name"        : "vf8",
-	"authors"     : [
+	"name"         : "vf8",
+	"authors"      : [
 		"vf"
 	],
-	"description" : "A minimal D application.",
-	"license"     : "proprietary",
+	"description"  : "A minimal D application.",
+	"license"      : "GPL3",
 	"dependencies" : {
-		"vf"    	 : {"path": "./deps/vf"},
+		"vf" : {"path": "./deps/vf"},
 	},
 	"versions"     : [],
 	"dflags"       : [ "-mixin=mixins.d" ],
 	"buildOptions" : ["ignoreDeprecations"],
-	"dflags-ldc": [
+	"dflags-ldc"   : [
   		"--link-defaultlib-shared"
 	],
 }

@@ -13,6 +13,7 @@ O {
     GO          go = &_go;
     Input       input;
     Local_input local_input;
+    Event       event;
     Audio       audio;
     Video       video;
     void*       ego;
@@ -51,11 +52,13 @@ O {
     // base
     static
     void
-    _go (void* o, void* e, void* evt, void* d) {
+    _go (void* o, void* e, void* evt, REG d) {
+        evt = &((cast(O*)o).event);
+
         // each input event
         with (cast(O*)o)
         while (go !is null) {
-            if (input.read ()) {
+            if (input.read (cast (Event*) evt)) {
                 _go2 (o,ego,evt,d);
             }
         }
@@ -64,19 +67,17 @@ O {
     // with local input
     static
     void
-    _go2 (void* o, void* e, void* evt, void* d) {
+    _go2 (void* o, void* e, void* evt, REG d) {
         with (cast(O*)o) {
             // process input event
-            evt = &input.event;
-            d   = cast (void*) input.event.type;
+            d = event.type;
             _go3 (o,e,evt,d);
 
             // each local input event
             while (!local_input.empty) {
-                local_input.read ();
+                local_input.read (cast (Event*) evt);
                 // process local input event
-                evt = &local_input.event;
-                d   = cast (void*) local_input.event.event.type;
+                d = event.type;
                 _go3 (o,e,evt,d);
             }
         }
@@ -85,7 +86,7 @@ O {
     // with map
     static
     void
-    _go3 (void* o, void* e, void* evt, void* d) {
+    _go3 (void* o, void* e, void* evt, REG d) {
         with (cast(O*)o) {
             if (e !is null) {
                 (cast (GO) e) (o,e,evt,d);
