@@ -1,0 +1,43 @@
+{
+    "authors": [
+        "zhad3"
+    ],
+    "copyright": "Copyright © 2022, zhad3",
+    "dependencies": {
+        "bindbc-loader": "~>1.1.2"
+    },
+    "description": "Dynamic and static bindings to ThorVG CAPI, compatible with -betterC, @nogc, and nothrow.",
+    "license": "MIT",
+    "name": "bindbc-thorvg",
+    "targetType": "staticLibrary",
+    "targetPath": "lib",
+    "targetName": "BindBC_TVG",
+
+    "configurations": [
+        {
+            "name": "dynamic",
+            "dependencies": {
+                "bindbc-loader": "~>1.1.2"
+            }
+        },
+        {
+            "name": "dynamicBC",
+            "subConfigurations": {
+                "bindbc-loader": "yesBC"
+            },
+            "buildOptions": ["betterC"],
+            "dependencies": {
+                "bindbc-loader": "~>1.1.2"
+            }
+        },
+        {
+            "name": "static",
+            "versions": ["BindTVG_Static"]
+        },
+        {
+            "name": "staticBC",
+            "buildOptions": ["betterC"],
+            "versions": ["BindTVG_Static"]
+        }
+    ]
+}

@@ -15,3 +15,5 @@
 #ifndef EV_SYN
 #define EV_SYN 0
 #endif
+
+#include "thorvg_capi.h"

@@ -6,8 +6,11 @@
 	"description"  : "A minimal D application.",
 	"license"      : "GPL3",
 	"dependencies" : {
-		"vf" : {"path": "./deps/vf"},
+		"vf"               : {"path": "./deps/vf"},
 	},
+	"libs" : [
+		"thorvg"
+	],
 	"versions"     : [],
 	"dflags"       : [ "-mixin=mixins.d" ],
 	"buildOptions" : ["ignoreDeprecations"],
