@@ -21,12 +21,12 @@ Video {
     }
 
     SDL_Window*   window;
-    SDL_Renderer* renderer;
+    //SDL_Renderer* renderer;
 
     void
     new_window_ () {
         window   = new_window ();
-        renderer = new_renderer (window);        
+        //renderer = new_renderer (window);        
     }
 
     void
@@ -40,19 +40,21 @@ Video {
         // SDL_RenderDrawRect (renderer,&rect);
         // ...
 
-        SDL_SetRenderDrawColor (renderer, 0x00, 0x00, 0x00, 0xFF);
-        SDL_RenderClear (renderer);
-        SDL_SetRenderDrawColor (renderer, 0xFF, 0xFF, 0xFF, 0xFF);
-        auto rect = SDL_Rect (100,100,200,200);
-        SDL_RenderDrawRect (renderer,&rect);
+        //SDL_SetRenderDrawColor (renderer, 0x00, 0x00, 0x00, 0xFF);
+        //SDL_RenderClear (renderer);
+        //SDL_SetRenderDrawColor (renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+        //auto rect = SDL_Rect (100,100,200,200);
+        //SDL_RenderDrawRect (renderer,&rect);
 
+        //// Rasterize
+        //SDL_RenderPresent (renderer);
 
         //
-        auto renderer = renderer; 
-        auto window_surface = SDL_GetWindowSurface (window);
+        //auto renderer = renderer; 
+        auto surface = SDL_GetWindowSurface (window);
 
         auto canvas = tvg_swcanvas_create (Tvg_Engine_Option.TVG_ENGINE_OPTION_DEFAULT);
-        auto sformat = window_surface.format.format;
+        auto sformat = surface.format.format;
         auto tformat = Tvg_Colorspace.TVG_COLORSPACE_ABGR8888;
         switch (sformat) {
             case SDL_PIXELFORMAT_ABGR8888: tformat = Tvg_Colorspace.TVG_COLORSPACE_ABGR8888; break;
@@ -65,13 +67,30 @@ Video {
                 throw new Exception ("unknown pixel format");
         }
 
+        //tvg_swcanvas_set_target (
+        //    canvas,
+        //    cast (uint32_t*) window_surface.pixels, 
+        //    window_surface.pitch / 4, 
+        //    window_surface.w, 
+        //    window_surface.h, 
+        //    tformat);
+
         tvg_swcanvas_set_target (
-            canvas,
-            cast (uint32_t*) window_surface.pixels, 
-            window_surface.pitch, 
-            window_surface.w, 
-            window_surface.h, 
-            tformat);
+            canvas, 
+            cast(uint32_t*)surface.pixels, 
+            surface.w, 
+            surface.pitch / 4, 
+            surface.h, 
+            TVG_COLORSPACE_ARGB8888);
+
+        //display the first frame
+        //tvg_canvas_draw (canvas, true);
+        //tvg_canvas_sync (canvas);
+        //SDL_UpdateWindowSurface (window);
+
+
+        //contents ();
+
 
         //Set a shape
         Tvg_Paint shape1 = tvg_shape_new();
@@ -101,8 +120,13 @@ Video {
         tvg_canvas_push(canvas, shape1);
 
 
-        // Rasterize
-        SDL_RenderPresent (renderer);
+
+        //draw the canvas
+        tvg_canvas_update (canvas);
+        tvg_canvas_draw (canvas, true);
+        tvg_canvas_sync (canvas);
+
+        SDL_UpdateWindowSurface (window);
     }
 }
 

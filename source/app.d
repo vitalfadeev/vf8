@@ -17,6 +17,8 @@ enum ulong UI_POINTER_OUT  = (4             << 16) | EVT_UI;
 extern(C) 
 void 
 main () {
+    tvg_engine_init(4);
+        
     O o;
     o.ego = &_panel_ego;
     o.open ();
