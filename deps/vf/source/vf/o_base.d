@@ -51,7 +51,7 @@ O {
     // base
     static
     void
-    _go (void* o, void* e, REG evt, void* d) {
+    _go (void* o, void* e, void* evt, void* d) {
         // each input event
         with (cast(O*)o)
         while (go !is null) {
@@ -64,19 +64,19 @@ O {
     // with local input
     static
     void
-    _go2 (void* o, void* e, REG evt, void* d) {
+    _go2 (void* o, void* e, void* evt, void* d) {
         with (cast(O*)o) {
             // process input event
-            evt = input.event.type;
-            d   = &input.event;
+            evt = &input.event;
+            d   = cast (void*) input.event.type;
             _go3 (o,e,evt,d);
 
             // each local input event
             while (!local_input.empty) {
                 local_input.read ();
                 // process local input event
-                evt = local_input.event.event.type;
-                d   = &local_input.event;
+                evt = &local_input.event;
+                d   = cast (void*) local_input.event.event.type;
                 _go3 (o,e,evt,d);
             }
         }
@@ -85,7 +85,7 @@ O {
     // with map
     static
     void
-    _go3 (void* o, void* e, REG evt, void* d) {
+    _go3 (void* o, void* e, void* evt, void* d) {
         with (cast(O*)o) {
             if (e !is null) {
                 (cast (GO) e) (o,e,evt,d);

@@ -20,11 +20,11 @@ main () {
     O o;
     o.ego = &_ego;
     o.open ();
-    o.go (&o,null,0,null);
+    o.go (&o,null,null,null);
 }
 
 void
-_ego (void* o, void* e, REG evt, void* d) {
+_ego (void* o, void* e, void* evt, void* d) {
     static E main_e = E (&go_base);
     main_e.go (o,&main_e,evt,d);
 }
@@ -40,8 +40,11 @@ Panel {
 
     static
     void
-    _go (void* o, void* e, REG evt, void* d) {
-        switch (evt) {
+    _go (void* o, void* e, void* evt, void* d) {
+        auto _evt = cast (Event*) evt;
+        REG   typ = cast (REG) _evt.type;
+        REG   key = cast (REG) d;
+        switch (typ) {
             case SDL_QUIT:
                 break;
             case SDL_MOUSEBUTTONDOWN:
@@ -49,11 +52,11 @@ Panel {
                 break;
             case SDL_KEYDOWN:
                 with (cast(O*)o)
-                if ((cast (Event*) d).key.keysym.sym == SDLK_ESCAPE)
+                if (_evt.key.keysym.sym == SDLK_ESCAPE)
                     break;
                 break;
             case SDL_WINDOWEVENT:
-                switch (evt) {
+                switch (_evt.window.event) {
     //                case SDL_WINDOWEVENT_EXPOSED: draw (renderer); break; // event.window.windowID
                     case SDL_WINDOWEVENT_SHOWN: break;        // event.window.windowID
                     case SDL_WINDOWEVENT_HIDDEN: break;       // event.window.windowID
@@ -82,7 +85,7 @@ Panel {
 }
 
 void
-_draw_text (void* o, void* e, REG evt, void* d) {
+_draw_text (void* o, void* e, void* evt, void* d) {
     string text = "abc";
 }
 
@@ -118,7 +121,7 @@ alias
 _go_esc = GO_local_event_new!(EVT_APP_QUIT);
 
 void
-_go_ctrl_pressed (void* o, void* e, REG evt, void* d) {
+_go_ctrl_pressed (void* o, void* e, void* evt, void* d) {
     with (cast(O*)o) {
         printf ("> CTRL pressed\n");
         (cast(E*)e).go = &go_ctrl_pressed;
@@ -126,7 +129,7 @@ _go_ctrl_pressed (void* o, void* e, REG evt, void* d) {
 }
 
 void
-_go_ctrl_released (void* o, void* e, REG evt, void* d) {
+_go_ctrl_released (void* o, void* e, void* evt, void* d) {
     with (cast(O*)o) {
         printf ("> CTRL released\n");
         (cast(E*)e).go = &go_base;
@@ -150,7 +153,7 @@ _go_play_3 = GO_play!(3);
 
 //
 void
-GO_quit (alias TEXT) (void* o, void* e, REG evt, void* d) {
+GO_quit (alias TEXT) (void* o, void* e, void* evt, void* d) {
     with (cast(O*)o) {
         printf (TEXT);
         go = null;
@@ -158,12 +161,12 @@ GO_quit (alias TEXT) (void* o, void* e, REG evt, void* d) {
 }
 
 void
-GO_printf (alias TEXT) (void* o, void* e, REG evt, void* d) {
+GO_printf (alias TEXT) (void* o, void* e, void* evt, void* d) {
     printf (TEXT);
 }
 
 void
-GO_local_event_new (REG EVT) (void* o, void* e, REG evt, void* d) {
+GO_local_event_new (REG EVT) (void* o, void* e, void* evt, void* d) {
     printf ("  put Event: 0x%X\n", EVT);
     with (cast(O*)o) {
         local_input.put_reg (EVT);
@@ -171,7 +174,7 @@ GO_local_event_new (REG EVT) (void* o, void* e, REG evt, void* d) {
 }
 
 void
-GO_play (int resource_id) (void* o, void* e, REG evt, void* d) {
+GO_play (int resource_id) (void* o, void* e, void* evt, void* d) {
     printf ("Play %d\n", resource_id);
     with (cast(O*)o) {
         audio.play_wav (resource_id);
@@ -180,9 +183,12 @@ GO_play (int resource_id) (void* o, void* e, REG evt, void* d) {
 
 //
 void
-GO_ui (void* o, void* e, REG evt, void* d) {
+GO_ui (void* o, void* e, void* evt, void* d) {
+    auto _evt = cast (Event*) evt;
+    REG   typ = cast (REG) _evt.type;
+    REG   key = cast (REG) d;
     with (cast(O*)o) {
-        if (evt == SDL_MOUSEMOTION) {
+        if (typ == SDL_MOUSEMOTION) {
             //go_ui_each (o,e,evt,d);
         }
     }
@@ -207,47 +213,55 @@ UI_element {
 
     static
     void
-    _go (void* o, void* e, REG evt, void* d) {
+    _go (void* o, void* e, void* evt, void* d) {
+        auto _evt = cast (Event*) evt;
+        REG   typ = cast (REG) _evt.type;
+        REG   key = cast (REG) d;
         with (cast(O*)o) {
-            if (evt == SDL_MOUSEMOTION) {
-                with (cast(UI_element*)e)
-                if ((cast(UI_element*)e).hit_test (o,e,evt,d)) {
-                    if (flags & Flags.mouse_over) {
-                        local_input.put_reg (UI_POINTER_OVER,e);
-                    } 
-                    else {
-                        flags |= Flags.mouse_over;
-                        local_input.put_reg (UI_POINTER_IN,e);
+            switch (typ) {
+                case SDL_MOUSEMOTION:
+                    with (cast(UI_element*)e)
+                    if ((cast(UI_element*)e).hit_test (o,e,evt,d)) {
+                        if (flags & Flags.mouse_over) {
+                            local_input.put_reg (UI_POINTER_OVER,e);
+                        } 
+                        else {
+                            flags |= Flags.mouse_over;
+                            local_input.put_reg (UI_POINTER_IN,e);
+                        }
                     }
+                    else {
+                        if (flags & Flags.mouse_over) {
+                            flags &= !Flags.mouse_over;
+                            local_input.put_reg (UI_POINTER_OUT,e);
+                        }                     
+                    }
+                    break;
+
+                case SDL_USEREVENT:
+                    if (_evt.user.code == UI_POINTER_IN) {
+                        // change style
+                        //   back color
+                    }
+
+                    if (_evt.user.code == UI_POINTER_OVER) {
+                        // change style
+                        //   back color
+                    }
+
+                    if (_evt.user.code == UI_POINTER_OUT) {
+                        // change style
+                        //   back color
+                    }
+                    break;
+                default:
                 }
-                else {
-                    if (flags & Flags.mouse_over) {
-                        flags &= !Flags.mouse_over;
-                        local_input.put_reg (UI_POINTER_OUT,e);
-                    }                     
-                }
-            }
-
-            if (evt == UI_POINTER_IN) {
-                // change style
-                //   back color
-            }
-
-            if (evt == UI_POINTER_OVER) {
-                // change style
-                //   back color
-            }
-
-            if (evt == UI_POINTER_OUT) {
-                // change style
-                //   back color
-            }
         }
     }
 
     static
     bool
-    hit_test (void* o, void* e, REG evt, void* d) {
+    hit_test (void* o, void* e, void* evt, void* d) {
         return false;
     }
 }
