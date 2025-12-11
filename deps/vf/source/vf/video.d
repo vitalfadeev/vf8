@@ -78,8 +78,8 @@ Video {
         tvg_swcanvas_set_target (
             canvas, 
             cast(uint32_t*)surface.pixels, 
-            surface.w, 
             surface.pitch / 4, 
+            surface.w, 
             surface.h, 
             TVG_COLORSPACE_ARGB8888);
 
@@ -93,31 +93,31 @@ Video {
 
 
         //Set a shape
-        Tvg_Paint shape1 = tvg_shape_new();
-        tvg_shape_move_to(shape1, 25.0f, 25.0f);
-        tvg_shape_line_to(shape1, 375.0f, 25.0f);
-        tvg_shape_cubic_to(shape1, 500.0f, 100.0f, -500.0f, 200.0f, 375.0f, 375.0f);
-        tvg_shape_close(shape1);
+        Tvg_Paint shape1 = tvg_shape_new ();
+        tvg_shape_move_to (shape1, 25.0f, 25.0f);
+        tvg_shape_line_to (shape1, 375.0f, 25.0f);
+        tvg_shape_cubic_to (shape1, 500.0f, 100.0f, -500.0f, 200.0f, 375.0f, 375.0f);
+        tvg_shape_close (shape1);
 
         //Prepare a gradient for the fill
-        Tvg_Gradient grad = tvg_linear_gradient_new();
-        tvg_linear_gradient_set(grad, 25.0f, 25.0f, 200.0f, 200.0f);
+        Tvg_Gradient grad = tvg_linear_gradient_new ();
+        tvg_linear_gradient_set (grad, 25.0f, 25.0f, 200.0f, 200.0f);
         Tvg_Color_Stop[4] color_stops = [{0.00f, 255, 0, 0, 155}, {0.33f, 0, 255, 0, 100}, {0.66f, 255, 0, 255, 100}, {1.00f, 0, 0, 255, 155}];
         tvg_gradient_set_color_stops (grad, color_stops.ptr, 4);
-        tvg_gradient_set_spread(grad, TVG_STROKE_FILL_REFLECT);
+        tvg_gradient_set_spread (grad, TVG_STROKE_FILL_REFLECT);
 
         //Prepare a gradient for the stroke
-        Tvg_Gradient grad_stroke = tvg_gradient_duplicate(grad);
+        Tvg_Gradient grad_stroke = tvg_gradient_duplicate (grad);
 
         //Set a gradient fill
-        tvg_shape_set_gradient(shape1, grad);
+        tvg_shape_set_gradient (shape1, grad);
 
         //Set a gradient stroke
-        tvg_shape_set_stroke_width(shape1, 20.0f);
-        tvg_shape_set_stroke_gradient(shape1, grad_stroke);
-        tvg_shape_set_stroke_join(shape1, TVG_STROKE_JOIN_ROUND);
+        tvg_shape_set_stroke_width (shape1, 20.0f);
+        tvg_shape_set_stroke_gradient (shape1, grad_stroke);
+        tvg_shape_set_stroke_join (shape1, TVG_STROKE_JOIN_ROUND);
 
-        tvg_canvas_push(canvas, shape1);
+        tvg_canvas_push (canvas, shape1);
 
 
 
