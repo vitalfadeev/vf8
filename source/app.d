@@ -97,23 +97,6 @@ _draw_text (void* o, void* e, void* evt, REG d) {
     string text = "abc";
 
     with (cast(O*)o) {
-        //// Generate a shape
-        //auto rect = tvg_shape_new ();
-        //// Append a rounded rectangle to the shape (x, y, w, h, rx, ry)
-        //rect.tvg_shape_append_rect (50, 50,  200, 200,  20, 20,  0);
-        //// Set the shape's color to (r, g, b)
-        //rect.tvg_shape_set_fill_color (100, 100, 100, 100);
-        //rect.tvg_shape_set_fill_rule (Tvg_Fill_Rule.TVG_FILL_RULE_NON_ZERO);
-        //// Push the shape into the canvas
-        //canvas.tvg_canvas_push (rect);
-
-        //auto buffer = canvas.buffer.data;
-        //int stride = canvas.buffer().stride();
-        //SDL_Texture* texture = SDL_CreateTexture (
-        //    video.renderer, format, access, w, h);
-        //SDL_UpdateTexture (texture, null, buffer, stride * uint32_t.sizeof);
-        //SDL_RenderCopy (renderer, texture, null, null);
-        //SDL_RenderPresent (renderer);
     }
 }
 
