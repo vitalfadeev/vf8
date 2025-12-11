@@ -10,13 +10,23 @@ Map_rec {
     GO  go;
 }
 
+import vf.input : Event;
+import importc;
 void
-process_map (void* o, void* e, REG evt, REG d,  size_t map_length, Map_rec* map_ptr) {
+process_map (void* o, void* e, REG evt, void* d,  size_t map_length, Map_rec* map_ptr) {
+    REG _d;
+    switch (evt) {
+        case SDL_KEYDOWN     : _d = (cast (Event*) d).key.keysym.sym; break;
+        case SDL_KEYUP       : _d = (cast (Event*) d).key.keysym.sym; break;
+        case SDL_WINDOWEVENT : _d = (cast (Event*) d).window.event; break;
+        default: 
+    }
+
     auto RCX = map_length;
     auto rec = map_ptr;
     for (; RCX != 0; rec++, RCX--)
         if (evt == rec.type)
-            if (d == rec.key)
+            if (_d == rec.key)
                 rec.go (o,e,evt,d);
 }
 
@@ -26,7 +36,7 @@ alias KEY = REG;
 
 //
 void
-GO_map (Pairs...) (void* o, void* e, REG evt, REG d) {
+GO_map (Pairs...) (void* o, void* e, REG evt, void* d) {
     alias _array = GO_map_array!Pairs;  // [Rec (Key,Value), ...]
     
     static Map_rec[ _array.length ] map = _array;

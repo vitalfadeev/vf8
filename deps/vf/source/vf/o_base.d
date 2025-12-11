@@ -42,8 +42,8 @@ O {
     void
     open () {
         SDL_Init (SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_EVENTS);
-        video.open ();
         audio.open ();
+        video.open ();
         input.open ();
         local_input.open ();
     }
@@ -51,22 +51,12 @@ O {
     // base
     static
     void
-    _go (void* o, void* e, REG evt, REG d) {
+    _go (void* o, void* e, REG evt, void* d) {
+        // each input event
         with (cast(O*)o)
         while (go !is null) {
             if (input.read ()) {
-                // process input event
-                evt = input.event.type;
-                switch (evt) {
-                    case SDL_KEYDOWN : d = input.event.key.keysym.sym; break;
-                    case SDL_KEYUP   : d = input.event.key.keysym.sym; break;
-                    default: 
-                        continue;
-                }
                 _go2 (o,ego,evt,d);
-
-                //
-                //video.draw ();
             }
         }
     }
@@ -74,32 +64,28 @@ O {
     // with local input
     static
     void
-    _go2 (void* o, void* e, REG evt, REG d) {
+    _go2 (void* o, void* e, REG evt, void* d) {
         with (cast(O*)o) {
             // process input event
-            //writefln ("Event  type,code,value: 0x%02X, %X, %s", input.event.type, input.event.code, input.event.value);
+            evt = input.event.type;
+            d   = &input.event;
             _go3 (o,e,evt,d);
 
-            //// each local input event
-            //while (!local_input.empty) {
-            //    local_input.read ();
-            //    // process local input event
-            //    evt = local_input.event.event.type;
-            //    switch (evt) {
-            //        case SDL_KEYDOWN : d = input.event.key.keysym.sym; break;
-            //        case SDL_KEYUP   : d = input.event.key.keysym.sym; break;
-            //        default: 
-            //            continue;
-            //    }
-            //    _go3 (o,e,evt,d);
-            //}
+            // each local input event
+            while (!local_input.empty) {
+                local_input.read ();
+                // process local input event
+                evt = local_input.event.event.type;
+                d   = &local_input.event;
+                _go3 (o,e,evt,d);
+            }
         }
     }
 
     // with map
     static
     void
-    _go3 (void* o, void* e, REG evt, REG d) {
+    _go3 (void* o, void* e, REG evt, void* d) {
         with (cast(O*)o) {
             if (e !is null) {
                 (cast (GO) e) (o,e,evt,d);
