@@ -310,8 +310,16 @@ Uni_e {
                     auto mx = _evt.button.x;
                     auto my = _evt.button.y;
                     if (hit_test (mx,my)) {
+                        // each childs
+                        //   true
+                        //     child
+                        //   false
+                        //     this
                         printf ("send CLICKED\n");
                         direct_send (o,e,evt,d,CLICKED);
+                        for (auto _e = cl; _e != null; _e = _e.r) {
+                            _e.go (o,_e,evt,d);
+                        }
                     }
                     break;
                 case SDL_USEREVENT:
