@@ -13,10 +13,11 @@ enum ulong UI_POINTER_IN   = (2             << 16) | EVT_UI;
 enum ulong UI_POINTER_OVER = (3             << 16) | EVT_UI;
 enum ulong UI_POINTER_OUT  = (4             << 16) | EVT_UI;
 enum ulong CLICKED         = (5             << 16) | EVT_UI;
-enum ulong DRAW            = (6             << 16) | EVT_UI;
-enum ulong PLAY_1          = (7             << 16) | EVT_UI;
-enum ulong PLAY_2          = (8             << 16) | EVT_UI;
-enum ulong PLAY_3          = (9             << 16) | EVT_UI;
+enum ulong OPEN            = (6             << 16) | EVT_UI;
+enum ulong DRAW            = (7             << 16) | EVT_UI;
+enum ulong PLAY_1          = (8             << 16) | EVT_UI;
+enum ulong PLAY_2          = (9             << 16) | EVT_UI;
+enum ulong PLAY_3          = (10            << 16) | EVT_UI;
 
 
 extern(C)
@@ -26,6 +27,17 @@ main () {
         
     O o;
     o.open ();
+
+    // direct_send
+    Event event;
+    event.type           = SDL_USEREVENT;
+    event.user.code      = OPEN;
+    event.user.data1     = null;
+    event.user.data2     = null;
+    event.user.timestamp = SDL_GetTicks ();
+    _app_ego (&o,&_app_ego,&event,SDL_USEREVENT);
+
+    // event loop
     o.go (&o,&_app_ego,null,0);
 }
 
@@ -240,21 +252,32 @@ Text_e {
 void
 _app_ego (void* o, void* e, void* evt, REG d) {
     static Uni_e uni_e;
-    uni_e.open ();
-    uni_e.load_ui ();
     auto _evt = cast (Event*) evt;
     REG   typ = _evt.type;
     REG   key;
     with (cast(O*)o)
     with (cast(Uni_e*)e) {
         switch (typ) {
+            case SDL_QUIT:
+                _go_quit (o,e,evt,d);
+                break;
+            case SDL_MOUSEBUTTONDOWN:
+                // ...
+                break;
             case SDL_WINDOWEVENT:
                 switch (_evt.window.event) {
                     case SDL_WINDOWEVENT_EXPOSED: (cast(O*)o).video.draw (o,&uni_e,evt,d,&uni_e.draw); break; // event.window.windowID
+                    case SDL_WINDOWEVENT_CLOSE: _go_quit (o,e,evt,d); break;
                     default:
                 }
                 break;
             case SDL_USEREVENT:
+                if (_evt.user.code == OPEN) {
+                    printf ("on OPEN\n");
+                    uni_e.open ();
+                    uni_e.load_ui ();
+                    break;
+                }
                 if (_evt.user.code == PLAY_1) {
                     printf ("on PLAY_1\n");
                     _go_play_1 (o,e,evt,d);
