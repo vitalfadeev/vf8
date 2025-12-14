@@ -15,6 +15,8 @@ enum ulong UI_POINTER_OUT  = (4             << 16) | EVT_UI;
 enum ulong CLICKED         = (5             << 16) | EVT_UI;
 enum ulong DRAW            = (6             << 16) | EVT_UI;
 enum ulong PLAY_1          = (7             << 16) | EVT_UI;
+enum ulong PLAY_2          = (8             << 16) | EVT_UI;
+enum ulong PLAY_3          = (9             << 16) | EVT_UI;
 
 
 extern(C)
@@ -24,7 +26,7 @@ main () {
         
     O o;
     o.open ();
-    o.go (&o,&_uni_ego,null,0);
+    o.go (&o,&_app_ego,null,0);
 }
 
 void
@@ -236,7 +238,7 @@ Text_e {
 //}
 
 void
-_uni_ego (void* o, void* e, void* evt, REG d) {
+_app_ego (void* o, void* e, void* evt, REG d) {
     static Uni_e uni_e;
     uni_e.open ();
     uni_e.load_ui ();
@@ -250,6 +252,23 @@ _uni_ego (void* o, void* e, void* evt, REG d) {
                 switch (_evt.window.event) {
                     case SDL_WINDOWEVENT_EXPOSED: (cast(O*)o).video.draw (o,&uni_e,evt,d,&uni_e.draw); break; // event.window.windowID
                     default:
+                }
+                break;
+            case SDL_USEREVENT:
+                if (_evt.user.code == PLAY_1) {
+                    printf ("on PLAY_1\n");
+                    _go_play_1 (o,e,evt,d);
+                    break;
+                }
+                if (_evt.user.code == PLAY_2) {
+                    printf ("on PLAY_2\n");
+                    _go_play_2 (o,e,evt,d);
+                    break;
+                }
+                if (_evt.user.code == PLAY_3) {
+                    printf ("on PLAY_3\n");
+                    _go_play_3 (o,e,evt,d);
+                    break;
                 }
                 break;
             default:
@@ -268,7 +287,10 @@ Uni_e {
     Uni_e* cr;
     Uni_e* parent;
     int    on_click_send_evt_code;  // PLAY_1
-    int    bg;
+    ubyte  bg_r;
+    ubyte  bg_g;
+    ubyte  bg_b;
+    ubyte  bg_a;
 
     static
     void
@@ -295,16 +317,12 @@ Uni_e {
                 case SDL_USEREVENT:
                     if (_evt.user.code == CLICKED) {
                         printf ("on CLICKED\n");
-                        send (o,e,evt,PLAY_1);
+                        if (on_click_send_evt_code)
+                            send (o,e,evt, on_click_send_evt_code);
                         break;
                     }
                     if (_evt.user.code == DRAW) {
                         draw (o,e,evt,cast (REG) _evt.user.data1);
-                        break;
-                    }
-                    if (_evt.user.code == PLAY_1) {
-                        printf ("on PLAY_1\n");
-                        _go_play_1 (o,e,evt,d);
                         break;
                     }
                     break;
@@ -330,7 +348,7 @@ Uni_e {
             Tvg_Paint shape = tvg_shape_new ();
             //tvg_shape_append_rect (shape, x, y, w, h, 0.0f, 0.0f, true);
             tvg_shape_append_rect (shape, x, y, w, h, 0.0f, 0.0f, true);
-            tvg_shape_set_fill_color (shape, 255, 255, 255, 255);
+            tvg_shape_set_fill_color (shape, bg_r, bg_g, bg_b, bg_a);
 
             //Push the shape into the canvas
             tvg_canvas_push (canvas, shape);
@@ -408,39 +426,42 @@ Uni_e {
         //   x,y,w,h, bg, on_click_send_evt_code
         x = 10;
         y = 10;
-        w = 90;
+        w = 300;
         h = 100;
 
         // 1
         auto c1 = new Uni_e ();
         with (c1) {
-            x = 110;
+            x = 10;
             y = 10;
             w = 90;
             h = 100;
-            bg = 0xFFFFFFFF;
+            bg_r = 255; bg_g = 255; bg_b = 255; bg_a = 255;
+            on_click_send_evt_code = PLAY_1;
         }
         this.add_child (c1);
 
         // 2
         auto c2 = new Uni_e ();
         with (c2) {
-            x = 210;
+            x = 110;
             y = 10;
             w = 90;
             h = 100;
-            bg = 0xFFFFFFFF;
+            bg_r = 255; bg_g = 255; bg_b = 255; bg_a = 255;
+            on_click_send_evt_code = PLAY_2;
         }
         this.add_child (c2);
 
         // 3
         auto c3 = new Uni_e ();
         with (c3) {
-            x = 310;
+            x = 210;
             y = 10;
             w = 90;
             h = 100;
-            bg = 0xFFFFFFFF;
+            bg_r = 255; bg_g = 255; bg_b = 255; bg_a = 255;
+            on_click_send_evt_code = PLAY_3;
         }
         this.add_child (c3);
     }
