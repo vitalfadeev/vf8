@@ -126,7 +126,7 @@ Panel_e {
                 break;
             case SDL_WINDOWEVENT:
                 switch (_evt.window.event) {
-                    case SDL_WINDOWEVENT_EXPOSED: (cast(O*)o).video.draw (); break; // event.window.windowID
+                    case SDL_WINDOWEVENT_EXPOSED: (cast(O*)o).video.draw (content_cb); break; // event.window.windowID
                     case SDL_WINDOWEVENT_SHOWN: break;        // event.window.windowID
                     case SDL_WINDOWEVENT_HIDDEN: break;       // event.window.windowID
                     case SDL_WINDOWEVENT_MOVED: break;        // event.window.windowID event.window.data1 event.window.data2 (x y)
@@ -240,17 +240,33 @@ _uni_ego (void* o, void* e, void* evt, REG d) {
     static Uni_e uni_e;
     uni_e.open ();
     uni_e.load_ui ();
+    auto _evt = cast (Event*) evt;
+    REG   typ = d;
+    REG   key;
+    with (cast(O*)o)
+    with (cast(Uni_e*)e) {
+        switch (typ) {
+            case SDL_WINDOWEVENT:
+                switch (_evt.window.event) {
+                    case SDL_WINDOWEVENT_EXPOSED: (cast(O*)o).video.draw (o,&uni_e,evt,d,&uni_e.draw); break; // event.window.windowID
+                    default:
+                }
+                break;
+            default:
+        }
+    }
     uni_e.go (o,&uni_e,evt,d);
     go_base (o,&uni_e,evt,d);
 }
 struct
 Uni_e {
     GO     go = &_go;
-    int    x,y,w,h;
+    float  x,y,w,h;
     Uni_e* l;
     Uni_e* r;
     Uni_e* cl;
     Uni_e* cr;
+    Uni_e* parent;
     int    on_click_send_evt_code;  // PLAY_1
     int    bg;
 
@@ -281,7 +297,7 @@ Uni_e {
                         break;
                     }
                     if (_evt.user.code == DRAW) {
-                        draw (cast (Tvg_Canvas*) _evt.user.data1);
+                        draw (o,e,evt,cast (REG) _evt.user.data1);
                         break;
                     }
                     break;
@@ -299,9 +315,26 @@ Uni_e {
         return false;
     }
 
+    static
     void
-    draw (Tvg_Canvas* canvas) {
-        //
+    draw (void* o, void* e, void* evt, REG d) {
+        with (cast(Uni_e*)e) {
+            Tvg_Canvas canvas = cast (Tvg_Canvas) d;
+            Tvg_Paint shape = tvg_shape_new ();
+            //tvg_shape_append_rect (shape, x, y, w, h, 0.0f, 0.0f, true);
+            tvg_shape_append_rect (shape, x, y, w, h, 0.0f, 0.0f, true);
+            tvg_shape_set_fill_color (shape, 255, 255, 255, 255);
+
+            //Push the shape into the canvas
+            tvg_canvas_push (canvas, shape);
+        }
+
+        //childs
+        with (cast(Uni_e*)e) {
+            for (auto _e = cl; _e != null; _e = _e.r) {
+                _e.draw (o,_e,evt,d);
+            }
+        }
     }
 
     void
@@ -355,6 +388,59 @@ Uni_e {
         //   x,y,w,h, bg, on_click_send_evt_code
         // add childs 3
         //   x,y,w,h, bg, on_click_send_evt_code
+        x = 10;
+        y = 10;
+        w = 90;
+        h = 100;
+
+        // 1
+        auto c1 = new Uni_e ();
+        with (c1) {
+            x = 110;
+            y = 10;
+            w = 90;
+            h = 100;
+            bg = 0xFFFFFFFF;
+        }
+        this.add_child (c1);
+
+        // 2
+        auto c2 = new Uni_e ();
+        with (c2) {
+            x = 210;
+            y = 10;
+            w = 90;
+            h = 100;
+            bg = 0xFFFFFFFF;
+        }
+        this.add_child (c2);
+
+        // 3
+        auto c3 = new Uni_e ();
+        with (c3) {
+            x = 310;
+            y = 10;
+            w = 90;
+            h = 100;
+            bg = 0xFFFFFFFF;
+        }
+        this.add_child (c3);
+    }
+
+    void
+    add_child (Uni_e* c) {
+        auto t = &this;
+        auto tr = t.cr;
+        if (tr is null) {
+            t.cr = c;
+            t.cl = c;
+        }
+        else {
+            c.l = tr;
+            tr.r = c;
+            t.cr = c;
+        }
+        c.parent = t;
     }
 }
 

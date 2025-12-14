@@ -5,6 +5,8 @@ import core.stdc.stdlib : abort;
 import std.format       : format;
 import std.conv         : to;
 import importc;
+import vf.types : GO;
+import vf.types : REG;
 
 
 struct
@@ -32,7 +34,7 @@ Video {
     }
 
     void
-    draw () {
+    draw (void* o, void* e, void* evt, REG d, GO cb) {
         // SDL_SetRenderDrawColor (renderer, 0x00, 0x00, 0x00, 0xFF);
         // SDL_RenderClear (renderer);
         // SDL_SetRenderDrawColor (renderer, 0xFF, 0xFF, 0xFF, 0xFF);
@@ -83,7 +85,7 @@ Video {
 
 
         // contents
-
+if (0) {
         //Linear gradient shape with a linear gradient stroke
         {
             // Set a shape
@@ -317,6 +319,9 @@ Video {
             tvg_animation_get_total_frame (animation, &totalFrame);
             tvg_animation_set_frame (animation, totalFrame * progress (elapsed, duration));
         }
+}
+
+        cb (o,e,evt,cast(REG)canvas);
 
         //
         auto ctime = SDL_GetTicks ();
