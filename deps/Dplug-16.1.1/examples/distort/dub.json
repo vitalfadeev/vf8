@@ -1,0 +1,78 @@
+{
+    "name": "distort",
+
+    "license": "public domain",
+    "importPaths": [ "source" ],
+    "sourcePaths": [ "source" ],
+    "stringImportPaths": ["gfx", "fonts", "scripts", "."],
+    "targetPath": "builds/dub",
+
+    "copyright": "none",
+
+    "dflags-linux-dmd": ["-defaultlib=libphobos2.a"],
+    "dflags-osx-ldc": ["-static"],
+    "dflags-linux-ldc": ["-link-defaultlib-shared=false"],
+    "dflags-linux-x86_64-ldc": ["-fvisibility=hidden"],
+    "dflags-windows-ldc": ["-mscrtlib=libcmt","-fvisibility=hidden", "-link-defaultlib-shared=false"],
+
+    "dependencies":
+    {
+        "dplug:dsp":  { "path": "../.." },
+        "dplug:vst2": { "path": "../.." },
+        "dplug:formats": { "path": "../.." },
+        "dplug:gui":  { "path": "../.." },
+        "dplug:pbr-widgets":  { "path": "../.." },
+        "dplug:flat-widgets": { "path": "../.." },
+        "canvasity": "~>1.0",
+        "dplug:wren-support": { "path": "../.." }
+    },
+
+    "versions": [
+        "futureMouseDrag",
+        "futureBinState",
+        "Dplug_RightClickMoveWidgets"
+    ],
+
+    "configurations": [
+        {
+            "name": "VST3",
+            "versions": ["VST3"],
+            "targetType": "dynamicLibrary",
+            "lflags-osx-ldc": [ "-exported_symbols_list", "$PACKAGE_DIR/source/module-vst3.lst", "-dead_strip" ],
+            "lflags-linux-ldc": [ "--version-script=$PACKAGE_DIR/source/module-vst3.ver" ]
+        },
+        {
+            "name": "VST2",
+            "versions": ["VST2"],
+            "targetType": "dynamicLibrary",
+            "lflags-osx-ldc": [ "-exported_symbols_list", "$PACKAGE_DIR/source/module-vst2.lst", "-dead_strip" ],
+            "lflags-linux-ldc": [ "--version-script=$PACKAGE_DIR/source/module-vst2.ver" ]
+        },
+        {
+            "name": "AU",
+            "versions": ["AU"],
+            "targetType": "dynamicLibrary",
+            "lflags-osx-ldc": [ "-exported_symbols_list", "$PACKAGE_DIR/source/module-au.lst", "-dead_strip" ]
+        },
+        {
+            "name": "LV2",
+            "versions": ["LV2"],
+            "targetType": "dynamicLibrary",
+            "lflags-osx-ldc": [ "-exported_symbols_list", "$PACKAGE_DIR/source/module-lv2.lst", "-dead_strip" ],
+            "lflags-linux-ldc": [ "--version-script=$PACKAGE_DIR/source/module-lv2.ver" ]
+        },
+        {
+            "name": "CLAP",
+            "versions": ["CLAP"],
+            "targetType": "dynamicLibrary",
+            "lflags-osx-ldc": [ "-exported_symbols_list", "$PACKAGE_DIR/source/module-clap.lst", "-dead_strip" ],
+            "lflags-linux-ldc": [ "--version-script=$PACKAGE_DIR/source/module-clap.ver" ]
+        },
+        {
+            "name": "FLP",
+            "versions": ["FLP"],
+            "targetType": "dynamicLibrary",
+            "lflags-osx-ldc": [ "-exported_symbols_list", "$PACKAGE_DIR/source/module-flp.lst", "-dead_strip" ],
+        }
+    ]
+}

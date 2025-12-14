@@ -53,13 +53,15 @@ O {
     static
     void
     _go (void* o, void* e, void* evt, REG d) {
-        evt = &((cast(O*)o).event);
-
         // each input event
-        with (cast(O*)o)
-        while (go !is null) {
-            if (input.read (cast (Event*) evt)) {
-                _go2 (o,ego,evt,d);
+        with (cast(O*)o) {
+            ego = e;
+            evt = &event;
+
+            while (go !is null) {
+                if (input.read (cast (Event*) evt)) {
+                    _go2 (o,e,evt,d);
+                }
             }
         }
     }

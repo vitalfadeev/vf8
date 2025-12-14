@@ -42,4 +42,16 @@ Local_input {
 
         s.add (event);
     }
+
+    void
+    put_reg (typeof(Event.type) _reg, void* e) {
+        Event event;
+        event.type           = SDL_USEREVENT;
+        event.user.code      = _reg;
+        event.user.data1     = e;
+        event.user.data2     = null;
+        event.user.timestamp = SDL_GetTicks ();
+
+        s.add (event);
+    }
 }

@@ -1,0 +1,290 @@
+{
+    "name": "dplug",
+    "description": "A library for crafting native audio plugins as simply as possible.",
+    "homepage": "http://github.com/AuburnSounds/dplug/",
+    "copyright": "Steinberg",
+    "license": "VST",
+
+    "targetType": "none",
+
+    "authors": [
+        "Guillaume Piolat (original author)",
+        "Richard Andrew Cattermole (X11 windowing)",
+        "Ethan Reker (compile-time JSON parsing, X11 fixes, Wiki, clipit)",
+        "Andrej Mitrovic"
+    ],
+
+    "dependencies":
+    {
+        "dplug:audio": "*",
+        "dplug:canvas": "*",
+        "dplug:client": "*",
+        "dplug:core": "*",
+        "dplug:dsp": "*",
+        "dplug:fft": "*",
+        "dplug:formats": "*",
+        "dplug:flat-widgets": "*",
+        "dplug:graphics": "*",
+        "dplug:gui": "*",
+        "dplug:host": "*",
+        "dplug:iir": "*",
+        "dplug:macos": "*",
+        "dplug:pbr-widgets": "*",
+        "dplug:vst2": "*",
+        "dplug:window": "*",
+        "dplug:wren-support": "*",
+        "dplug:x11": "*"
+    },
+
+    "subPackages": [
+
+        {
+            "name": "audio",
+            "sourcePaths": [ "audio/dplug/audio" ],
+            "importPaths": [ "audio" ],
+            "dependencies": {
+                "dplug:core": "*",
+                "intel-intrinsics": "~>1.0"
+            }
+        },
+        {
+            "name": "canvas",
+            "sourcePaths": [ "canvas/dplug/canvas" ],
+            "importPaths": [ "canvas" ],
+            "dependencies": {
+                "dplug:core": "*",
+                "dplug:graphics": "*",
+                "colors": "~>0.0",
+                "dplug:math": "*",
+                "intel-intrinsics": "~>1.0"
+            }
+        },
+        {
+            "name": "client",
+            "sourcePaths": [ "client/dplug/client" ],
+            "importPaths": [ "client" ],
+            "dependencies": {
+                "dplug:core": "*"
+            }
+        },
+        {
+            "name": "core",
+            "sourcePaths":
+            [
+                "core/dplug/core"
+            ],
+
+            "importPaths": [ "core" ],
+
+            "dependencies": {
+                "intel-intrinsics": "~>1.0",
+                "numem": ">=1.5.1 <2.0.0"
+            },
+
+            "buildTypes":
+            {
+                "unittest-release":
+                {
+                    "buildOptions": ["unittests", "optimize", "inline"]
+                }
+            }
+        },
+
+        {
+            "name": "dsp",
+
+            "sourcePaths":
+            [
+                "dsp/dplug/dsp"
+            ],
+
+            "importPaths": [ "dsp" ],
+            "dependencies": {
+                "dplug:core": "*",
+                "intel-intrinsics": "~>1.0"
+            },
+
+            "buildTypes":
+            {
+                "unittest-release":
+                {
+                    "buildOptions": ["unittests", "optimize", "inline"]
+                }
+            }
+        },
+        {
+            "name": "fft",
+
+            "sourcePaths":
+            [
+                "fft/dplug/fft"
+            ],
+
+            "importPaths": [ "fft" ],
+            "dependencies": {
+                "dplug:core": "*",
+                "dplug:dsp": "*",
+                "intel-intrinsics": "~>1.0"
+            },
+            "buildTypes":
+            {
+                "unittest-release":
+                {
+                    "buildOptions": ["unittests", "optimize", "inline"]
+                }
+            }
+        },
+        {
+            "name": "flat-widgets",
+            "sourcePaths": [ "flatwidgets/dplug/flatwidgets" ],
+            "importPaths": [ "flatwidgets" ],
+
+            "dependencies": {
+                "dplug:core": "*",
+                "dplug:graphics": "*",
+                "dplug:window": "*",
+                "dplug:client": "*",
+                "dplug:gui": "*",
+                "dplug:canvas": "*"
+            }
+        },
+        {
+            "name": "formats",
+            "sourcePaths": [ "formats/dplug" ],
+            "importPaths": [ "formats" ],
+            "dependencies": {
+                "dplug:client": "*",
+                "dplug:macos": "*",
+                "dplug:window": "*"
+            }
+        },
+        {
+            "name": "graphics",
+            "sourcePaths": [ "graphics/dplug/graphics" ],
+            "importPaths": [ "graphics" ],
+            "dependencies": {
+                "dplug:core": "*",
+                "dplug:math": "*",
+                "intel-intrinsics": "~>1.0",
+                "gamut": ">=3.1.2 <4.0.0",
+                "stb_image_resize2-d": "~>1.0"
+            },
+            "subConfigurations": {
+                "gamut": "audio-plugin"
+            }
+        },
+        {
+            "name": "gui",
+            "sourcePaths": [ "gui/dplug/gui" ],
+            "importPaths": [ "gui" ],
+
+            "dependencies": {
+                "dplug:math": "*",
+                "dplug:client": "*",
+                "dplug:window": "*",
+                "dplug:core": "*",
+                "dplug:graphics": "*",
+                "intel-intrinsics": "~>1.0",
+                "gamut": ">=3.0.0 <4.0.0"
+            }
+        },
+        {
+            "name": "host",
+            "sourcePaths": [ "host/dplug/host" ],
+            "importPaths": [ "host" ],
+            "dependencies": {
+                "dplug:core": "*",
+                "dplug:vst2": "*",
+                "dplug:window": "*"
+            }
+        },
+        {
+            "name": "iir",
+            "sourcePaths": [ "iir/dplug/iir" ],
+            "importPaths": [ "iir" ],
+            "dependencies": {
+                "dplug:core": "*",
+                "dplug:audio": "*",
+                "intel-intrinsics": "~>1.0"
+            }
+        },
+        {
+            "name": "macos",
+            "sourcePaths": [ "macos/derelict/cocoa", "macos/derelict/carbon" ],
+            "importPaths": [ "macos" ],
+            "dependencies": {
+                "dplug:core": "*"
+            }
+        },
+        {
+            "name": "math",
+            "sourcePaths": [ "math/dplug/math" ],
+            "importPaths": [ "math" ],
+            "dependencies": {
+                "intel-intrinsics": "~>1.0"
+            }
+        },
+        {
+            "name": "pbr-widgets",
+            "sourcePaths": [ "pbrwidgets/dplug/pbrwidgets" ],
+            "importPaths": [ "pbrwidgets" ],
+
+            "dependencies": {
+                "dplug:core": "*",
+                "dplug:graphics": "*",
+                "dplug:window": "*",
+                "dplug:client": "*",
+                "dplug:gui": "*"
+            }
+        },
+        {
+            "name": "vst2",
+            "sourcePaths": [ "vst2/dplug/vst2" ],
+            "importPaths": [ "vst2" ],
+            "stringImportPaths": [ "$VST2_SDK/pluginterfaces/vst2.x" ],
+            "dependencies": {
+                "dplug:client": "*"
+            }
+        },
+        {
+            "name": "wren-support",
+            "sourcePaths": [ "wren/dplug/wren" ],
+            "importPaths": [ "wren" ],
+            "stringImportPaths": ["wren/dplug/wren"],
+            "dependencies": {
+                "dplug:gui": "*",
+                "dplug:graphics": "*",
+                "wren-port": ">=1.2.1 <2.0.0"
+            }
+        },
+        {
+            "name": "window",
+            "sourcePaths": [ "window/dplug/window" ],
+            "importPaths": [ "window" ],
+
+            "libs-windows": ["gdi32", "user32"],
+
+            "dependencies": {
+                "dplug:math": "*",
+                "dplug:graphics": "*",
+                "dplug:core": "*",
+                "dplug:macos": "*",
+                "dplug:x11": "*"
+            }
+        },
+        {
+            "name": "x11",
+            "sourcePaths": [ "x11/derelict/x11" ],
+            "importPaths": [ "x11" ],
+            "libs-linux": ["X11"],
+            "dependencies": {
+                "dplug:core": "*"
+            }
+        },
+        "./tools/dplug-build",
+        "./tools/bench",
+        "./tools/abtest",
+        "./tools/process",
+        "./tools/wav-compare"
+    ]
+}

@@ -1,0 +1,12 @@
+{
+    "name": "presetbank",
+
+    "sourcePaths": ["source"],
+    "importPaths": ["source"],
+
+    "dependencies":
+    {
+        "dplug:client": {"path": "../../"},
+        "console-colors": "~>1.0"
+    }
+}
