@@ -5,6 +5,8 @@ import vf.map          : GO_map;
 import vf.input        : Event;
 import importc;
 
+import mod.quit : mod_quit_go = go;
+
 enum       EVT_APP         = 0x0100;
 enum       APP_CODE_QUIT   = 0x0001;
 enum ulong EVT_APP_QUIT    = (APP_CODE_QUIT << 16) | EVT_APP;
@@ -41,216 +43,111 @@ main () {
     o.go (&o,&_app_ego,null,0);
 }
 
-void
-_ego (void* o, void* e, void* evt, REG d) {
-    static Main_E main_e;
-    main_e.go (o,&main_e,evt,d);
-}
+//void 
+//Event_map (Triads...) (void* o, void* e, void* evt, REG d) {
+//    import std.meta : AliasSeq;
 
-struct
-Main_E {
-    GO go = &go_base;
-}
+//    static if (Triads.length == 0)
+//    {
+//        // Базовый случай: пустой набор
+//        enum result = AliasSeq!();
+//    }
+//    else static if (Triads.length >= 3)
+//    {
+//        alias Typ   = Triads[0];
+//        alias Key   = Triads[1];
+//        alias Value = Triads[2];
 
-version (_NEVER_)
-void
-_panel_ego (void* o, void* e, void* evt, REG d) {
-    static Panel_e panel_e;
-    panel_e.open ();
-    panel_e.go (o,&panel_e,evt,d);
-    go_base (o,&panel_e,evt,d);
-}
-version (_NEVER_)
-struct
-Panel_e {
-    GO go = &_go;
-    SDL_Window* window;
-    bool        opened;
-    Text_e      text;
+//        // Рекурсивно обрабатываем оставшиеся пары
+//        enum rest   = GO_map_array_init!(Triads[3 .. $]).result;
+//        enum result = AliasSeq!(Map_rec (Typ,Key,&Value), rest);
 
-    void
-    open () {
-        if (opened) return;
-        opened = true;
-        // get screen size
-        // create window
-        SDL_DisplayMode mode;
-        SDL_GetDesktopDisplayMode (0, &mode);
-        //SDL_GetCurrentDisplayMode (0, &mode);
+//        auto _evt = cast (Event*) evt;
+//        REG   typ = _evt.type;
+//        REG   key;
 
-        window = 
-            SDL_CreateWindow (
-                __FILE_FULL_PATH__, // "SDL2 Window",
-                SDL_WINDOWPOS_CENTERED_DISPLAY (0),
-                0,
-                mode.w, 64,
-                SDL_WINDOW_BORDERLESS
-                | SDL_WINDOW_VULKAN
-                | SDL_WINDOW_ALLOW_HIGHDPI
-            );
+//        switch (typ) {
+//            case SDL_WINDOWEVENT : key = _evt.window.event; break;
+//            case SDL_USEREVENT   : key = _evt.user.code; break;
+//            default              : key = 0;
+//        }
 
-        import vf.video : SDLException;
-        if (!window)
-            throw new SDLException ("Failed to create window");
-
-        // Update
-        SDL_UpdateWindowSurface (window);
-    }
-
-    static
-    void
-    _go (void* o, void* e, void* evt, REG d) {
-        auto _evt = cast (Event*) evt;
-        REG   typ = _evt.type;
-        REG   key;
-
-        //Map!(
-        //    SDL_QUIT,           null,                           { _go_quit (o,e,evt,d); },
-        //    SDL_MOUSEBUTTONDOWN,null,                           {},
-        //    SDL_KEYDOWN,        SDLK_a,                         {},
-        //    SDL_KEYDOWN,        SDLK_ESCAPE,                    {},
-        //    SDL_WINDOWEVENT,    SDL_WINDOWEVENT_EXPOSED,        { (cast(O*)o).video.draw (); },
-        //    SDL_WINDOWEVENT,    SDL_WINDOWEVENT_SHOWN,          {},
-        //    SDL_WINDOWEVENT,    SDL_WINDOWEVENT_HIDDEN,         {},
-        //    SDL_WINDOWEVENT,    SDL_WINDOWEVENT_MOVED,          {},
-        //    SDL_WINDOWEVENT,    SDL_WINDOWEVENT_RESIZED,        {},
-        //    SDL_WINDOWEVENT,    SDL_WINDOWEVENT_SIZE_CHANGED,   {},
-        //    SDL_WINDOWEVENT,    SDL_WINDOWEVENT_MINIMIZED,      {},
-        //    SDL_WINDOWEVENT,    SDL_WINDOWEVENT_MAXIMIZED,      {},
-        //    SDL_WINDOWEVENT,    SDL_WINDOWEVENT_RESTORED,       {},
-        //    SDL_WINDOWEVENT,    SDL_WINDOWEVENT_ENTER,          {},
-        //    SDL_WINDOWEVENT,    SDL_WINDOWEVENT_LEAVE,          {},
-        //    SDL_WINDOWEVENT,    SDL_WINDOWEVENT_FOCUS_GAINED,   {},
-        //    SDL_WINDOWEVENT,    SDL_WINDOWEVENT_FOCUS_LOST,     {},
-        //    SDL_WINDOWEVENT,    SDL_WINDOWEVENT_CLOSE,          {},
-        //    SDL_WINDOWEVENT,    SDL_WINDOWEVENT_TAKE_FOCUS,     {},
-        //    SDL_WINDOWEVENT,    SDL_WINDOWEVENT_HIT_TEST,       {},
-        //) (o,e,evt,d);
-
-        switch (typ) {
-            case SDL_QUIT:
-                _go_quit (o,e,evt,d); 
-                break;
-            case SDL_MOUSEBUTTONDOWN:
-                // ...
-                break;
-            case SDL_KEYDOWN:
-                if (_evt.key.keysym.sym == SDLK_ESCAPE)
-                    break;
-                break;
-            case SDL_WINDOWEVENT:
-                switch (_evt.window.event) {
-                    case SDL_WINDOWEVENT_EXPOSED: (cast(O*)o).video.draw (content_cb); break; // event.window.windowID
-                    case SDL_WINDOWEVENT_SHOWN: break;        // event.window.windowID
-                    case SDL_WINDOWEVENT_HIDDEN: break;       // event.window.windowID
-                    case SDL_WINDOWEVENT_MOVED: break;        // event.window.windowID event.window.data1 event.window.data2 (x y)
-                    case SDL_WINDOWEVENT_RESIZED: break;      // event.window.windowID event.window.data1 event.window.data2 (width height)
-                    case SDL_WINDOWEVENT_SIZE_CHANGED: break; // event.window.windowID event.window.data1 event.window.data2 (width height)
-                    case SDL_WINDOWEVENT_MINIMIZED: break;    // event.window.windowID
-                    case SDL_WINDOWEVENT_MAXIMIZED: break;    // event.window.windowID
-                    case SDL_WINDOWEVENT_RESTORED: break;     // event.window.windowID
-                    case SDL_WINDOWEVENT_ENTER: break;        // event.window.windowID
-                    case SDL_WINDOWEVENT_LEAVE: break;        // event.window.windowID
-                    case SDL_WINDOWEVENT_FOCUS_GAINED: break; // event.window.windowID
-                    case SDL_WINDOWEVENT_FOCUS_LOST: break;   // event.window.windowID
-                    case SDL_WINDOWEVENT_CLOSE: break;        // event.window.windowID
-                    case SDL_WINDOWEVENT_TAKE_FOCUS: break;   // event.window.windowID
-                    case SDL_WINDOWEVENT_HIT_TEST: break;     // event.window.windowID
-                    default:
-                        SDL_Log ("Window %d got unknown event %d",
-                            _evt.window.windowID, _evt.window.event);
-                }
-                break;
-            default:
-                //writeln (ev);
-        }
-    }
-}
-
-version (_NEVER_)
-struct
-Text_e {
-    GO   go   = &_go;
-
-    static
-    void
-    _go (void* o, void* e, void* evt, REG d) {
-        //
-    }
-
-    string font_file    = "resources/font/Arial.ttf";
-    string font_name    = "Arial";
-    float  font_size    = 25.0f;
-    ubyte  font_color_r = 200;
-    ubyte  font_color_g = 200;
-    ubyte  font_color_b = 200;
-    string text         = "ThorVG is the best";
-    float  x            = 50.0f;
-    float  y            = 50.0f;
-
-    static
-    void
-    _draw (void* o, void* e, void* evt, REG d) {
-        with (cast(O*)o) 
-        with (cast(Text_e*)e)  
-        {
-            auto canvas = cast (Tvg_Canvas) d;
-
-            //
-            if (tvg_font_load (font_file.ptr) != TVG_RESULT_SUCCESS) {
-                printf ("Problem with loading the font from the file. Did you enable TTF Loader?\n");
-            }
-
-            Tvg_Paint _text = tvg_text_new ();
-            tvg_text_set_font   (_text, font_name.ptr);
-            tvg_text_set_size   (_text, font_size);
-            tvg_text_set_color  (_text, font_color_r, font_color_g, font_color_b);
-            tvg_text_set_text   (_text, text.ptr);
-            tvg_paint_translate (_text, x, y);
-            tvg_canvas_push (canvas, _text);
-        }
-    }
-}
-
-//struct
-//Container {
-//    GO      go = &_go;
-//    Content content;
-
-//    struct
-//    Content {
-//        void* a;
-//        void* z;
-
-//        struct
-//        Rec {
-//            void* data;
-//            Rec*  prev;
-//            Rec*  next;
+//        switch (typ) {
+//            case Typ: Value (o,e,evt,d); break;
+//            case Typ: 
+//                switch (key) {
+//                    case Key: Value (o,e,evt,d); break;
+//                    default:
+//                }
+//                break;
+//            default:
 //        }
 //    }
-
-//    static
-//    void
-//    _go (void* o, void* e, void* evt, REG d) {
-//        //
+//    else
+//    {
+//        static assert(0, "Количество элементов в AliasSeq должно быть 3");
 //    }
 
-//    static
-//    void
-//    _content (void* o, void* e, void* evt, REG d) {
-//        with (cast(O*)o) 
-//        with (cast(Container*)e)
-//        {
-//            foreach (_e; es) {
-//                _e.go (o,_e,evt,d);
-//            }
+//    auto _evt = cast (Event*) evt;
+//    REG   typ = _evt.type;
+//    REG   key;
+//    with (cast(O*)o)
+//    with (cast(Uni_e*)e) {
+//        switch (typ) {
+//            case SDL_QUIT:
+//                _go_quit (o,e,evt,d);
+//                break;
+//            case SDL_MOUSEBUTTONDOWN:
+//                // ...
+//                break;
+//            case SDL_WINDOWEVENT:
+//                switch (_evt.window.event) {
+//                    case SDL_WINDOWEVENT_EXPOSED: (cast(O*)o).video.draw (o,&uni_e,evt,d,&uni_e.draw); break; // event.window.windowID
+//                    case SDL_WINDOWEVENT_CLOSE: _go_quit (o,e,evt,d); break;
+//                    default:
+//                }
+//                break;
+//            case SDL_USEREVENT:
+//                if (_evt.user.code == OPEN) {
+//                    printf ("on OPEN\n");
+//                    uni_e.open ();
+//                    uni_e.load_ui ();
+//                    break;
+//                }
+//                if (_evt.user.code == PLAY_1) {
+//                    printf ("on PLAY_1\n");
+//                    _go_play_1 (o,e,evt,d);
+//                    // App.go (o,e,evt,d);
+//                    break;
+//                }
+//                if (_evt.user.code == PLAY_2) {
+//                    printf ("on PLAY_2\n");
+//                    _go_play_2 (o,e,evt,d);
+//                    break;
+//                }
+//                if (_evt.user.code == PLAY_3) {
+//                    printf ("on PLAY_3\n");
+//                    _go_play_3 (o,e,evt,d);
+//                    break;
+//                }
+//                break;
+//            default:
 //        }
 //    }
 //}
 
 void
 _app_ego (void* o, void* e, void* evt, REG d) {
+    //Event_map!(
+    //    SDL_QUIT,        null,   { _go_quit (o,e,evt,d); },
+    //    SDL_WINDOWEVENT, SDL_WINDOWEVENT_EXPOSED, { (cast(O*)o).video.draw (o,&uni_e,evt,d,&uni_e.draw); },
+    //    SDL_WINDOWEVENT, SDL_WINDOWEVENT_CLOSE,   { _go_quit (o,e,evt,d); },
+    //    SDL_USEREVENT,   OPEN,   { printf ("on OPEN\n"); uni_e.open (); uni_e.load_ui (); },
+    //    SDL_USEREVENT,   PLAY_1, { printf ("on PLAY_1\n"); _go_play_1 (o,e,evt,d); },
+    //    SDL_USEREVENT,   PLAY_2, { printf ("on PLAY_2\n"); _go_play_2 (o,e,evt,d); },
+    //    SDL_USEREVENT,   PLAY_3, { printf ("on PLAY_3\n"); _go_play_3 (o,e,evt,d); },
+    //) (o,e,evt,d);
+
     static Uni_e uni_e;
     auto _evt = cast (Event*) evt;
     REG   typ = _evt.type;
@@ -258,45 +155,49 @@ _app_ego (void* o, void* e, void* evt, REG d) {
     with (cast(O*)o)
     with (cast(Uni_e*)e) {
         switch (typ) {
-            case SDL_QUIT:
-                _go_quit (o,e,evt,d);
-                break;
+            //case SDL_QUIT:
+            //    _go_quit (o,e,evt,d);
+            //    break;
             case SDL_MOUSEBUTTONDOWN:
                 // ...
                 break;
             case SDL_WINDOWEVENT:
                 switch (_evt.window.event) {
-                    case SDL_WINDOWEVENT_EXPOSED: (cast(O*)o).video.draw (o,&uni_e,evt,d,&uni_e.draw); break; // event.window.windowID
-                    case SDL_WINDOWEVENT_CLOSE: _go_quit (o,e,evt,d); break;
+                    case SDL_WINDOWEVENT_EXPOSED: 
+                        video.draw (o,&uni_e,evt,d,&uni_e.draw); 
+                        break;
+                    case SDL_WINDOWEVENT_CLOSE: 
+                        _go_quit (o,e,evt,d); 
+                        break;
                     default:
                 }
                 break;
             case SDL_USEREVENT:
-                if (_evt.user.code == OPEN) {
-                    printf ("on OPEN\n");
-                    uni_e.open ();
-                    uni_e.load_ui ();
-                    break;
-                }
-                if (_evt.user.code == PLAY_1) {
-                    printf ("on PLAY_1\n");
-                    _go_play_1 (o,e,evt,d);
-                    break;
-                }
-                if (_evt.user.code == PLAY_2) {
-                    printf ("on PLAY_2\n");
-                    _go_play_2 (o,e,evt,d);
-                    break;
-                }
-                if (_evt.user.code == PLAY_3) {
-                    printf ("on PLAY_3\n");
-                    _go_play_3 (o,e,evt,d);
-                    break;
+                switch (_evt.user.code) {
+                    case OPEN: 
+                        printf ("on OPEN\n");
+                        uni_e.open ();
+                        uni_e.load_ui ();
+                        break;
+                    case PLAY_1: 
+                        printf ("on PLAY_1\n");
+                        _go_play_1 (o,e,evt,d);
+                        break;
+                    case PLAY_2: 
+                        printf ("on PLAY_2\n");
+                        _go_play_2 (o,e,evt,d);
+                        break;
+                    case PLAY_3: 
+                        printf ("on PLAY_3\n");
+                        _go_play_3 (o,e,evt,d);
+                        break;
+                    default:
                 }
                 break;
             default:
         }
     }
+    mod_quit_go  (o,&uni_e,evt,d);
     uni_e.go (o,&uni_e,evt,d);
     go_base (o,&uni_e,evt,d);
 }
@@ -731,3 +632,216 @@ Style {
 
 alias 
 Color = uint;
+
+
+
+
+
+
+void
+_ego (void* o, void* e, void* evt, REG d) {
+    static Main_E main_e;
+    main_e.go (o,&main_e,evt,d);
+}
+
+struct
+Main_E {
+    GO go = &go_base;
+}
+
+version (_NEVER_)
+void
+_panel_ego (void* o, void* e, void* evt, REG d) {
+    static Panel_e panel_e;
+    panel_e.open ();
+    panel_e.go (o,&panel_e,evt,d);
+    go_base (o,&panel_e,evt,d);
+}
+version (_NEVER_)
+struct
+Panel_e {
+    GO go = &_go;
+    SDL_Window* window;
+    bool        opened;
+    Text_e      text;
+
+    void
+    open () {
+        if (opened) return;
+        opened = true;
+        // get screen size
+        // create window
+        SDL_DisplayMode mode;
+        SDL_GetDesktopDisplayMode (0, &mode);
+        //SDL_GetCurrentDisplayMode (0, &mode);
+
+        window = 
+            SDL_CreateWindow (
+                __FILE_FULL_PATH__, // "SDL2 Window",
+                SDL_WINDOWPOS_CENTERED_DISPLAY (0),
+                0,
+                mode.w, 64,
+                SDL_WINDOW_BORDERLESS
+                | SDL_WINDOW_VULKAN
+                | SDL_WINDOW_ALLOW_HIGHDPI
+            );
+
+        import vf.video : SDLException;
+        if (!window)
+            throw new SDLException ("Failed to create window");
+
+        // Update
+        SDL_UpdateWindowSurface (window);
+    }
+
+    static
+    void
+    _go (void* o, void* e, void* evt, REG d) {
+        auto _evt = cast (Event*) evt;
+        REG   typ = _evt.type;
+        REG   key;
+
+        //Map!(
+        //    SDL_QUIT,           null,                           { _go_quit (o,e,evt,d); },
+        //    SDL_MOUSEBUTTONDOWN,null,                           {},
+        //    SDL_KEYDOWN,        SDLK_a,                         {},
+        //    SDL_KEYDOWN,        SDLK_ESCAPE,                    {},
+        //    SDL_WINDOWEVENT,    SDL_WINDOWEVENT_EXPOSED,        { (cast(O*)o).video.draw (); },
+        //    SDL_WINDOWEVENT,    SDL_WINDOWEVENT_SHOWN,          {},
+        //    SDL_WINDOWEVENT,    SDL_WINDOWEVENT_HIDDEN,         {},
+        //    SDL_WINDOWEVENT,    SDL_WINDOWEVENT_MOVED,          {},
+        //    SDL_WINDOWEVENT,    SDL_WINDOWEVENT_RESIZED,        {},
+        //    SDL_WINDOWEVENT,    SDL_WINDOWEVENT_SIZE_CHANGED,   {},
+        //    SDL_WINDOWEVENT,    SDL_WINDOWEVENT_MINIMIZED,      {},
+        //    SDL_WINDOWEVENT,    SDL_WINDOWEVENT_MAXIMIZED,      {},
+        //    SDL_WINDOWEVENT,    SDL_WINDOWEVENT_RESTORED,       {},
+        //    SDL_WINDOWEVENT,    SDL_WINDOWEVENT_ENTER,          {},
+        //    SDL_WINDOWEVENT,    SDL_WINDOWEVENT_LEAVE,          {},
+        //    SDL_WINDOWEVENT,    SDL_WINDOWEVENT_FOCUS_GAINED,   {},
+        //    SDL_WINDOWEVENT,    SDL_WINDOWEVENT_FOCUS_LOST,     {},
+        //    SDL_WINDOWEVENT,    SDL_WINDOWEVENT_CLOSE,          {},
+        //    SDL_WINDOWEVENT,    SDL_WINDOWEVENT_TAKE_FOCUS,     {},
+        //    SDL_WINDOWEVENT,    SDL_WINDOWEVENT_HIT_TEST,       {},
+        //) (o,e,evt,d);
+
+        switch (typ) {
+            case SDL_QUIT:
+                _go_quit (o,e,evt,d); 
+                break;
+            case SDL_MOUSEBUTTONDOWN:
+                // ...
+                break;
+            case SDL_KEYDOWN:
+                if (_evt.key.keysym.sym == SDLK_ESCAPE)
+                    break;
+                break;
+            case SDL_WINDOWEVENT:
+                switch (_evt.window.event) {
+                    case SDL_WINDOWEVENT_EXPOSED: (cast(O*)o).video.draw (content_cb); break; // event.window.windowID
+                    case SDL_WINDOWEVENT_SHOWN: break;        // event.window.windowID
+                    case SDL_WINDOWEVENT_HIDDEN: break;       // event.window.windowID
+                    case SDL_WINDOWEVENT_MOVED: break;        // event.window.windowID event.window.data1 event.window.data2 (x y)
+                    case SDL_WINDOWEVENT_RESIZED: break;      // event.window.windowID event.window.data1 event.window.data2 (width height)
+                    case SDL_WINDOWEVENT_SIZE_CHANGED: break; // event.window.windowID event.window.data1 event.window.data2 (width height)
+                    case SDL_WINDOWEVENT_MINIMIZED: break;    // event.window.windowID
+                    case SDL_WINDOWEVENT_MAXIMIZED: break;    // event.window.windowID
+                    case SDL_WINDOWEVENT_RESTORED: break;     // event.window.windowID
+                    case SDL_WINDOWEVENT_ENTER: break;        // event.window.windowID
+                    case SDL_WINDOWEVENT_LEAVE: break;        // event.window.windowID
+                    case SDL_WINDOWEVENT_FOCUS_GAINED: break; // event.window.windowID
+                    case SDL_WINDOWEVENT_FOCUS_LOST: break;   // event.window.windowID
+                    case SDL_WINDOWEVENT_CLOSE: break;        // event.window.windowID
+                    case SDL_WINDOWEVENT_TAKE_FOCUS: break;   // event.window.windowID
+                    case SDL_WINDOWEVENT_HIT_TEST: break;     // event.window.windowID
+                    default:
+                        SDL_Log ("Window %d got unknown event %d",
+                            _evt.window.windowID, _evt.window.event);
+                }
+                break;
+            default:
+                //writeln (ev);
+        }
+    }
+}
+
+version (_NEVER_)
+struct
+Text_e {
+    GO   go   = &_go;
+
+    static
+    void
+    _go (void* o, void* e, void* evt, REG d) {
+        //
+    }
+
+    string font_file    = "resources/font/Arial.ttf";
+    string font_name    = "Arial";
+    float  font_size    = 25.0f;
+    ubyte  font_color_r = 200;
+    ubyte  font_color_g = 200;
+    ubyte  font_color_b = 200;
+    string text         = "ThorVG is the best";
+    float  x            = 50.0f;
+    float  y            = 50.0f;
+
+    static
+    void
+    _draw (void* o, void* e, void* evt, REG d) {
+        with (cast(O*)o) 
+        with (cast(Text_e*)e)  
+        {
+            auto canvas = cast (Tvg_Canvas) d;
+
+            //
+            if (tvg_font_load (font_file.ptr) != TVG_RESULT_SUCCESS) {
+                printf ("Problem with loading the font from the file. Did you enable TTF Loader?\n");
+            }
+
+            Tvg_Paint _text = tvg_text_new ();
+            tvg_text_set_font   (_text, font_name.ptr);
+            tvg_text_set_size   (_text, font_size);
+            tvg_text_set_color  (_text, font_color_r, font_color_g, font_color_b);
+            tvg_text_set_text   (_text, text.ptr);
+            tvg_paint_translate (_text, x, y);
+            tvg_canvas_push (canvas, _text);
+        }
+    }
+}
+
+//struct
+//Container {
+//    GO      go = &_go;
+//    Content content;
+
+//    struct
+//    Content {
+//        void* a;
+//        void* z;
+
+//        struct
+//        Rec {
+//            void* data;
+//            Rec*  prev;
+//            Rec*  next;
+//        }
+//    }
+
+//    static
+//    void
+//    _go (void* o, void* e, void* evt, REG d) {
+//        //
+//    }
+
+//    static
+//    void
+//    _content (void* o, void* e, void* evt, REG d) {
+//        with (cast(O*)o) 
+//        with (cast(Container*)e)
+//        {
+//            foreach (_e; es) {
+//                _e.go (o,_e,evt,d);
+//            }
+//        }
+//    }
+//}

@@ -39,8 +39,8 @@ alias KEY = REG;
 
 //
 void
-GO_map (Pairs...) (void* o, void* e, void* evt, REG d) {
-    alias _array = GO_map_array!Pairs;  // [Rec (Key,Value), ...]
+GO_map (Triads...) (void* o, void* e, void* evt, REG d) {
+    alias _array = GO_map_array!Triads;  // [Rec (Key,Value), ...]
     
     static Map_rec[ _array.length ] map = _array;
 
@@ -48,27 +48,27 @@ GO_map (Pairs...) (void* o, void* e, void* evt, REG d) {
 }
 
 template
-GO_map_array (Pairs...) {
-    enum GO_map_array = [GO_map_array_init!(Pairs).result];
+GO_map_array (Triads...) {
+    enum GO_map_array = [GO_map_array_init!(Triads).result];
 }
 
 template 
-GO_map_array_init (Pairs...) {
+GO_map_array_init (Triads...) {
     import std.meta : AliasSeq;
 
-    static if (Pairs.length == 0)
+    static if (Triads.length == 0)
     {
         // Базовый случай: пустой набор
         enum result = AliasSeq!();
     }
-    else static if (Pairs.length >= 3)
+    else static if (Triads.length >= 3)
     {
-        alias Typ   = Pairs[0];
-        alias Key   = Pairs[1];
-        alias Value = Pairs[2];
+        alias Typ   = Triads[0];
+        alias Key   = Triads[1];
+        alias Value = Triads[2];
 
         // Рекурсивно обрабатываем оставшиеся пары
-        enum rest   = GO_map_array_init!(Pairs[3 .. $]).result;
+        enum rest   = GO_map_array_init!(Triads[3 .. $]).result;
         enum result = AliasSeq!(Map_rec (Typ,Key,&Value), rest);
     }
     else
