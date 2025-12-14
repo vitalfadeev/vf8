@@ -87,7 +87,7 @@ Panel_e {
     void
     _go (void* o, void* e, void* evt, REG d) {
         auto _evt = cast (Event*) evt;
-        REG   typ = d;
+        REG   typ = _evt.type;
         REG   key;
 
         //Map!(
@@ -241,7 +241,7 @@ _uni_ego (void* o, void* e, void* evt, REG d) {
     uni_e.open ();
     uni_e.load_ui ();
     auto _evt = cast (Event*) evt;
-    REG   typ = d;
+    REG   typ = _evt.type;
     REG   key;
     with (cast(O*)o)
     with (cast(Uni_e*)e) {
@@ -279,7 +279,7 @@ Uni_e {
         // CLICKED
         //  send PLAY_1
         auto _evt = cast (Event*) evt;
-        REG   typ = d;
+        REG   typ = _evt.type;
         REG   key;
         with (cast(O*)o)
         with (cast(Uni_e*)e) {
@@ -288,16 +288,23 @@ Uni_e {
                     auto mx = _evt.button.x;
                     auto my = _evt.button.y;
                     if (hit_test (mx,my)) {
-                        send (o,e,evt,CLICKED);
+                        printf ("send CLICKED\n");
+                        direct_send (o,e,evt,d,CLICKED);
                     }
                     break;
                 case SDL_USEREVENT:
                     if (_evt.user.code == CLICKED) {
+                        printf ("on CLICKED\n");
                         send (o,e,evt,PLAY_1);
                         break;
                     }
                     if (_evt.user.code == DRAW) {
                         draw (o,e,evt,cast (REG) _evt.user.data1);
+                        break;
+                    }
+                    if (_evt.user.code == PLAY_1) {
+                        printf ("on PLAY_1\n");
+                        _go_play_1 (o,e,evt,d);
                         break;
                     }
                     break;
@@ -335,6 +342,17 @@ Uni_e {
                 _e.draw (o,_e,evt,d);
             }
         }
+    }
+
+    void
+    direct_send (void* o, void* e, void* evt, REG d, int code) {
+        Event event;
+        event.type           = SDL_USEREVENT;
+        event.user.code      = code;
+        event.user.data1     = null;
+        event.user.data2     = null;
+        event.user.timestamp = SDL_GetTicks ();
+        go (o,e,&event,SDL_USEREVENT);
     }
 
     void
@@ -455,7 +473,7 @@ App {
         // SDL_QUIT,        null,                    { _go_quit (o,e,evt,d); },
         // SDL_WINDOWEVENT, SDL_WINDOWEVENT_EXPOSED, { (cast(O*)o).video.draw (); },
         auto _evt = cast (Event*) evt;
-        REG   typ = d;
+        REG   typ = _evt.type;
         REG   key;
         with (cast(O*)o)
         with (cast(App*)e) {
@@ -571,7 +589,7 @@ GO_play (int resource_id) (void* o, void* e, void* evt, REG d) {
 void
 GO_ui (void* o, void* e, void* evt, REG d) {
     auto _evt = cast (Event*) evt;
-    REG   typ = d;
+    REG   typ = _evt.type;
     REG   key;
     with (cast(O*)o) {
         if (typ == SDL_MOUSEMOTION) {
@@ -601,7 +619,7 @@ UI_element {
     void
     _go (void* o, void* e, void* evt, REG d) {
         auto _evt = cast (Event*) evt;
-        REG   typ = d;
+        REG   typ = _evt.type;
         REG   key;
         with (cast(O*)o) {
             switch (typ) {
