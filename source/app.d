@@ -5,7 +5,10 @@ import vf.map          : GO_map;
 import vf.input        : Event;
 import importc;
 
-import mod.quit : mod_quit_go = go;
+import mod.quit   : mod_quit_go = go,go_quit;
+import mod.player : mod_player_go = go;
+import mod.print  : mod_print_go = go,go_printf;
+import mod.send   : mod_send_go = go,go_send;
 
 enum       EVT_APP         = 0x0100;
 enum       APP_CODE_QUIT   = 0x0001;
@@ -167,7 +170,7 @@ _app_ego (void* o, void* e, void* evt, REG d) {
                         video.draw (o,&uni_e,evt,d,&uni_e.draw); 
                         break;
                     case SDL_WINDOWEVENT_CLOSE: 
-                        _go_quit (o,e,evt,d); 
+                        go_quit!"Quit\n" (o,e,evt,d); 
                         break;
                     default:
                 }
@@ -179,25 +182,26 @@ _app_ego (void* o, void* e, void* evt, REG d) {
                         uni_e.open ();
                         uni_e.load_ui ();
                         break;
-                    case PLAY_1: 
-                        printf ("on PLAY_1\n");
-                        _go_play_1 (o,e,evt,d);
-                        break;
-                    case PLAY_2: 
-                        printf ("on PLAY_2\n");
-                        _go_play_2 (o,e,evt,d);
-                        break;
-                    case PLAY_3: 
-                        printf ("on PLAY_3\n");
-                        _go_play_3 (o,e,evt,d);
-                        break;
+                    //case PLAY_1: 
+                    //    printf ("on PLAY_1\n");
+                    //    _go_play_1 (o,e,evt,d);
+                    //    break;
+                    //case PLAY_2: 
+                    //    printf ("on PLAY_2\n");
+                    //    _go_play_2 (o,e,evt,d);
+                    //    break;
+                    //case PLAY_3: 
+                    //    printf ("on PLAY_3\n");
+                    //    _go_play_3 (o,e,evt,d);
+                    //    break;
                     default:
                 }
                 break;
             default:
         }
     }
-    mod_quit_go  (o,&uni_e,evt,d);
+    mod_quit_go   (o,&uni_e,evt,d);
+    mod_player_go (o,&uni_e,evt,d);
     uni_e.go (o,&uni_e,evt,d);
     go_base (o,&uni_e,evt,d);
 }
@@ -450,32 +454,29 @@ App {
 //
 alias
 go_stacked_this = GO_map!(
-    SDL_KEYDOWN, SDLK_ESCAPE, _go_esc,
+    SDL_KEYDOWN, SDLK_ESCAPE, go_send!EVT_APP_QUIT,
 );
 
 alias 
 go_base = GO_map!(
-    SDL_KEYDOWN, SDLK_ESCAPE, _go_quit,
+    SDL_KEYDOWN, SDLK_ESCAPE, go_quit!"Quit\n",
     SDL_KEYDOWN, SDLK_LCTRL,  _go_ctrl_pressed,
-    SDL_KEYDOWN, SDLK_a,      _go_a_pressed,
-    SDL_KEYDOWN, SDLK_q,      _go_play_1,
-    SDL_KEYDOWN, SDLK_w,      _go_play_2,
-    SDL_KEYDOWN, SDLK_e,      _go_play_3,
+    SDL_KEYDOWN, SDLK_a,      go_printf!"A! OK!\n",
+    SDL_KEYDOWN, SDLK_q,      go_send!PLAY_1,
+    SDL_KEYDOWN, SDLK_w,      go_send!PLAY_2,
+    SDL_KEYDOWN, SDLK_e,      go_send!PLAY_3,
 );
 
 alias 
 go_ctrl_pressed = GO_map!(
     SDL_KEYUP,   SDLK_LCTRL, _go_ctrl_released,
-    SDL_KEYDOWN, SDLK_a,     _go_ctrl_a,
+    SDL_KEYDOWN, SDLK_a,     go_printf!"CTRL+A\n",
 );
 
 
 //
-alias 
-_go_quit = GO_quit!"QUIT\n";
-
-alias
-_go_esc = GO_local_event_new!(EVT_APP_QUIT);
+//alias 
+//_go_quit = go_quit!"QUIT\n";
 
 void
 _go_ctrl_pressed (void* o, void* e, void* evt, REG d) {
@@ -493,50 +494,6 @@ _go_ctrl_released (void* o, void* e, void* evt, REG d) {
     }
 }
 
-alias
-_go_ctrl_a = GO_printf!"CTRL+A\n";
-
-alias
-_go_a_pressed = GO_printf!"A! OK!\n";
-
-alias
-_go_play_1 = GO_play!(1);
-
-alias
-_go_play_2 = GO_play!(2);
-
-alias
-_go_play_3 = GO_play!(3);
-
-//
-void
-GO_quit (alias TEXT) (void* o, void* e, void* evt, REG d) {
-    with (cast(O*)o) {
-        printf (TEXT);
-        go = null;
-    }
-}
-
-void
-GO_printf (alias TEXT) (void* o, void* e, void* evt, REG d) {
-    printf (TEXT);
-}
-
-void
-GO_local_event_new (REG EVT) (void* o, void* e, void* evt, REG d) {
-    printf ("  put Event: 0x%X\n", EVT);
-    with (cast(O*)o) {
-        local_input.put_reg (EVT);
-    }
-}
-
-void
-GO_play (int resource_id) (void* o, void* e, void* evt, REG d) {
-    printf ("Play %d\n", resource_id);
-    with (cast(O*)o) {
-        audio.play_wav (resource_id);
-    }
-}
 
 //
 void
