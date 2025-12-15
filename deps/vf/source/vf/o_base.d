@@ -6,6 +6,10 @@ import vf.local_input : Local_input;
 import vf.audio       : Audio;
 import vf.video       : Video;
 import importc;
+import std.conv : to;
+
+enum       EVT_UI          = 0x0200;
+enum ulong OPEN            = (6             << 16) | EVT_UI;
 
 ///
 struct
@@ -53,6 +57,17 @@ O {
     static
     void
     _go (void* o, void* e, void* evt, REG d) {
+        // send OPEN
+        {
+            Event event;
+            event.type           = SDL_USEREVENT;
+            event.user.code      = OPEN;
+            event.user.data1     = null;
+            event.user.data2     = null;
+            event.user.timestamp = SDL_GetTicks ();
+            _go2 (o,e,&event,event.type);
+        }
+
         // each input event
         with (cast(O*)o) {
             ego = e;
@@ -117,3 +132,39 @@ O {
 // text
 //   to_map
 //
+
+void
+send_now (int TYP, int COD) (void* o, void* e, void* evt, REG d, void* data1) {
+    assert (TYP == SDL_USEREVENT);
+    Event event;
+    event.type           = TYP;
+    event.user.code      = COD;
+    event.user.data1     = data1;
+    event.user.data2     = null;
+    event.user.timestamp = SDL_GetTicks ();
+    (cast (GO) ((cast(O*)o).ego)) (o,e,&event,TYP);
+}
+
+void
+send (int TYP, int COD) (void* o, void* e, void* evt, REG d) {
+    assert (TYP == SDL_USEREVENT);
+    Event event;
+    event.type           = TYP;
+    event.user.code      = COD;
+    event.user.data1     = null;
+    event.user.data2     = null;
+    event.user.timestamp = SDL_GetTicks ();
+    (cast(O*)o).local_input.put (&event);
+}
+
+void
+send_d_code (int TYP) (void* o, void* e, void* evt, REG d) {
+    assert (TYP == SDL_USEREVENT);
+    Event event;
+    event.type           = TYP;
+    event.user.code      = d.to!int;
+    event.user.data1     = null;
+    event.user.data2     = null;
+    event.user.timestamp = SDL_GetTicks ();
+    (cast(O*)o).local_input.put (&event);
+}

@@ -7,6 +7,11 @@ import std.conv         : to;
 import importc;
 import vf.types : GO;
 import vf.types : REG;
+import vf.o_base : send_now;
+
+enum       EVT_UI          = 0x0200;
+enum ulong OPEN            = (6             << 16) | EVT_UI;
+enum ulong DRAW            = (7             << 16) | EVT_UI;
 
 
 struct
@@ -34,7 +39,7 @@ Video {
     }
 
     void
-    draw (void* o, void* e, void* evt, REG d, GO cb) {
+    draw (void* o, void* e, void* evt, REG d) {
         // SDL_SetRenderDrawColor (renderer, 0x00, 0x00, 0x00, 0xFF);
         // SDL_RenderClear (renderer);
         // SDL_SetRenderDrawColor (renderer, 0xFF, 0xFF, 0xFF, 0xFF);
@@ -321,7 +326,9 @@ if (0) {
         }
 }
 
-        cb (o,e,evt,cast(REG)canvas);
+        // DRAW
+        send_now!(SDL_USEREVENT,DRAW) (o,e,evt,d, canvas);
+
 
         //
         auto ctime = SDL_GetTicks ();
