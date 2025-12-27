@@ -346,8 +346,9 @@ O2_event {
         this.type = type;
     }
 
-    this (uint type, string str) {
-        this.type = type;
+    this (REG type, string str) {
+        this.type      = type;
+        this.file_name = str;
     }
 }
 
