@@ -18,8 +18,10 @@ test () {
 }
 
 alias Klass_enum = uint;
-enum Klass_enum _panel  = 0b0000_0001;
-enum Klass_enum _window = 0b0000_0010;
+enum :uint {
+    _panel  = 0b0000_0001,
+    _window = 0b0000_0010,
+}
 
 void
 test_klass () {
@@ -73,8 +75,8 @@ E {
 
 struct
 Klass {
-    Value[Properties.max+1] props;
     Klass_enum              klass_enum;
+    Value[Properties.max+1] props;
 
     Klass*
     x (int a) {
@@ -135,7 +137,7 @@ e (E* e) {
     return child;
 }
 
-Klass panel_klass;
+Klass panel_klass = Klass (_panel);
 E*
 panel (E* e) {
     e.add_klass (&panel_klass);
