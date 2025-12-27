@@ -27,16 +27,22 @@ test_klass () {
     ;
 }
 
-Klass[] klasses = [
-    0: Klass (0),
-    _panel  : Klass (_panel),
-    _window : Klass (_window),
+Klass[_max] klasses = [
+    _panel  : Klass (_panel_bit),
+    _window : Klass (_window_bit),
 ];
 
 alias Klass_enum = uint;
 enum :Klass_enum {  // bitset .......1  // 32 klasses
-    _panel  = 0b0000_0001,
-    _window = 0b0000_0010,
+    _panel_bit  = 1 << _panel,
+    _window_bit = 1 << _window,
+}
+
+enum {
+    _panel,
+    _window,
+    //
+    _max
 }
 
 alias 
