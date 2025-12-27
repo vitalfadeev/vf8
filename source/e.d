@@ -19,12 +19,12 @@ test () {
 
 void
 test_klass () {
-    with (window) {
-        x = 0;
-        y = "top";
-        w = "screen.w";
-        h = 64;
-    }
+    window
+    .x (0)
+    .y ("top")
+    .w ("screen.w")
+    .h (64)
+    ;
 }
 
 alias 
