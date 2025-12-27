@@ -61,15 +61,17 @@ E {
 
 struct
 Klass {
-    Value[Properties.max] props;
+    Value[Properties.max+1] props;
 
     Klass*
     x (int a) {
+        props[Properties.x] = Value (0,a);
         return &this;
     }
 
     Klass*
     y (int a) {
+        props[Properties.y] = Value (0,a);
         return &this;
     }
     Klass*
@@ -79,6 +81,7 @@ Klass {
 
     Klass*
     w (int a) {
+        props[Properties.w] = Value (0,a);
         return &this;
     }
     Klass*
@@ -88,15 +91,17 @@ Klass {
 
     Klass*
     h (int a) {
+        props[Properties.h] = Value (0,a);
         return &this;
     }
 }
 
 enum
 Properties {
-    a,
-    b,
-    c,
+    x,
+    y,
+    w,
+    h,
 }
 
 struct
