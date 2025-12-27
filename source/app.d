@@ -134,6 +134,15 @@ mai () {
 }
 
 void
+O2_open (void* o, void* e, void* evt, REG d) {
+    with (cast(O2*)o) {
+        auto file_name = (cast (O2_event*) evt).file_name;
+        input.open (file_name);
+        local_input.open ();
+    }
+}
+
+void
 O2_level2_ego (void* o, void* e, void* evt, REG d) {
     with (cast (O2*) o)
     switch ((cast (O2_event*) evt).type) {
@@ -322,15 +331,6 @@ O2_input {
         if (text.length <= i) return false;
         event.type = text[i];
         return true;
-    }
-}
-
-void
-O2_open (void* o, void* e, void* evt, REG d) {
-    with (cast(O2*)o) {
-        auto file_name = (cast (O2_event*) evt).file_name;
-        input.open (file_name);
-        local_input.open ();
     }
 }
 
