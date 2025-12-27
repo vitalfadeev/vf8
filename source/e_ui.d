@@ -1,4 +1,4 @@
-module e;
+module e_ui;
 
 auto
 test () {
@@ -17,12 +17,6 @@ test () {
     ;
 }
 
-alias Klass_enum = uint;
-enum :uint {
-    _panel  = 0b0000_0001,
-    _window = 0b0000_0010,
-}
-
 void
 test_klass () {
     window
@@ -32,6 +26,13 @@ test_klass () {
     .h (64)
     ;
 }
+
+alias Klass_enum = uint;
+enum :Klass_enum {  // bitset .......1  // 32 klasses
+    _panel  = 0b0000_0001,
+    _window = 0b0000_0010,
+}
+
 
 alias 
 GO = void function (void* o, void* e, void* evt, REG d);
@@ -60,7 +61,16 @@ E {
     has_klass (Klass_enum k) {
         return (klasses & k);
     }
+    auto
+    has_klass (Klass k) {
+        return (klasses & k.klass_enum);
+    }
 
+    E*
+    add_klass (Klass_enum k) {
+        klasses |= k;
+        return &this;
+    }
     E*
     add_klass (Klass* k) {
         klasses |= k.klass_enum;
@@ -144,7 +154,7 @@ panel (E* e) {
     return e;
 }
 
-Klass window_klass;
+Klass window_klass = Klass (_window);
 E*
 window (E* e) {
     e.add_klass (&window_klass);
