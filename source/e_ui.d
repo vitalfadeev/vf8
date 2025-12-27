@@ -5,15 +5,15 @@ test () {
     return
     e .panel .window .canvas
     .e .loc1
-     .e .button ._1
-     .e .button ._2
-     .e .button ._3
+     .e .button ._1  .parent
+     .e .button ._2  .parent
+     .e .button ._3  .parent.parent
     .e .loc2
-     .e .button .clock
+     .e .button .clock  .parent.parent
     .e .loc3
-     .e .indicator ._1
-     .e .indicator ._2
-     .e .indicator ._3
+     .e .indicator ._1  .parent
+     .e .indicator ._2  .parent
+     .e .indicator ._3  .parent.parent
     ;
 }
 
@@ -27,22 +27,20 @@ test_klass () {
     ;
 }
 
-Klass[_max] klasses = [
-    _panel  : Klass (_panel_bit),
-    _window : Klass (_window_bit),
+Klass[_max_klasses] 
+klasses = [
+    _panel  : Klass (_panel),
+    _window : Klass (_window),
 ];
 
-alias Klass_enum = uint;
-enum :Klass_enum {  // bitset .......1  // 32 klasses
-    _panel_bit  = 1 << _panel,
-    _window_bit = 1 << _window,
-}
+alias
+Klass_i = ubyte;
 
-enum {
+enum :Klass_i {
     _panel,
     _window,
     //
-    _max
+    _max_klasses
 }
 
 alias 
@@ -54,14 +52,14 @@ REG = void*;
 struct
 E {
     GO     go;
-    uint   klasses;  // bitset .......1  // 32 klasses
+    Klass_i[4] klasses;  // bitset .......1  // 32 klasses
     //
     float  x,y,w,h;
-    E* l;
-    E* r;
-    E* cl;
-    E* cr;
-    E* parent;
+    E*     l;
+    E*     r;
+    E*     cl;
+    E*     cr;
+    E*     parent;
     ubyte  bg_r;
     ubyte  bg_g;
     ubyte  bg_b;
@@ -69,22 +67,31 @@ E {
     int    on_click_send_evt_code;  // PLAY_1
 
     auto
-    has_klass (Klass_enum k) {
-        return (klasses & k);
+    has_klass (Klass_i _klass_i) {
+        return 
+            (klasses[0] == _klass_i) ||
+            (klasses[1] == _klass_i) ||
+            (klasses[2] == _klass_i) ||
+            (klasses[3] == _klass_i);
     }
     auto
     has_klass (Klass k) {
-        return (klasses & k.klass_enum);
+        auto _klass_i = k.klass_i;
+        return 
+            (klasses[0] == _klass_i) ||
+            (klasses[1] == _klass_i) ||
+            (klasses[2] == _klass_i) ||
+            (klasses[3] == _klass_i);
     }
 
     E*
-    add_klass (Klass_enum k) {
-        klasses |= k;
+    add_klass (Klass_i _klass_i) {
+        klasses[0] = _klass_i;
         return &this;
     }
     E*
     add_klass (Klass* k) {
-        klasses |= k.klass_enum;
+        klasses[0] = k.klass_i;
         return &this;
     }
 
@@ -96,7 +103,7 @@ E {
 
 struct
 Klass {
-    Klass_enum              klass_enum;
+    Klass_i                 klass_i;
     Value[Properties.max+1] props;
 
     Klass*
