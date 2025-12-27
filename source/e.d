@@ -17,6 +17,10 @@ test () {
     ;
 }
 
+alias Klass_enum = uint;
+enum Klass_enum _panel  = 0b0000_0001;
+enum Klass_enum _window = 0b0000_0010;
+
 void
 test_klass () {
     window
@@ -36,6 +40,8 @@ REG = void*;
 struct
 E {
     GO     go;
+    uint   klasses;  // bitset .......1  // 32 klasses
+    //
     float  x,y,w,h;
     E* l;
     E* r;
@@ -48,8 +54,14 @@ E {
     ubyte  bg_a;
     int    on_click_send_evt_code;  // PLAY_1
 
+    auto
+    has_klass (Klass_enum k) {
+        return (klasses & k);
+    }
+
     E*
-    add_klass (Klass* klass) {
+    add_klass (Klass* k) {
+        klasses |= k.klass_enum;
         return &this;
     }
 
@@ -62,6 +74,7 @@ E {
 struct
 Klass {
     Value[Properties.max+1] props;
+    Klass_enum              klass_enum;
 
     Klass*
     x (int a) {
