@@ -2,19 +2,29 @@ module e;
 
 auto
 test () {
-   return
-   e .panel .window .canvas
-   .e .loc1
-    .e .button ._1
-    .e .button ._2
-    .e .button ._3
-   .e .loc2
-    .e .button .clock
-   .e .loc3
-    .e .indicator ._1
-    .e .indicator ._2
-    .e .indicator ._3
-   ;
+    return
+    e .panel .window .canvas
+    .e .loc1
+     .e .button ._1
+     .e .button ._2
+     .e .button ._3
+    .e .loc2
+     .e .button .clock
+    .e .loc3
+     .e .indicator ._1
+     .e .indicator ._2
+     .e .indicator ._3
+    ;
+}
+
+void
+test_klass () {
+    with (window) {
+        x = 0;
+        y = "top";
+        w = "screen.w";
+        h = 64;
+    }
 }
 
 alias 
@@ -52,6 +62,34 @@ E {
 struct
 Klass {
     Value[Properties.max] props;
+
+    Klass*
+    x (int a) {
+        return &this;
+    }
+
+    Klass*
+    y (int a) {
+        return &this;
+    }
+    Klass*
+    y (string a) {
+        return &this;
+    }
+
+    Klass*
+    w (int a) {
+        return &this;
+    }
+    Klass*
+    w (string a) {
+        return &this;
+    }
+
+    Klass*
+    h (int a) {
+        return &this;
+    }
 }
 
 enum
@@ -91,6 +129,10 @@ E*
 window (E* e) {
     e.add_klass (&window_klass);
     return e;
+}
+Klass*
+window () {
+    return &window_klass;
 }
 
 Klass canvas_klass;
