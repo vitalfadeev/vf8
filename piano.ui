@@ -1,0 +1,28 @@
+e container
+ e play 1
+ e play 2
+ e play 3
+
+container
+ x = 10
+ y = 10
+ w = 300
+ h = 100
+
+play
+ y = 10
+ w = 90
+ h = 100
+ bg = 255,255,255,255
+
+1
+ x = 110
+ on_click = PLAY_1
+
+2
+ x = 210
+ on_click = PLAY_2
+
+3
+ x = 310
+ on_click = PLAY_3

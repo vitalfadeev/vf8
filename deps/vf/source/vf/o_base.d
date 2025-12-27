@@ -16,7 +16,7 @@ struct
 O {
     GO          go = &_go;
     Input       input;
-    Local_input local_input;
+    Local_input!Event local_input;
     Event       event;
     Audio       audio;
     Video       video;

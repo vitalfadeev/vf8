@@ -96,13 +96,6 @@ load_ui () {
     loaded = true;
 
     with (uni_e) {
-        // x,y,w,h, bg
-        // add childs 1
-        //   x,y,w,h, bg, on_click_send_evt_code
-        // add childs 2
-        //   x,y,w,h, bg, on_click_send_evt_code
-        // add childs 3
-        //   x,y,w,h, bg, on_click_send_evt_code
         x = 10;
         y = 10;
         w = 300;
@@ -156,11 +149,11 @@ Uni_e {
     Uni_e* cl;
     Uni_e* cr;
     Uni_e* parent;
-    int    on_click_send_evt_code;  // PLAY_1
     ubyte  bg_r;
     ubyte  bg_g;
     ubyte  bg_b;
     ubyte  bg_a;
+    int    on_click_send_evt_code;  // PLAY_1
 
     static
     void
@@ -172,7 +165,6 @@ Uni_e {
         //  send PLAY_1
         auto _evt = cast (Event*) evt;
         REG   typ = _evt.type;
-        REG   key;
         with (cast(O*)o)
         with (cast(Uni_e*)e) {
             switch (typ) {
