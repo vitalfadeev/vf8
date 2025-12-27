@@ -127,26 +127,27 @@ _app_ego (void* o, void* e, void* evt, REG d) {
 void
 mai () {
     O2 o;
-    o ~= O2_event (O2.Open,"file.ui");
-    // event loop
-    o.go ();
+    with (o) {
+        put (OPEN,"file.ui");
+        go ();  // event loop
+    }
 }
 
 void
 O2_level2_ego (void* o, void* e, void* evt, REG d) {
     with (cast (O2*) o)
-    switch (evt) {
-        case open              : O2_open (evt.file_name); break;
-        case indent_start      : ego = &O2_ego_indent; break;
-        case indent_end        : ego = &O2_ego_after_indent; break;
-        case indented_e_start  : ego = &O2_ego_after_indented_e; break;
-        case indented_e_klass_name_start : break;
-        case indented_e_klass_name_end   : break;
-        case e_start           : break;
-        case klass_name_start  : break;
-        case klass_name_end    : break;
-        case ignore_start      : break;
-        case ignore_end        : break;
+    switch ((cast (O2_event*) evt).type) {
+        case OPEN              : O2_open (o,e,evt,d); break;
+        case INDENT_START      : ego = &O2_ego_indent; break;
+        case INDENT_END        : ego = &O2_ego_after_indent; break;
+        case INDENTED_E_START  : ego = &O2_ego_after_indented_e; break;
+        case INDENTED_E_KLASS_NAME_START : break;
+        case INDENTED_E_KLASS_NAME_END   : break;
+        case E_START           : break;
+        case KLASS_NAME_START  : break;
+        case KLASS_NAME_END    : break;
+        case IGNORE_START      : break;
+        case IGNORE_END        : break;
         default:
     }
 }
@@ -154,8 +155,8 @@ O2_level2_ego (void* o, void* e, void* evt, REG d) {
 void
 O2_ego (void* o, void* e, void* evt, REG d) {
     with (cast (O2*) o)
-    switch (evt) {
-        case ' '  : emit (indent_start); break;
+    switch (cast (dchar) d) {
+        case ' '  : put (INDENT_START); break;
         case 'e'  : break;
         case '\n' : break;
         default:
@@ -165,37 +166,37 @@ O2_ego (void* o, void* e, void* evt, REG d) {
 void
 O2_ego_indent (void* o, void* e, void* evt, REG d) {
     with (cast (O2*) o)
-    switch (evt) {
+    switch (cast (dchar) d) {
         case ' ' : break;
-        default  : emit (indent_end); break;
+        default  : put (INDENT_END); break;
     }
 }
 
 void
 O2_ego_after_indent (void* o, void* e, void* evt, REG d) {
     with (cast (O2*) o)
-    switch (evt) {
-        case 'e'  : emit (indented_e_start); break;
-        case '\n' : emit (eol); break;
-        default   : ego = &O2_ego_ignore; emit (ignore_start); break;
+    switch (cast (dchar) d) {
+        case 'e'  : put (INDENTED_E_START); break;
+        case '\n' : put (EOL); break;
+        default   : ego = &O2_ego_ignore; put (IGNORE_START); break;
     }
 }
 
 void
 O2_ego_after_indented_e (void* o, void* e, void* evt, REG d) {
     with (cast (O2*) o)
-    switch (evt) {
-        case ' '  : emit (space); break;
-        case '\n' : emit (eol); break;
-        default   : emit (indented_e_klass_name_start); break;
+    switch (cast (dchar) d) {
+        case ' '  : put (SPACE); break;
+        case '\n' : put (EOL); break;
+        default   : put (INDENTED_E_KLASS_NAME_START); break;
     }
 }
 
 void
 O2_ego_ignore (void* o, void* e, void* evt, REG d) {
     with (cast (O2*) o)
-    switch (evt) {
-        case '\n' : ego = &O2_ego; emit (ignore_end); break;
+    switch (cast (dchar) d) {
+        case '\n' : ego = &O2_ego; put (IGNORE_END); break;
         default   :
     }
 }
@@ -214,7 +215,19 @@ _O2 (Input,Local_input,Event,alias base_ego) {
     alias O = typeof(this);
 
     enum {
-        Open = 1,
+        OPEN = 1,
+        INDENT_START,
+        INDENT_END,
+        INDENTED_E_START,
+        INDENTED_E_KLASS_NAME_START,
+        INDENTED_E_KLASS_NAME_END,
+        E_START,
+        KLASS_NAME_START,
+        KLASS_NAME_END,
+        IGNORE_START,
+        IGNORE_END,
+        EOL,
+        SPACE,
     };
 
     void
@@ -228,8 +241,20 @@ _O2 (Input,Local_input,Event,alias base_ego) {
     }
 
     void
-    opOpAssign (string op : "~") (Event b) {
+    put (Event b) {
         local_input.put (&b);
+    }
+
+    void
+    put (uint type) {
+        auto evt = Event (type);
+        local_input.put (&evt);
+    }
+
+    void
+    put (uint type, string str) {
+        auto evt = Event (type,str);
+        local_input.put (&evt);
     }
 
     // base
@@ -255,12 +280,14 @@ _O2 (Input,Local_input,Event,alias base_ego) {
     _go2 (void* o, void* e, void* evt, REG d) {
         with (cast(O*)o) {
             // process input event
+            d = event.type;
             _go3 (o,e,evt,d);
 
             // each local input event
             while (!local_input.empty) {
                 local_input.read (cast (Event*) evt);
                 // process local input event
+                d = event.type;
                 _go3 (o,e,evt,d);
             }
         }
@@ -280,6 +307,10 @@ _O2 (Input,Local_input,Event,alias base_ego) {
 
 struct
 O2_input {
+    string filename;
+    string text;
+    size_t i;  // text pos
+
     void
     open (string filename) {
         // open file
@@ -287,24 +318,36 @@ O2_input {
 
     bool 
     read (O2_event* event) {
-        return (SDL_WaitEvent (event) == 1);
+        if (text.length == 0) return false;
+        if (text.length <= i) return false;
+        event.type = text[i];
+        return true;
     }
 }
 
 void
-O2_open (string file_name) {
-    input.open ();
-    local_input.open ();
+O2_open (void* o, void* e, void* evt, REG d) {
+    with (cast(O2*)o) {
+        auto file_name = (cast (O2_event*) evt).file_name;
+        input.open (file_name);
+        local_input.open ();
+    }
 }
 
 struct
 O2_event {
-    dchar  c;
+    REG    type;
     size_t pos_a;
     size_t pos_b;
+    //
+    string file_name;
+
+    this (uint type) {
+        this.type = type;
+    }
 
     this (uint type, string str) {
-        //
+        this.type = type;
     }
 }
 

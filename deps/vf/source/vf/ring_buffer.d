@@ -33,6 +33,16 @@ Ring_buffer (T,size_t N) {
             b = s.ptr;
     }
 
+    void
+    put (ref T t) {
+        // T[a..b]
+        assert (b != a);
+        *b = t;
+        b++;
+        if (b == limit)
+            b = s.ptr;
+    }
+
     bool
     empty () {
         return a == b;
