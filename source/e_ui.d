@@ -27,12 +27,17 @@ test_klass () {
     ;
 }
 
+Klass[] klasses = [
+    0: Klass (0),
+    _panel  : Klass (_panel),
+    _window : Klass (_window),
+];
+
 alias Klass_enum = uint;
 enum :Klass_enum {  // bitset .......1  // 32 klasses
     _panel  = 0b0000_0001,
     _window = 0b0000_0010,
 }
-
 
 alias 
 GO = void function (void* o, void* e, void* evt, REG d);
@@ -147,22 +152,20 @@ e (E* e) {
     return child;
 }
 
-Klass panel_klass = Klass (_panel);
 E*
 panel (E* e) {
-    e.add_klass (&panel_klass);
+    e.add_klass (_panel);
     return e;
 }
 
-Klass window_klass = Klass (_window);
 E*
 window (E* e) {
-    e.add_klass (&window_klass);
+    e.add_klass (_window);
     return e;
 }
 Klass*
 window () {
-    return &window_klass;
+    return &klasses[_window];
 }
 
 Klass canvas_klass;
