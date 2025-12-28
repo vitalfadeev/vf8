@@ -116,18 +116,16 @@ E {
 struct
 E_moded {
 union {
-    GO    go = &_go;
+    GO    go = cast (GO) &_go;
     E     e;
     E_mod e_mod;  // klasses  // Klass (go,next,klass_data)
 }
 
     static
     void
-    _go (O* o, E* e, void* evt) {
-        with (cast (E_moded*) e) {
-            for (auto _mod = &e_mod; _mod !is null; _mod = _mod.next) {
-                _mod.go (o,cast(E*)_mod,evt);
-            }
+    _go (O* o, E_moded* e, void* evt) {
+        for (auto _mod = &e.e_mod; _mod !is null; _mod = _mod.next) {
+            _mod.go (o,cast(E*)_mod,evt);
         }
     }
 
@@ -138,6 +136,29 @@ union {
             //
         }
         _mod.next = mod;
+    }
+
+    bool
+    has_mod (E_mod* mod) {
+        auto _mod = &e_mod;
+        for (; _mod !is null; _mod = _mod.next) {
+            if (_mod is mod) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    void
+    del_mod (E_mod* mod) {
+        auto _pre = &e_mod;
+        auto _mod = _pre.next;
+        for (; _mod !is null; _pre = _mod, _mod = _mod.next) {
+            if (_mod is mod) {
+                _pre.next = _mod.next;
+                break;
+            }
+        }
     }
 }
 
@@ -160,6 +181,42 @@ union {
     void* data1;
 }
 
+//
+alias Color = uint;
+alias Coord = float;
+alias Code  = int;
+
+struct
+E_ui {
+union {
+    GO    go = cast (GO) &_go;
+    E     e;
+    E_mod mod;
+}
+    //
+    Coord x,y,w,h;
+    Color bg;
+    Code  on_click_send_evt_code;  // PLAY_1
+    
+    //
+    static
+    void
+    _go (O* o, E_ui* e, void* evt) {
+        switch ((cast (Event*) evt).type) {
+            case CLICK : put (o,e,e.on_click_send_evt_code); break;
+            default:
+        }
+    }
+
+    enum CLICK = 1;
+
+    static
+    void
+    put (O* o, E_ui* e, Code code) {
+        //
+    }
+}
+
 E_klass
 window_klass = {
     (O* o, E* e, void* evt) {
@@ -176,41 +233,14 @@ window_klass = {
     }
 };
 
+struct
+Event {
+    uint type;
+}
+
 
 
 //
-struct
-_E {
-    Klass_set klasses;  // r32,r32
-    //
-    float  x,y,w,h;
-    E*     l;
-    E*     r;
-    E*     cl;
-    E*     cr;
-    E*     parent;
-    ubyte  bg_r;
-    ubyte  bg_g;
-    ubyte  bg_b;
-    ubyte  bg_a;
-    int    on_click_send_evt_code;  // PLAY_1
-
-    auto
-    has_klass (Klass k) {
-        return klasses.has (k);
-    }
-
-    E*
-    add_klass (Klass k) {
-        klasses.add (k);
-        return &this;
-    }
-
-    E*
-    add_child (E* e) {
-        return &this;
-    }
-}
 
 alias
 Klass = void function (void* o, void* e, void* evt);
