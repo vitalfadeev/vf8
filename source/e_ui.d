@@ -171,9 +171,9 @@ union {
     Klass klass;  // with data1
 }
     //
-    Coord x,y,w,h;
-    Color bg;
-    Code  on_click_send_evt_code;  // PLAY_1
+    A.Coord x,y,w,h;
+    Color   bg;
+    Code    on_click_send_evt_code;  // PLAY_1
     
     //
     static
@@ -283,7 +283,9 @@ window = {
     cast (GO) (O* o, E* e, Ex* ex, void* evt) {
         with (cast (E_ui*) e) {
             x = 0;
-            y = 100;
+            y = 0;
+            w = Desktop.w;
+            h = 64;
         }
 
         with (cast (Klass*) ex) {
@@ -301,14 +303,44 @@ window = {
 
 Klass panel;
 Klass canvas;
-Klass loc1;
+Klass 
+loc1 = {
+    cast (GO) (O* o, E* e, Ex* ex, void* evt) {
+        with (cast (E_ui*) e) {
+           x = A.Coord.left;
+           y = 0;
+           w = 33.perc;
+           h = A.Coord.parent_h;
+        }
+    }
+};
 Klass button;
 Klass _1;
 Klass _2;
 Klass _3;
-Klass loc2;
+Klass 
+loc2 = {
+    cast (GO) (O* o, E* e, Ex* ex, void* evt) {
+        with (cast (E_ui*) e) {
+           x = A.Coord.center;
+           y = 0;
+           w = 34.perc;
+           h = A.Coord.parent_h;
+        }
+    }
+};
 Klass clock;
-Klass loc3;
+Klass 
+loc3 = {
+    cast (GO) (O* o, E* e, Ex* ex, void* evt) {
+        with (cast (E_ui*) e) {
+           x = A.Coord.right;
+           y = 0;
+           w = 33.perc;
+           h = A.Coord.parent_h;
+        }
+    }
+};
 Klass indicator;
 
 struct
@@ -316,6 +348,108 @@ Event {
     uint type;
 }
 
+//
+struct
+A {
+    Coord x;
+    Coord y;
+
+    struct
+    Coord {
+        Type type;
+    union {
+        Int  _int;
+        Perc _perc;
+    }
+
+        void
+        opAssign (int b) {
+            type = Tree._int;
+            _int = Int (b);
+        }
+        void
+        opAssign (Int b) {
+            type = Tree._int;
+            _int = b;
+        }
+        void
+        opAssign (Perc b) {
+            type = Tree._perc;
+            _perc = b;
+        }
+        void
+        opAssign (Left b) {
+            type = Tree._left;
+            _left = b;
+        }
+        void
+        opAssign (Center b) {
+            type = Tree._center;
+            _center = b;
+        }
+        void
+        opAssign (Right b) {
+            type = Tree._right;
+            _right = b;
+        }
+        void
+        opAssign (Parent_h b) {
+            type = Tree._parent_h;
+            _parent_h = b;
+        }
+
+        static left     = Left ();
+        static center   = Center ();
+        static right    = Right ();
+        static parent_h = Parent_h ();
+    }
+
+    enum
+    Type {
+        _,
+        _int,
+        _perc,
+        _left,
+        _center,
+        _right,
+        _parent_h,
+    }
+
+    struct
+    Int {
+        int a;
+    }
+
+    struct
+    Perc {
+        int a;
+    }
+
+    struct
+    Left {
+        int a;
+    }
+
+    struct
+    Center {
+        int a;
+    }
+
+    struct
+    Right {
+        int a;
+    }
+
+    struct
+    Parent_h {
+        int a;
+    }
+}
+
+auto
+perc (int a) {
+    return A.Perc (a);
+}
 
 //
 void
@@ -335,11 +469,6 @@ dump_tree (E_ui_childed* e, int level=0) {
     //foreach (t; WalkTree (e,&skip)) {
     //    printf ("e\n");
     //}
-}
-
-bool
-skip (E_ui_childed* e) {
-    return false;
 }
 
 
@@ -386,6 +515,11 @@ _WalkTree (Tree,Skip) {
 
         return 0;
     }
+}
+
+bool
+skip (Tree) (Tree* e) {
+    return false;
 }
 
 
@@ -443,3 +577,17 @@ _WalkTree (Tree,Skip) {
 //  .y = 0
 //  .w = parent.h
 //  .h = parent.h
+
+struct
+Desktop {
+    static
+    int 
+    w () {
+        return 1366;
+    }
+    static
+    int 
+    h () {
+        return 768;
+    }
+}
