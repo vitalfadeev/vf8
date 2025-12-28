@@ -99,7 +99,10 @@ union {
     static
     void
     _go (O* o, E_exed* e, Ex* ex, void* evt) {
-        for (auto _ex = &e.ex; _ex !is null; _ex = _ex.next) {
+        //go (o,e,ex,evt);
+
+        // ex.go, ex.go,...
+        for (auto _ex = e.ex.next; _ex !is null; _ex = _ex.next) {
             _ex.go (o,cast(E*)e,_ex,evt);
         }
     }
@@ -107,8 +110,10 @@ union {
     void
     add_ex (Ex* ex) {
         auto _ex = &this.ex;
-        for (; _ex !is null; _ex = _ex.next) {
-            //
+        for (; _ex.next !is null; _ex = _ex.next) {
+            if (_ex is ex) {
+                return;
+            }
         }
         _ex.next = ex;
     }
@@ -168,7 +173,7 @@ union {
     static
     void
     _go (O* o, E_ui* e, Klass* k, void* evt) {
-        // switch
+        // go
         switch ((cast (Event*) evt).type) {
             case CLICK : put (o,e,e.on_click_send_evt_code); break;
             default:
@@ -202,7 +207,7 @@ union {
     static
     void
     _go (O* o, E_ui* e, Klass* k, void* evt) {
-        // 
+        // k.data1
     }
 }
 
