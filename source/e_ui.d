@@ -224,10 +224,13 @@ auto
 e () {
     return new E_ui ();
 }
-
 auto
 e (E_ui* e) {
     return new E_ui ();
+}
+auto
+parent (E_ui* e) {
+    return e; //.parent;
 }
 
 Klass
@@ -258,7 +261,6 @@ Klass button;
 Klass _1;
 Klass _2;
 Klass _3;
-Klass parent;
 Klass loc2;
 Klass clock;
 Klass loc3;
