@@ -158,8 +158,6 @@ union {
 }
 
 //
-alias Color = uint;
-alias Coord = float;
 alias Code  = int;
 
 struct
@@ -167,13 +165,15 @@ E_ui {
 union {
     GO    go = cast (GO) &_go;
     E     _e;
-    Ex    ex;    // with next
+    Ex    ex;     // with next
     Klass klass;  // with data1
 }
     //
     A.Coord x,y,w,h;
     Color   bg;
     Code    on_click_send_evt_code;  // PLAY_1
+    //
+    Canvased canvased;
     
     //
     static
@@ -181,7 +181,8 @@ union {
     _go (O* o, E_ui* e, Klass* k, void* evt) {
         // go
         switch ((cast (Event*) evt).type) {
-            case CLICK : put (o,e,e.on_click_send_evt_code); break;
+            case CLICK  : put (o,e,k,e.on_click_send_evt_code); break;
+            case UPDATE : on_update (o,e,k,evt); break;
             default:
         }
 
@@ -192,11 +193,18 @@ union {
         }        
     }
 
-    enum CLICK = 1;
+    enum CLICK  = 1;
+    enum UPDATE = 2;
 
     static
     void
-    put (O* o, E_ui* e, Code code) {
+    put (O* o, E_ui* e, Klass* k, Code code) {
+        //
+    }
+
+    static
+    void
+    on_update (O* o, E_ui* e, Klass* k, void* evt) {
         //
     }
 }
@@ -453,6 +461,20 @@ A {
 auto
 perc (int a) {
     return A.Perc (a);
+}
+
+struct
+Canvased {
+    Coord x,y,w,h;
+    Color color;
+
+    alias Color = uint;
+    alias Coord = float;
+}
+
+struct
+Color {
+    int a;
 }
 
 //
