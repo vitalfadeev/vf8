@@ -105,19 +105,19 @@ union {
     }
 
     void
-    add_ex (Ex* m) {
-        auto _m = &ex;
-        for (; _m !is null; _m = _m.next) {
+    add_ex (Ex* ex) {
+        auto _ex = &this.ex;
+        for (; _ex !is null; _ex = _ex.next) {
             //
         }
-        _m.next = m;
+        _ex.next = ex;
     }
 
     bool
-    has_ex (Ex* m) {
-        auto _m = &ex;
-        for (; _m !is null; _m = _m.next) {
-            if (_m is m) {
+    has_ex (Ex* ex) {
+        auto _ex = &this.ex;
+        for (; _ex !is null; _ex = _ex.next) {
+            if (_ex is ex) {
                 return true;
             }
         }
@@ -125,12 +125,12 @@ union {
     }
 
     void
-    del_ex (Ex* m) {
-        auto _pre = &ex;
-        auto _m   = _pre.next;
-        for (; _m !is null; _pre = _m, _m = _m.next) {
-            if (_m is m) {
-                _pre.next = _m.next;
+    del_ex (Ex* ex) {
+        auto _pre = &this.ex;
+        auto _ex  = _pre.next;
+        for (; _ex !is null; _pre = _ex, _ex = _ex.next) {
+            if (_ex is ex) {
+                _pre.next = _ex.next;
                 break;
             }
         }
@@ -156,7 +156,7 @@ E_ui {
 union {
     GO    go = cast (GO) &_go;
     E     e;
-    Ex   mod;    // with next
+    Ex    ex;    // with next
     Klass klass;  // with data1
 }
     //
@@ -176,7 +176,7 @@ union {
 
         // klass.go, klass.go, ...
         k = &e.klass;
-        for (; k !is null; k = cast (Klass*) k.mod.next) {
+        for (; k !is null; k = cast (Klass*) k.ex.next) {
             k.go (o,cast(E*)e,cast(Ex*)k,evt);  // klass.go
         }        
     }
@@ -195,7 +195,7 @@ Klass {
 union {
     GO      go = cast (GO) &_go;
     E       e;
-    Ex     mod;
+    Ex      ex;
 }
     void*   data1;
 
@@ -208,8 +208,8 @@ union {
 
 Klass
 window_klass = {
-    cast (GO) (O* o, E* e, Ex* m, void* evt) {
-        with (cast (Klass*) m) {
+    cast (GO) (O* o, E* e, Ex* ex, void* evt) {
+        with (cast (Klass*) ex) {
 //        if ((cast (Event*) evt).type == UPDATE) {
 //            // (cast (Event*) evt).props[x] = 0
 //
