@@ -19,7 +19,7 @@ module e_ui;
 
 
 alias 
-GO  = void function (O* o, E* e, Mod* m, void* evt);
+GO  = void function (O* o, E* e, Ex* ex, void* evt);
 
 alias
 REG = void*;
@@ -78,7 +78,7 @@ REG = void*;
 struct
 O {
     GO go;
-    E* e;  // = new E_moded ()
+    E* e;  // = new E_exed ()
 
     alias GO  = void function (O* o, void* evt);
 }
@@ -89,24 +89,24 @@ E {
 }
 
 struct
-E_moded {
+E_exed {
 union {
     GO    go = cast (GO) &_go;
     E     e;
-    Mod   mod;  // klasses  // Klass (go,next,klass_data)
+    Ex    ex;  // klasses  // Klass (go,next,klass_data)
 }
 
     static
     void
-    _go (O* o, E_moded* e, Mod* m, void* evt) {
-        for (auto _mod = &e.mod; _mod !is null; _mod = _mod.next) {
-            _mod.go (o,cast(E*)e,_mod,evt);
+    _go (O* o, E_exed* e, Ex* ex, void* evt) {
+        for (auto _ex = &e.ex; _ex !is null; _ex = _ex.next) {
+            _ex.go (o,cast(E*)e,_ex,evt);
         }
     }
 
     void
-    add_mod (Mod* m) {
-        auto _m = &mod;
+    add_ex (Ex* m) {
+        auto _m = &ex;
         for (; _m !is null; _m = _m.next) {
             //
         }
@@ -114,8 +114,8 @@ union {
     }
 
     bool
-    has_mod (Mod* m) {
-        auto _m = &mod;
+    has_ex (Ex* m) {
+        auto _m = &ex;
         for (; _m !is null; _m = _m.next) {
             if (_m is m) {
                 return true;
@@ -125,8 +125,8 @@ union {
     }
 
     void
-    del_mod (Mod* m) {
-        auto _pre = &mod;
+    del_ex (Ex* m) {
+        auto _pre = &ex;
         auto _m   = _pre.next;
         for (; _m !is null; _pre = _m, _m = _m.next) {
             if (_m is m) {
@@ -138,12 +138,12 @@ union {
 }
 
 struct
-Mod {
+Ex {
 union {
     GO go;
     E  e;
 }
-    Mod* next;
+    Ex* next;
 }
 
 //
@@ -156,8 +156,8 @@ E_ui {
 union {
     GO    go = cast (GO) &_go;
     E     e;
-    Mod   mod;
-    Klass klass;
+    Ex   mod;    // with next
+    Klass klass;  // with data1
 }
     //
     Coord x,y,w,h;
@@ -177,7 +177,7 @@ union {
         // klass.go, klass.go, ...
         k = &e.klass;
         for (; k !is null; k = cast (Klass*) k.mod.next) {
-            k.go (o,cast(E*)e,cast(Mod*)k,evt);
+            k.go (o,cast(E*)e,cast(Ex*)k,evt);  // klass.go
         }        
     }
 
@@ -195,7 +195,7 @@ Klass {
 union {
     GO      go = cast (GO) &_go;
     E       e;
-    Mod     mod;
+    Ex     mod;
 }
     void*   data1;
 
@@ -208,7 +208,7 @@ union {
 
 Klass
 window_klass = {
-    cast (GO) (O* o, E* e, Mod* m, void* evt) {
+    cast (GO) (O* o, E* e, Ex* m, void* evt) {
         with (cast (Klass*) m) {
 //        if ((cast (Event*) evt).type == UPDATE) {
 //            // (cast (Event*) evt).props[x] = 0
