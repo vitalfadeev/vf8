@@ -1,5 +1,11 @@
 module e_ui;
 
+void
+mai () {
+    auto e = test ();
+    dump_tree (e);
+}
+
 auto
 test () {
     return
@@ -308,6 +314,78 @@ Klass indicator;
 struct
 Event {
     uint type;
+}
+
+
+//
+void
+dump_tree (E_ui_childed* e, int level=0) {
+    import core.stdc.stdio : printf;
+
+    for (auto i = level; i > 0; i--)  printf ("  ");
+    printf ("e");
+    for (auto ex = e.ex.next; ex != null; ex = ex.next) printf (" %x", ex);
+    printf ("\n");
+
+    // childs
+    for (auto _e = e.cl; _e !is null; _e = _e.r) {
+        dump_tree (_e,level+1);
+    }
+
+    //foreach (t; WalkTree (e,&skip)) {
+    //    printf ("e\n");
+    //}
+}
+
+bool
+skip (E_ui_childed* e) {
+    return false;
+}
+
+
+auto 
+WalkTree (Tree,Skip) (Tree* t, Skip skip) {
+    return _WalkTree!(Tree,Skip) (cast (Tree*) t,skip);
+}
+
+struct
+_WalkTree (Tree,Skip) {
+    Tree* t;
+    Skip  skip;
+
+    int
+    opApply (int delegate (Tree* t) dg) {
+        Tree*  next = t;
+        Tree* _next = t;
+
+        loop:
+            if (skip (cast (Tree*) next)) {
+                _next = next;
+                goto go_right;
+            }
+
+            if (auto result = dg (cast (Tree*) next))
+                return result;
+
+            _next = next;
+
+            go_down:   // v
+                next = _next.cl;
+                if (next !is null)
+                    goto loop;  // go_down
+            go_right:  // >
+                next = _next.r;
+                if (next !is null)
+                    goto loop;  // go_down
+            go_up:     // ^
+                next = _next.parent;
+                if (next !is null) {
+                    _next = next;
+                    goto go_right;
+                }
+
+        return 0;
+    }
 }
 
 
