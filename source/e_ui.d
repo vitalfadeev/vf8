@@ -19,7 +19,7 @@ module e_ui;
 
 
 alias 
-GO  = void function (O* o, E* e, E_mod* k, void* evt);
+GO  = void function (O* o, E* e, Mod* m, void* evt);
 
 alias
 REG = void*;
@@ -93,31 +93,31 @@ E_moded {
 union {
     GO    go = cast (GO) &_go;
     E     e;
-    E_mod e_mod;  // klasses  // Klass (go,next,klass_data)
+    Mod   mod;  // klasses  // Klass (go,next,klass_data)
 }
 
     static
     void
-    _go (O* o, E_moded* e, E_mod* m, void* evt) {
-        for (auto _mod = &e.e_mod; _mod !is null; _mod = _mod.next) {
+    _go (O* o, E_moded* e, Mod* m, void* evt) {
+        for (auto _mod = &e.mod; _mod !is null; _mod = _mod.next) {
             _mod.go (o,cast(E*)e,_mod,evt);
         }
     }
 
     void
-    add_mod (E_mod* mod) {
-        auto _mod = &e_mod;
-        for (; _mod !is null; _mod = _mod.next) {
+    add_mod (Mod* m) {
+        auto _m = &mod;
+        for (; _m !is null; _m = _m.next) {
             //
         }
-        _mod.next = mod;
+        _m.next = m;
     }
 
     bool
-    has_mod (E_mod* mod) {
-        auto _mod = &e_mod;
-        for (; _mod !is null; _mod = _mod.next) {
-            if (_mod is mod) {
+    has_mod (Mod* m) {
+        auto _m = &mod;
+        for (; _m !is null; _m = _m.next) {
+            if (_m is m) {
                 return true;
             }
         }
@@ -125,12 +125,12 @@ union {
     }
 
     void
-    del_mod (E_mod* mod) {
-        auto _pre = &e_mod;
-        auto _mod = _pre.next;
-        for (; _mod !is null; _pre = _mod, _mod = _mod.next) {
-            if (_mod is mod) {
-                _pre.next = _mod.next;
+    del_mod (Mod* m) {
+        auto _pre = &mod;
+        auto _m   = _pre.next;
+        for (; _m !is null; _pre = _m, _m = _m.next) {
+            if (_m is m) {
+                _pre.next = _m.next;
                 break;
             }
         }
@@ -138,12 +138,12 @@ union {
 }
 
 struct
-E_mod {
+Mod {
 union {
     GO go;
     E  e;
 }
-    E_mod* next;
+    Mod* next;
 }
 
 //
@@ -154,10 +154,10 @@ alias Code  = int;
 struct
 E_ui {
 union {
-    GO      go = cast (GO) &_go;
-    E       e;
-    E_mod   mod;
-    E_klass klass;
+    GO    go = cast (GO) &_go;
+    E     e;
+    Mod   mod;
+    Klass klass;
 }
     //
     Coord x,y,w,h;
@@ -167,7 +167,7 @@ union {
     //
     static
     void
-    _go (O* o, E_ui* e, E_klass* k, void* evt) {
+    _go (O* o, E_ui* e, Klass* k, void* evt) {
         // switch
         switch ((cast (Event*) evt).type) {
             case CLICK : put (o,e,e.on_click_send_evt_code); break;
@@ -176,8 +176,8 @@ union {
 
         // klass.go, klass.go, ...
         k = &e.klass;
-        for (; k !is null; k = cast (E_klass*) k.mod.next) {
-            k.go (o,cast(E*)e,cast(E_mod*)k,evt);
+        for (; k !is null; k = cast (Klass*) k.mod.next) {
+            k.go (o,cast(E*)e,cast(Mod*)k,evt);
         }        
     }
 
@@ -191,25 +191,25 @@ union {
 }
 
 struct
-E_klass {
+Klass {
 union {
     GO      go = cast (GO) &_go;
     E       e;
-    E_mod   mod;
+    Mod     mod;
 }
-    void* data1;
+    void*   data1;
 
     static
     void
-    _go (O* o, E_ui* e, E_klass* k, void* evt) {
+    _go (O* o, E_ui* e, Klass* k, void* evt) {
         // 
     }
 }
 
-E_klass
+Klass
 window_klass = {
-    cast (GO) (O* o, E* e, E_mod* m, void* evt) {
-        with (cast (E_klass*) m) {
+    cast (GO) (O* o, E* e, Mod* m, void* evt) {
+        with (cast (Klass*) m) {
 //        if ((cast (Event*) evt).type == UPDATE) {
 //            // (cast (Event*) evt).props[x] = 0
 //
@@ -231,124 +231,124 @@ Event {
 
 //
 
-alias
-Klass = void function (void* o, void* e, void* evt);
+//alias
+//Klass = void function (void* o, void* e, void* evt);
 
-Klass 
-_panel = (void* o, void* e, void* evt) {
-    with (cast (E*) e) {
-        //
-    }
-};
+//Klass 
+//_panel = (void* o, void* e, void* evt) {
+//    with (cast (E*) e) {
+//        //
+//    }
+//};
 
-Klass 
-_window = (void* o, void* e, void* evt) {
-    with (cast (E*) e) {
-//        if ((cast (Event*) evt).type == UPDATE) {
-//            // (cast (Event*) evt).props[x] = 0
-//
-//            x = 0;
-//            //y = top;
-//            //w = screen.w;
-//            h = 64;
-//        }
-    }
-};
+//Klass 
+//_window = (void* o, void* e, void* evt) {
+//    with (cast (E*) e) {
+////        if ((cast (Event*) evt).type == UPDATE) {
+////            // (cast (Event*) evt).props[x] = 0
+////
+////            x = 0;
+////            //y = top;
+////            //w = screen.w;
+////            h = 64;
+////        }
+//    }
+//};
 
 
-E* 
-e () {
-    return new E ();
-}
+//E* 
+//e () {
+//    return new E ();
+//}
 
-E* 
-e (E* e) {
-    auto child = new E ();
-    e.add_child (child);
-    return child;
-}
+//E* 
+//e (E* e) {
+//    auto child = new E ();
+//    e.add_child (child);
+//    return child;
+//}
 
-E*
-panel (E* e) {
-    e.add_klass (_panel);
-    return e;
-}
+//E*
+//panel (E* e) {
+//    e.add_klass (_panel);
+//    return e;
+//}
 
-E*
-window (E* e) {
-    e.add_klass (_window);
-    return e;
-}
+//E*
+//window (E* e) {
+//    e.add_klass (_window);
+//    return e;
+//}
 
-Klass canvas_klass;
-E*
-canvas (E* e) {
-    e.add_klass (canvas_klass);
-    return e;
-}
+//Klass canvas_klass;
+//E*
+//canvas (E* e) {
+//    e.add_klass (canvas_klass);
+//    return e;
+//}
 
-Klass loc1_klass;
-E*
-loc1 (E* e) {
-    e.add_klass (loc1_klass);
-    return e;
-}
+//Klass loc1_klass;
+//E*
+//loc1 (E* e) {
+//    e.add_klass (loc1_klass);
+//    return e;
+//}
 
-Klass loc2_klass;
-E*
-loc2 (E* e) {
-    e.add_klass (loc2_klass);
-    return e;
-}
+//Klass loc2_klass;
+//E*
+//loc2 (E* e) {
+//    e.add_klass (loc2_klass);
+//    return e;
+//}
 
-Klass loc3_klass;
-E*
-loc3 (E* e) {
-    e.add_klass (loc3_klass);
-    return e;
-}
+//Klass loc3_klass;
+//E*
+//loc3 (E* e) {
+//    e.add_klass (loc3_klass);
+//    return e;
+//}
 
-Klass button_klass;
-E*
-button (E* e) {
-    e.add_klass (button_klass);
-    return e;
-}
+//Klass button_klass;
+//E*
+//button (E* e) {
+//    e.add_klass (button_klass);
+//    return e;
+//}
 
-Klass _1_klass;
-E*
-_1 (E* e) {
-    e.add_klass (_1_klass);
-    return e;
-}
+//Klass _1_klass;
+//E*
+//_1 (E* e) {
+//    e.add_klass (_1_klass);
+//    return e;
+//}
 
-Klass _2_klass;
-E*
-_2 (E* e) {
-    e.add_klass (_2_klass);
-    return e;
-}
+//Klass _2_klass;
+//E*
+//_2 (E* e) {
+//    e.add_klass (_2_klass);
+//    return e;
+//}
 
-Klass _3_klass;
-E*
-_3 (E* e) {
-    e.add_klass (_3_klass);
-    return e;
-}
+//Klass _3_klass;
+//E*
+//_3 (E* e) {
+//    e.add_klass (_3_klass);
+//    return e;
+//}
 
-Klass clock_klass;
-E*
-clock (E* e) {
-    e.add_klass (clock_klass);
-    return e;
-}
+//Klass clock_klass;
+//E*
+//clock (E* e) {
+//    e.add_klass (clock_klass);
+//    return e;
+//}
 
-Klass indicator_klass;
-E*
-indicator (E* e) {
-    e.add_klass (indicator_klass);
-    return e;
-}
+//Klass indicator_klass;
+//E*
+//indicator (E* e) {
+//    e.add_klass (indicator_klass);
+//    return e;
+//}
 
 // e .panel .window .canvas
 // .e .loc1
