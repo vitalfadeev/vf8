@@ -92,19 +92,25 @@ O {
 struct
 E {
     GO go;
-}
-
-struct
-E_exed {
-union {
-    GO    go = cast (GO) &_go;
-    E     e;
-    Ex    ex;  // klasses  // Klass (go,next,klass_data)
-}
 
     static
     void
-    _go (O* o, E_exed* e, Ex* ex, void* evt) {
+    _go (O* o, E* e, Ex* ex, void* evt) {
+        //
+    }
+}
+
+struct
+Ex {
+union {
+    GO go;
+    E  _e;
+}
+    Ex* next;
+
+    static
+    void
+    _go (O* o, E* e, Ex* ex, void* evt) {
         //go (o,e,ex,evt);
 
         // ex.go, ex.go,...
@@ -113,18 +119,19 @@ union {
 
     void
     add_ex (Ex* ex) {
-        auto _ex = &this.ex;
+        // find end
+        auto _ex = &this;
         for (; _ex.next !is null; _ex = _ex.next) {
             if (_ex is ex) {
-                return;
+                return;  // skip existent
             }
         }
-        _ex.next = ex;
+        _ex.next = ex;  // to end
     }
 
     bool
     has_ex (Ex* ex) {
-        auto _ex = &this.ex;
+        auto _ex = next;
         for (; _ex !is null; _ex = _ex.next) {
             if (_ex is ex) {
                 return true;
@@ -135,8 +142,10 @@ union {
 
     void
     del_ex (Ex* ex) {
-        auto _pre = &this.ex;
+        auto _pre = next;
+        if (_pre is null) return;
         auto _ex  = _pre.next;
+        if (_pre is ex) { next = _ex; return; }
         for (; _ex !is null; _pre = _ex, _ex = _ex.next) {
             if (_ex is ex) {
                 _pre.next = _ex.next;
@@ -147,20 +156,11 @@ union {
 
     static
     void
-    each_ex (O* o, E_exed* e, Ex* ex, void* evt) {
-        for (auto _ex = e.ex.next; _ex !is null; _ex = _ex.next) {
-            _ex.go (o,cast(E*)e,_ex,evt);
+    each_ex (O* o, E* e, Ex* ex, void* evt) {
+        for (auto _ex = ex.next; _ex !is null; _ex = _ex.next) {
+            _ex.go (o,e,_ex,evt);
         }
     }
-}
-
-struct
-Ex {
-union {
-    GO go;
-    E  e;
-}
-    Ex* next;
 }
 
 //
@@ -169,10 +169,10 @@ alias Code  = int;
 struct
 E_ui {
 union {
-    GO    go = cast (GO) &_go;
-    E     _e;
-    Ex    ex;     // with next
-    Klass klass;  // with data1
+    GO     go = cast (GO) &_go;
+    E      _e;
+    Ex     ex;     // with next
+    Klass  klass;  // with data1
 }
     //
     A.Coord x,y,w,h;
@@ -209,10 +209,7 @@ union {
         }
 
         // klass.go, klass.go, ...
-        k = &e.klass;
-        for (; k !is null; k = cast (Klass*) k.ex.next) {
-            k.go (o,cast(E*)e,cast(Ex*)k,evt);  // klass.go
-        }        
+        Ex.each_ex (o,cast (E*) e,e.klass.ex.next,evt);
     }
 
     enum CLICK  = 1;
@@ -262,12 +259,12 @@ union {
     // e .window
     E_ui*
     opCall (E_ui* e) {
-        (cast (E_exed*) e).add_ex (cast (Ex*) new Klass (this.go));
+        (cast (Ex*) e).add_ex (cast (Ex*) new Klass (this.go));
         return e;
     }
     E_ui_childed*
     opCall (E_ui_childed* e) {
-        (cast (E_exed*) e).add_ex (cast (Ex*) new Klass (this.go));
+        (cast (Ex*) e).add_ex (cast (Ex*) new Klass (this.go));
         return e;
     }
 }
