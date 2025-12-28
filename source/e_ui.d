@@ -19,33 +19,10 @@ module e_ui;
 
 
 alias 
-GO  = void function (O* o, E* e, void* evt);
+GO  = void function (O* o, E* e, E_mod* k, void* evt);
 
 alias
 REG = void*;
-
-struct
-Klass_set {
-    Klass[8] s;
-
-    auto
-    has (Klass k) {
-        return 
-            (s[0] == k) ||
-            (s[1] == k) ||
-            (s[2] == k) ||
-            (s[3] == k) ||
-            (s[4] == k) ||
-            (s[5] == k) ||
-            (s[6] == k) ||
-            (s[7] == k);
-    }
-
-    void
-    add (Klass k) {
-        s[0] = k;
-    }
-}
 
 // ctx, go
 //   go (ctx) {
@@ -109,8 +86,6 @@ O {
 struct
 E {
     GO go;
-
-    alias GO  = void function (O* o, E* e, void* evt);
 }
 
 struct
@@ -123,9 +98,9 @@ union {
 
     static
     void
-    _go (O* o, E_moded* e, void* evt) {
+    _go (O* o, E_moded* e, E_mod* m, void* evt) {
         for (auto _mod = &e.e_mod; _mod !is null; _mod = _mod.next) {
-            _mod.go (o,cast(E*)_mod,evt);
+            _mod.go (o,cast(E*)e,_mod,evt);
         }
     }
 
@@ -171,16 +146,6 @@ union {
     E_mod* next;
 }
 
-struct
-E_klass {
-union {
-    GO    go;
-    E     e;
-    E_mod mod;
-}
-    void* data1;
-}
-
 //
 alias Color = uint;
 alias Coord = float;
@@ -189,9 +154,10 @@ alias Code  = int;
 struct
 E_ui {
 union {
-    GO    go = cast (GO) &_go;
-    E     e;
-    E_mod mod;
+    GO      go = cast (GO) &_go;
+    E       e;
+    E_mod   mod;
+    E_klass klass;
 }
     //
     Coord x,y,w,h;
@@ -201,11 +167,18 @@ union {
     //
     static
     void
-    _go (O* o, E_ui* e, void* evt) {
+    _go (O* o, E_ui* e, E_klass* k, void* evt) {
+        // switch
         switch ((cast (Event*) evt).type) {
             case CLICK : put (o,e,e.on_click_send_evt_code); break;
             default:
         }
+
+        // klass.go, klass.go, ...
+        k = &e.klass;
+        for (; k !is null; k = cast (E_klass*) k.mod.next) {
+            k.go (o,cast(E*)e,cast(E_mod*)k,evt);
+        }        
     }
 
     enum CLICK = 1;
@@ -217,10 +190,26 @@ union {
     }
 }
 
+struct
+E_klass {
+union {
+    GO      go = cast (GO) &_go;
+    E       e;
+    E_mod   mod;
+}
+    void* data1;
+
+    static
+    void
+    _go (O* o, E_ui* e, E_klass* k, void* evt) {
+        // 
+    }
+}
+
 E_klass
 window_klass = {
-    (O* o, E* e, void* evt) {
-        with (cast (E*) e) {
+    cast (GO) (O* o, E* e, E_mod* m, void* evt) {
+        with (cast (E_klass*) m) {
 //        if ((cast (Event*) evt).type == UPDATE) {
 //            // (cast (Event*) evt).props[x] = 0
 //
