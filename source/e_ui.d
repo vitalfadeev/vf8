@@ -108,9 +108,7 @@ union {
         //go (o,e,ex,evt);
 
         // ex.go, ex.go,...
-        for (auto _ex = e.ex.next; _ex !is null; _ex = _ex.next) {
-            _ex.go (o,cast(E*)e,_ex,evt);
-        }
+        each_ex (o,e,ex,evt);
     }
 
     void
@@ -146,6 +144,14 @@ union {
             }
         }
     }
+
+    static
+    void
+    each_ex (O* o, E_exed* e, Ex* ex, void* evt) {
+        for (auto _ex = e.ex.next; _ex !is null; _ex = _ex.next) {
+            _ex.go (o,cast(E*)e,_ex,evt);
+        }
+    }
 }
 
 struct
@@ -170,6 +176,22 @@ union {
 }
     //
     A.Coord x,y,w,h;
+    // layers
+    // layer 1
+    //   bg
+    //   fg
+    //   svg
+    //   text
+    // layer 2
+    //   bg
+    //   fg
+    //   svg
+    //   text
+    // layer 3
+    //   bg
+    //   fg
+    //   svg
+    //   text
     Color   bg;
     Code    on_click_send_evt_code;  // PLAY_1
     //
@@ -282,6 +304,14 @@ E_ui_childed {
         c.parent = t;
 
         return c;
+    }
+
+    static
+    void
+    each_child (O* o, E_ui_childed* e, Ex* ex, void* evt) {
+        for (auto _e = e.cl; _e !is null; _e = _e.r) {
+            _e.go (o,cast(E*)e,ex,evt);
+        }
     }
 }
 
@@ -633,5 +663,16 @@ Desktop {
     int 
     h () {
         return 768;
+    }
+}
+
+struct
+Rects {
+    Rect[] s;  // active rects only
+
+    struct
+    Rect {
+        int   x,y,w,h;
+        void* e;
     }
 }
