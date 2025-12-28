@@ -2,10 +2,9 @@ module e_ui;
 
 auto
 test () {
-    auto e = new E_ui ();
-    return
-    e .window //.panel .canvas
-    //.e .loc1
+    e .window .panel .canvas
+    .e .loc1;
+    return e;
     // .e .button ._1  .parent
     // .e .button ._2  .parent
     // .e .button ._3  .parent.parent
@@ -15,7 +14,7 @@ test () {
     // .e .indicator ._1  .parent
     // .e .indicator ._2  .parent
     // .e .indicator ._3  .parent.parent
-    ;
+    //;
 }
 
 
@@ -161,7 +160,7 @@ struct
 E_ui {
 union {
     GO    go = cast (GO) &_go;
-    E     e;
+    E     _e;
     Ex    ex;    // with next
     Klass klass;  // with data1
 }
@@ -200,7 +199,7 @@ struct
 Klass {
 union {
     GO      go = cast (GO) &_go;
-    E       e;
+    E       _e;
     Ex      ex;
 }
     void*   data1;
@@ -211,11 +210,24 @@ union {
         // k.data1
     }
 
+    //
     // e .window
-    void
+    E_ui*
     opCall (E_ui* e) {
         (cast (E_exed*) e).add_ex (cast (Ex*) new Klass (this.go));
+        return e;
     }
+}
+
+//
+auto 
+e () {
+    return new E_ui ();
+}
+
+auto
+e (E_ui* e) {
+    return new E_ui ();
 }
 
 Klass
@@ -238,6 +250,10 @@ window = {
         }
     }
 };
+
+Klass panel;
+Klass canvas;
+Klass loc1;
 
 struct
 Event {
