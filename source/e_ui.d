@@ -1,21 +1,22 @@
 module e_ui;
 
-//auto
-//test () {
-//    return
-//    e .panel .window .canvas
-//    .e .loc1
-//     .e .button ._1  .parent
-//     .e .button ._2  .parent
-//     .e .button ._3  .parent.parent
-//    .e .loc2
-//     .e .button .clock  .parent.parent
-//    .e .loc3
-//     .e .indicator ._1  .parent
-//     .e .indicator ._2  .parent
-//     .e .indicator ._3  .parent.parent
-//    ;
-//}
+auto
+test () {
+    auto e = new E_ui ();
+    return
+    e .window //.panel .canvas
+    //.e .loc1
+    // .e .button ._1  .parent
+    // .e .button ._2  .parent
+    // .e .button ._3  .parent.parent
+    //.e .loc2
+    // .e .button .clock  .parent.parent
+    //.e .loc3
+    // .e .indicator ._1  .parent
+    // .e .indicator ._2  .parent
+    // .e .indicator ._3  .parent.parent
+    ;
+}
 
 
 alias 
@@ -209,10 +210,16 @@ union {
     _go (O* o, E_ui* e, Klass* k, void* evt) {
         // k.data1
     }
+
+    // e .window
+    void
+    opCall (E_ui* e) {
+        (cast (E_exed*) e).add_ex (cast (Ex*) new Klass (this.go));
+    }
 }
 
 Klass
-window_klass = {
+window = {
     cast (GO) (O* o, E* e, Ex* ex, void* evt) {
         with (cast (Klass*) ex) {
 //        if ((cast (Event*) evt).type == UPDATE) {
