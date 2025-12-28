@@ -356,45 +356,49 @@ A {
 
     struct
     Coord {
-        Type type;
+        Type     type;
     union {
-        Int  _int;
-        Perc _perc;
+        Int      _int;
+        Perc     _perc;
+        Left     _left;
+        Center   _center;
+        Right    _right;
+        Parent_h _parent_h;
     }
 
         void
         opAssign (int b) {
-            type = Tree._int;
+            type = Type._int;
             _int = Int (b);
         }
         void
         opAssign (Int b) {
-            type = Tree._int;
+            type = Type._int;
             _int = b;
         }
         void
         opAssign (Perc b) {
-            type = Tree._perc;
+            type = Type._perc;
             _perc = b;
         }
         void
         opAssign (Left b) {
-            type = Tree._left;
+            type = Type._left;
             _left = b;
         }
         void
         opAssign (Center b) {
-            type = Tree._center;
+            type = Type._center;
             _center = b;
         }
         void
         opAssign (Right b) {
-            type = Tree._right;
+            type = Type._right;
             _right = b;
         }
         void
         opAssign (Parent_h b) {
-            type = Tree._parent_h;
+            type = Type._parent_h;
             _parent_h = b;
         }
 
