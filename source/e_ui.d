@@ -2,19 +2,19 @@ module e_ui;
 
 auto
 test () {
+    return
     e .window .panel .canvas
-    .e .loc1;
-    return e;
-    // .e .button ._1  .parent
-    // .e .button ._2  .parent
-    // .e .button ._3  .parent.parent
-    //.e .loc2
-    // .e .button .clock  .parent.parent
-    //.e .loc3
-    // .e .indicator ._1  .parent
-    // .e .indicator ._2  .parent
-    // .e .indicator ._3  .parent.parent
-    //;
+    .e .loc1
+     .e .button ._1  .parent
+     .e .button ._2  .parent
+     .e .button ._3  .parent.parent
+    .e .loc2
+     .e .button .clock  .parent.parent
+    .e .loc3
+     .e .indicator ._1  .parent
+     .e .indicator ._2  .parent
+     .e .indicator ._3  .parent.parent
+    ;
 }
 
 
@@ -254,6 +254,15 @@ window = {
 Klass panel;
 Klass canvas;
 Klass loc1;
+Klass button;
+Klass _1;
+Klass _2;
+Klass _3;
+Klass parent;
+Klass loc2;
+Klass clock;
+Klass loc3;
+Klass indicator;
 
 struct
 Event {
