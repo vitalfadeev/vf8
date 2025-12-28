@@ -217,20 +217,59 @@ union {
         (cast (E_exed*) e).add_ex (cast (Ex*) new Klass (this.go));
         return e;
     }
+    E_ui_childed*
+    opCall (E_ui_childed* e) {
+        (cast (E_exed*) e).add_ex (cast (Ex*) new Klass (this.go));
+        return e;
+    }
+}
+
+struct
+E_ui_childed {
+    union {
+        GO    go;
+        E     _e;
+        Ex    ex;    // with next
+        Klass klass;  // with data1
+    }    
+    //
+    E_ui_childed* l;
+    E_ui_childed* r;
+    E_ui_childed* cl;
+    E_ui_childed* cr;
+    E_ui_childed* parent;
+
+    E_ui_childed*
+    add_child (E_ui_childed* c) {
+        auto t = &this;
+        auto tr = t.cr;
+        if (tr is null) {
+            t.cr = c;
+            t.cl = c;
+        }
+        else {
+            c.l = tr;
+            tr.r = c;
+            t.cr = c;
+        }
+        c.parent = t;
+
+        return c;
+    }
 }
 
 //
 auto 
 e () {
-    return new E_ui ();
+    return new E_ui_childed ();
 }
 auto
-e (E_ui* e) {
-    return new E_ui ();
+e (E_ui_childed* e) {
+    return e.add_child (new E_ui_childed ());
 }
 auto
-parent (E_ui* e) {
-    return e; //.parent;
+parent (E_ui_childed* e) {
+    return e.parent;
 }
 
 Klass
@@ -271,128 +310,6 @@ Event {
     uint type;
 }
 
-
-
-//
-
-//alias
-//Klass = void function (void* o, void* e, void* evt);
-
-//Klass 
-//_panel = (void* o, void* e, void* evt) {
-//    with (cast (E*) e) {
-//        //
-//    }
-//};
-
-//Klass 
-//_window = (void* o, void* e, void* evt) {
-//    with (cast (E*) e) {
-////        if ((cast (Event*) evt).type == UPDATE) {
-////            // (cast (Event*) evt).props[x] = 0
-////
-////            x = 0;
-////            //y = top;
-////            //w = screen.w;
-////            h = 64;
-////        }
-//    }
-//};
-
-
-//E* 
-//e () {
-//    return new E ();
-//}
-
-//E* 
-//e (E* e) {
-//    auto child = new E ();
-//    e.add_child (child);
-//    return child;
-//}
-
-//E*
-//panel (E* e) {
-//    e.add_klass (_panel);
-//    return e;
-//}
-
-//E*
-//window (E* e) {
-//    e.add_klass (_window);
-//    return e;
-//}
-
-//Klass canvas_klass;
-//E*
-//canvas (E* e) {
-//    e.add_klass (canvas_klass);
-//    return e;
-//}
-
-//Klass loc1_klass;
-//E*
-//loc1 (E* e) {
-//    e.add_klass (loc1_klass);
-//    return e;
-//}
-
-//Klass loc2_klass;
-//E*
-//loc2 (E* e) {
-//    e.add_klass (loc2_klass);
-//    return e;
-//}
-
-//Klass loc3_klass;
-//E*
-//loc3 (E* e) {
-//    e.add_klass (loc3_klass);
-//    return e;
-//}
-
-//Klass button_klass;
-//E*
-//button (E* e) {
-//    e.add_klass (button_klass);
-//    return e;
-//}
-
-//Klass _1_klass;
-//E*
-//_1 (E* e) {
-//    e.add_klass (_1_klass);
-//    return e;
-//}
-
-//Klass _2_klass;
-//E*
-//_2 (E* e) {
-//    e.add_klass (_2_klass);
-//    return e;
-//}
-
-//Klass _3_klass;
-//E*
-//_3 (E* e) {
-//    e.add_klass (_3_klass);
-//    return e;
-//}
-
-//Klass clock_klass;
-//E*
-//clock (E* e) {
-//    e.add_klass (clock_klass);
-//    return e;
-//}
-
-//Klass indicator_klass;
-//E*
-//indicator (E* e) {
-//    e.add_klass (indicator_klass);
-//    return e;
-//}
 
 // e .panel .window .canvas
 // .e .loc1
