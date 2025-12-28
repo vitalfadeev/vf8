@@ -205,7 +205,19 @@ union {
     static
     void
     on_update (O* o, E_ui* e, Klass* k, void* evt) {
+        // read w
+        // write canvased.w
         //
+        // read x
+        // write canvased.x
+        with (e)
+        if (w.type == A.Type._perc) {
+            canvased.w = 
+                (
+                    (cast (E_ui_childed*)e).parent
+                )
+                ._e_ui.canvased.w * w._perc.a / 100;
+        }
     }
 }
 
@@ -245,6 +257,7 @@ E_ui_childed {
         E     _e;
         Ex    ex;    // with next
         Klass klass;  // with data1
+        E_ui  _e_ui;
     }    
     //
     E_ui_childed* l;
@@ -435,6 +448,11 @@ A {
     struct
     Perc {
         int a;
+
+        //auto 
+        //opBinaryRight (string op : "*") (float rhs) {
+        //    return a * rhs;
+        //}
     }
 
     struct
