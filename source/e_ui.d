@@ -221,6 +221,8 @@ union {
 Klass
 window = {
     cast (GO) (O* o, E* e, Ex* ex, void* evt) {
+        (cast (E_ui*) e).x = 0;
+        
         with (cast (Klass*) ex) {
 //        if ((cast (Event*) evt).type == UPDATE) {
 //            // (cast (Event*) evt).props[x] = 0
