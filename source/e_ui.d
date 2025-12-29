@@ -173,7 +173,7 @@ alias Code  = int;
 struct
 E_ui {
 union {
-    GO     go = &_go;
+    GO     go = &all_ex_go;
     E      e_;
     Ex     ex_;     // with next
     Klass  klass_;  // with data1
@@ -239,6 +239,14 @@ union {
                     (cast (E_ui_childed*)e).parent
                 )
                 .e_ui_.canvased.w * w._perc.a / 100;
+        }
+    }
+
+    static
+    void
+    all_ex_go (O* o, E_ui* e, Klass* k, Event* evt) {
+        for (auto _k = cast (Klass*) e; _k !is null; _k = cast (Klass*) (cast (Ex*) _k).next) {
+            _k.go (o,e,_k,evt);
         }
     }
 }
