@@ -163,10 +163,7 @@ Ex {
 }
 
 
-
 //
-alias Code  = int;
-
 struct
 E_ui {
 // Klass {
@@ -219,15 +216,6 @@ E_ui {
             case UPDATE : on_update (o,e,k,evt); break;
             default:
         }
-    }
-
-    enum CLICK  = 1;
-    enum UPDATE = 2;
-
-    static
-    void
-    put (O* o, E_ui* e, Klass* k, Code code) {
-        //
     }
 
     static
@@ -432,10 +420,20 @@ Klass indicator;
 
 struct
 Event {
-    uint type;
+    Code type;
 }
 
+alias Code  = int;
+
+enum CLICK  = 1;
+enum UPDATE = 2;
 enum SET_E_PROP = 11;
+
+static
+void
+put (O* o, E_ui* e, Klass* k, Code code) {
+    //
+}
 
 //
 struct
