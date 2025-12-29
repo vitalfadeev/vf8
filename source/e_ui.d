@@ -25,7 +25,7 @@ test () {
 
 
 alias 
-GO  = void function (O* o, E* e, Ex* ex, void* evt);
+GO  = void function (O* o, E* e, Ex* ex, Event* evt);
 
 alias
 REG = void*;
@@ -86,7 +86,7 @@ O {
     GO go;
     E* e;  // = new E_exed ()
 
-    alias GO  = void function (O* o, void* evt);
+    alias GO  = void function (O* o, Event* evt);
 }
 
 struct
@@ -95,7 +95,7 @@ E {
 
     static
     void
-    _go (O* o, E* e, Ex* ex, void* evt) {
+    _go (O* o, E* e, Ex* ex, Event* evt) {
         //
     }
 }
@@ -110,7 +110,7 @@ union {
 
     static
     void
-    _go (O* o, Ex* e, Ex* ex, void* evt) {
+    _go (O* o, Ex* e, Ex* ex, Event* evt) {
         //e.go (o,e,ex,evt);
         each_ex (o,e,ex,evt);
     }
@@ -153,7 +153,7 @@ union {
 
     static
     void
-    each_ex (O* o, Ex* e, Ex* ex, void* evt) {
+    each_ex (O* o, Ex* e, Ex* ex, Event* evt) {
         for (auto _ex = e.next; _ex !is null; _ex = _ex.next) {
             _ex.go (o,cast(E*)e,_ex,evt);
         }
@@ -199,7 +199,7 @@ union {
     //
     static
     void
-    _go (O* o, E_ui* e, Klass* k, void* evt) {
+    _go (O* o, E_ui* e, Klass* k, Event* evt) {
         // go
         switch ((cast (Event*) evt).type) {
             case CLICK  : put (o,e,k,e.on_click_send_evt_code); break;
@@ -222,7 +222,7 @@ union {
 
     static
     void
-    on_update (O* o, E_ui* e, Klass* k, void* evt) {
+    on_update (O* o, E_ui* e, Klass* k, Event* evt) {
         // read w
         // write canvased.w
         //
@@ -250,7 +250,7 @@ union {
 
     static
     void
-    _go (O* o, E_ui* e, Klass* k, void* evt) {
+    _go (O* o, E_ui* e, Klass* k, Event* evt) {
         // k.data1
     }
 
@@ -304,7 +304,7 @@ union {
 
     static
     void
-    each_child (O* o, E_ui_childed* e, Ex* ex, void* evt) {
+    each_child (O* o, E_ui_childed* e, Ex* ex, Event* evt) {
         for (auto _e = e.cl; _e !is null; _e = _e.r) {
             _e.go (o,cast(E*)e,ex,evt);
         }
@@ -327,23 +327,20 @@ parent (E_ui_childed* e) {
 
 Klass
 window = {
-    (O* o, E* e, Ex* ex, void* evt) {
-        with (cast (E_ui*) e) {
-            x = 0;
-            y = 0;
-            w = Desktop.w;
-            h = 64;
-        }
+    (O* o, E* e, Ex* ex, Event* evt) {
+        enum SET_E_PROP = 11;
+        GO on_set_e_prop = (O* o, E* e, Ex* ex, Event* evt) {
+            with (cast (E_ui*) e) {
+                x = 0;
+                y = 0;
+                w = Desktop.w;
+                h = 64;
+            }
+        };
 
-        with (cast (Klass*) ex) {
-//        if ((cast (Event*) evt).type == UPDATE) {
-//            // (cast (Event*) evt).props[x] = 0
-//
-//            x = 0;
-//            //y = top;
-//            //w = screen.w;
-//            h = 64;
-//        }
+        switch ((cast (Event*) evt).type) {
+            case SET_E_PROP : on_set_e_prop (o,e,ex,evt); break;
+            default:
         }
     }
 };
@@ -352,7 +349,7 @@ Klass panel;
 Klass canvas;
 Klass 
 loc1 = {
-    (O* o, E* e, Ex* ex, void* evt) {
+    (O* o, E* e, Ex* ex, Event* evt) {
         with (cast (E_ui*) e) {
            x = A.Coord.left;
            y = 0;
@@ -367,7 +364,7 @@ Klass _2;
 Klass _3;
 Klass 
 loc2 = {
-    (O* o, E* e, Ex* ex, void* evt) {
+    (O* o, E* e, Ex* ex, Event* evt) {
         with (cast (E_ui*) e) {
            x = A.Coord.center;
            y = 0;
@@ -379,7 +376,7 @@ loc2 = {
 Klass clock;
 Klass 
 loc3 = {
-    (O* o, E* e, Ex* ex, void* evt) {
+    (O* o, E* e, Ex* ex, Event* evt) {
         with (cast (E_ui*) e) {
            x = A.Coord.right;
            y = 0;
