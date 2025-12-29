@@ -24,9 +24,6 @@ test () {
 }
 
 
-alias 
-GO  = void function (O* o, E* e, Ex* ex, Event* evt);
-
 alias
 REG = void*;
 
@@ -91,11 +88,13 @@ O {
 
 struct
 E {
-    GO go;
+    GO go = &_go;
+
+    alias GO = void function (O* o, E* e, E* ex, Event* evt);
 
     static
     void
-    _go (O* o, E* e, Ex* ex, Event* evt) {
+    _go (O* o, E* e, E* ex, Event* evt) {
         //
     }
 }
@@ -103,16 +102,17 @@ E {
 struct
 Ex {
 union {
-    GO  go;
+    GO  go = &_go;
     E   e_;
 }
     Ex* next;
 
+    alias GO = void function (O* o, Ex* e, Ex* ex, Event* evt);
+
     static
     void
     _go (O* o, Ex* e, Ex* ex, Event* evt) {
-        //e.go (o,e,ex,evt);
-        each_ex (o,e,ex,evt);
+        // ...
     }
 
     void
@@ -153,9 +153,9 @@ union {
 
     static
     void
-    each_ex (O* o, Ex* e, Ex* ex, Event* evt) {
-        for (auto _ex = e.next; _ex !is null; _ex = _ex.next) {
-            _ex.go (o,cast(E*)e,_ex,evt);
+    calling (O* o, Ex* e, Ex* ex, Event* evt) {
+        for (auto _ex = e; _ex !is null; _ex = _ex.next) {
+            _ex.go (o,e,_ex,evt);
         }
     }
 }
@@ -168,7 +168,7 @@ alias Code  = int;
 struct
 E_ui {
 union {
-    GO     go = cast (GO) &_go;
+    GO     go = &_go;
     E      e_;
     Ex     ex_;     // with next
     Klass  klass_;  // with data1
@@ -195,6 +195,8 @@ union {
     Code    on_click_send_evt_code;  // PLAY_1
     //
     Canvased canvased;
+
+    alias GO = void function (O* o, E_ui* e, Klass* k, Event* evt);
     
     //
     static
@@ -206,9 +208,6 @@ union {
             case UPDATE : on_update (o,e,k,evt); break;
             default:
         }
-
-        // klass.go, klass.go, ...
-        Ex.each_ex (o,cast(Ex*)e,cast(Ex*)k,evt);
     }
 
     enum CLICK  = 1;
@@ -242,11 +241,13 @@ union {
 struct
 Klass {
 union {
-    GO      go = cast (GO) &_go;
+    GO      go = &_go;
     E       e_;
     Ex      ex_;
 }
     void*   data1;
+
+    alias GO = void function (O* o, E_ui* e, Klass* k, Event* evt);
 
     static
     void
@@ -284,6 +285,8 @@ union {
     E_ui_childed* cr;
     E_ui_childed* parent;
 
+    alias GO = void function (O* o, E_ui_childed* e, Klass* k, Event* evt);
+
     E_ui_childed*
     add_child (E_ui_childed* c) {
         auto t = &this;
@@ -304,9 +307,9 @@ union {
 
     static
     void
-    each_child (O* o, E_ui_childed* e, Ex* ex, Event* evt) {
+    each_child (O* o, E_ui_childed* e, Klass* k, Event* evt) {
         for (auto _e = e.cl; _e !is null; _e = _e.r) {
-            _e.go (o,cast(E*)e,ex,evt);
+            _e.go (o,e,k,evt);
         }
     }
 }
@@ -327,12 +330,12 @@ parent (E_ui_childed* e) {
 
 Klass
 window = {
-    (O* o, E* e, Ex* ex, Event* evt) {
+    (O* o, E_ui* e, Klass* k, Event* evt) {
         enum SET_E_PROP = 11;
 
         switch (evt.type) {
             case SET_E_PROP : 
-                with (cast (E_ui*) e) {
+                with (e) {
                     x = 0;
                     y = 0;
                     w = Desktop.w;
@@ -348,8 +351,8 @@ Klass panel;
 Klass canvas;
 Klass 
 loc1 = {
-    (O* o, E* e, Ex* ex, Event* evt) {
-        with (cast (E_ui*) e) {
+    (O* o, E_ui* e, Klass* k, Event* evt) {
+        with (e) {
            x = A.Coord.left;
            y = 0;
            w = 33.perc;
@@ -363,8 +366,8 @@ Klass _2;
 Klass _3;
 Klass 
 loc2 = {
-    (O* o, E* e, Ex* ex, Event* evt) {
-        with (cast (E_ui*) e) {
+    (O* o, E_ui* e, Klass* k, Event* evt) {
+        with (e) {
            x = A.Coord.center;
            y = 0;
            w = 34.perc;
@@ -375,8 +378,8 @@ loc2 = {
 Klass clock;
 Klass 
 loc3 = {
-    (O* o, E* e, Ex* ex, Event* evt) {
-        with (cast (E_ui*) e) {
+    (O* o, E_ui* e, Klass* k, Event* evt) {
+        with (e) {
            x = A.Coord.right;
            y = 0;
            w = 33.perc;
@@ -538,55 +541,55 @@ dump_tree (E_ui_childed* e, int level=0) {
 }
 
 
-auto 
-WalkTree (Tree,Skip) (Tree* t, Skip skip) {
-    return _WalkTree!(Tree,Skip) (cast (Tree*) t,skip);
-}
+//auto 
+//WalkTree (Tree,Skip) (Tree* t, Skip skip) {
+//    return _WalkTree!(Tree,Skip) (cast (Tree*) t,skip);
+//}
 
-struct
-_WalkTree (Tree,Skip) {
-    Tree* t;
-    Skip  skip;
+//struct
+//_WalkTree (Tree,Skip) {
+//    Tree* t;
+//    Skip  skip;
 
-    int
-    opApply (int delegate (Tree* t) dg) {
-        Tree*  next = t;
-        Tree* _next = t;
+//    int
+//    opApply (int delegate (Tree* t) dg) {
+//        Tree*  next = t;
+//        Tree* _next = t;
 
-        loop:
-            if (skip (cast (Tree*) next)) {
-                _next = next;
-                goto go_right;
-            }
+//        loop:
+//            if (skip (cast (Tree*) next)) {
+//                _next = next;
+//                goto go_right;
+//            }
 
-            if (auto result = dg (cast (Tree*) next))
-                return result;
+//            if (auto result = dg (cast (Tree*) next))
+//                return result;
 
-            _next = next;
+//            _next = next;
 
-            go_down:   // v
-                next = _next.cl;
-                if (next !is null)
-                    goto loop;  // go_down
-            go_right:  // >
-                next = _next.r;
-                if (next !is null)
-                    goto loop;  // go_down
-            go_up:     // ^
-                next = _next.parent;
-                if (next !is null) {
-                    _next = next;
-                    goto go_right;
-                }
+//            go_down:   // v
+//                next = _next.cl;
+//                if (next !is null)
+//                    goto loop;  // go_down
+//            go_right:  // >
+//                next = _next.r;
+//                if (next !is null)
+//                    goto loop;  // go_down
+//            go_up:     // ^
+//                next = _next.parent;
+//                if (next !is null) {
+//                    _next = next;
+//                    goto go_right;
+//                }
 
-        return 0;
-    }
-}
+//        return 0;
+//    }
+//}
 
-bool
-skip (Tree) (Tree* e) {
-    return false;
-}
+//bool
+//skip (Tree) (Tree* e) {
+//    return false;
+//}
 
 
 // e .panel .window .canvas
