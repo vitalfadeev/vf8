@@ -7,7 +7,7 @@ mai () {
     // SET_E_PROP
     O    o;
     auto evt = Event (SET_E_PROP);
-    e.calling (&o,e,null,&evt);
+    e.call_go (&o,e,null,&evt);
 }
 
 auto
@@ -106,16 +106,17 @@ E {
 struct
 Ex {
 union {
-    GO  go = &_go;
+    GO  go = &all_ex_go;
     E   e_;
 }
+    GO  ex_go = &_ex_go;
     Ex* next;
 
     alias GO = void function (O* o, Ex* e, Ex* ex, Event* evt);
 
     static
     void
-    _go (O* o, Ex* e, Ex* ex, Event* evt) {
+    _ex_go (O* o, Ex* e, Ex* ex, Event* evt) {
         // ...
     }
 
@@ -157,9 +158,9 @@ union {
 
     static
     void
-    calling (O* o, Ex* e, Ex* ex, Event* evt) {
+    all_ex_go (O* o, Ex* e, Ex* ex, Event* evt) {
         for (auto _ex = e; _ex !is null; _ex = _ex.next) {
-            _ex.go (o,e,_ex,evt);
+            _ex.ex_go (o,e,_ex,evt);
         }
     }
 }
@@ -328,7 +329,7 @@ union {
 
     static
     void
-    calling (O* o, E_ui_childed* e, Klass* k, Event* evt) {
+    call_go (O* o, E_ui_childed* e, Klass* k, Event* evt) {
         for (auto _k = cast (Klass*) e; _k !is null; _k = cast (Klass*) (cast (Ex*) _k).next) {
             (cast (E_ui_childed*) _k).go (o,e,_k,evt);
         }
