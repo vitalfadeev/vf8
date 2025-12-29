@@ -274,12 +274,12 @@ Klass {
     // e .window
     E_ui*
     opCall (E_ui* e) {
-        e.add_klass (&this);
+        e.add_klass (new Klass (this.go, this.ex_go));
         return e;
     }
     E_ui_childed*
     opCall (E_ui_childed* e) {
-        e.add_klass (&this);
+        e.add_klass (new Klass (this.go, this.ex_go));
         return e;
     }
 }
