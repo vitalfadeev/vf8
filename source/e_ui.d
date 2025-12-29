@@ -8,6 +8,10 @@ mai () {
     O    o;
     auto evt = Event (SET_E_PROP);
     e.go (&o,e,null,&evt);
+    // childs
+    for (auto _e = e.cl; _e !is null; _e = _e.r) {
+        _e.go (&o,_e,null,&evt);
+    }
     dump_tree (e);
 }
 
@@ -373,8 +377,6 @@ parent (E_ui_childed* e) {
 Klass
 window = {&Klass._all_ex_go,
     (O* o, E_ui* e, Klass* k, Event* evt) {
-        import core.stdc.stdio : printf;
-        printf ("Klass window\n");
         switch (evt.type) {
             case SET_E_PROP : 
                 with (e) {
