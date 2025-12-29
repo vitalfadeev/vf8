@@ -118,13 +118,14 @@ union {
     void
     add_ex (Ex* ex) {
         // find end
-        Ex* _ex = &this;
-        for (; _ex.next !is null; _ex = _ex.next) {
+        Ex* _pre = &this;
+        Ex* _ex  = _pre.next;
+        for (; _ex !is null; _pre = _ex, _ex = _ex.next) {
             if (_ex is ex) {
                 return;  // skip existent
             }
         }
-        _ex.next = ex;  // to end
+        _pre.next = ex;  // to end
     }
 
     bool
