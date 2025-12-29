@@ -4,6 +4,10 @@ void
 mai () {
     auto e = test ();
     dump_tree (e);
+    // SET_E_PROP
+    O    o;
+    auto evt = Event (SET_E_PROP);
+    e.go (&o,e,null,&evt);
 }
 
 auto
@@ -272,7 +276,7 @@ union {
 struct
 E_ui_childed {
 union {
-    GO    go;
+    GO    go = &_go;
     E     e_;
     Ex    ex_;     // with next
     Klass klass_;  // with data1
@@ -286,6 +290,15 @@ union {
     E_ui_childed* parent;
 
     alias GO = void function (O* o, E_ui_childed* e, Klass* k, Event* evt);
+
+    static
+    void 
+    _go (O* o, E_ui_childed* e, Klass* k, Event* evt) {
+        switch (evt.type) {
+            case SET_E_PROP : break;
+            default:
+        }
+    }
 
     E_ui_childed*
     add_child (E_ui_childed* c) {
@@ -339,8 +352,6 @@ parent (E_ui_childed* e) {
 Klass
 window = {
     (O* o, E_ui* e, Klass* k, Event* evt) {
-        enum SET_E_PROP = 11;
-
         switch (evt.type) {
             case SET_E_PROP : 
                 with (e) {
@@ -401,6 +412,8 @@ struct
 Event {
     uint type;
 }
+
+enum SET_E_PROP = 11;
 
 //
 struct
