@@ -8,10 +8,6 @@ mai () {
     O    o;
     auto evt = Event (SET_E_PROP);
     e.go (&o,e,null,&evt);
-    // childs
-    for (auto _e = e.cl; _e !is null; _e = _e.r) {
-        _e.go (&o,_e,null,&evt);
-    }
     dump_tree (e);
 }
 
@@ -293,7 +289,7 @@ E_ui_childed {
 // E_ui {
 // Klass {
 // Ex {
-    GO       go    = &_all_ex_go;
+    GO       go    = &_all_childs_go;
     GO       ex_go = &_ex_go;
     Klass*   next;
 // }
@@ -315,13 +311,27 @@ E_ui_childed {
 
     static
     void
+    _all_childs_go (O* o, E_ui_childed* e, Klass* k, Event* evt) {
+        // this
+        _all_ex_go (o,e,k,evt);
+
+        // childs
+        for (auto _e = e.cl; _e !is null; _e = _e.r) {
+            _e.go (o,_e,k,evt);
+        }
+    }
+
+    static
+    void
     _all_ex_go (O* o, E_ui_childed* e, Klass* k, Event* evt) {
+        // ex
         Ex._all_ex_go (o,cast(Ex*)e,cast(Ex*)k,evt);
     }
 
     static
     void 
     _ex_go (O* o, E_ui_childed* e, Klass* k, Event* evt) {
+        // this
         switch (evt.type) {
             case SET_E_PROP : break;
             default:
@@ -419,7 +429,17 @@ loc2 = {&Klass._all_ex_go,
         }
     }
 };
-Klass clock;
+Klass 
+clock = {&Klass._all_ex_go,
+    (O* o, E_ui* e, Klass* k, Event* evt) {
+        with (e) {
+           x = A.Coord.center;
+           y = 0;
+           w = 33.perc;
+           h = A.Coord.parent_h;
+        }
+    }
+};
 Klass 
 loc3 = {&Klass._all_ex_go,
     (O* o, E_ui* e, Klass* k, Event* evt) {
