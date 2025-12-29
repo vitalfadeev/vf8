@@ -7,7 +7,7 @@ mai () {
     // SET_E_PROP
     O    o;
     auto evt = Event (SET_E_PROP);
-    e.go (&o,e,null,&evt);
+    e.calling (&o,e,null,&evt);
 }
 
 auto
@@ -329,8 +329,8 @@ union {
     static
     void
     calling (O* o, E_ui_childed* e, Klass* k, Event* evt) {
-        for (auto _ex = cast (Klass*) e; _ex !is null; _ex = cast (Klass*) (cast (Ex*) _ex).next) {
-            (cast (E_ui_childed*) _ex).go (o,e,_ex,evt);
+        for (auto _k = cast (Klass*) e; _k !is null; _k = cast (Klass*) (cast (Ex*) _k).next) {
+            (cast (E_ui_childed*) _k).go (o,e,_k,evt);
         }
     }
 }
