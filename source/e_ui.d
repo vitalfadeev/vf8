@@ -103,24 +103,22 @@ E {
 struct
 Ex {
 union {
-    GO go;
-    E  _e;
+    GO  go;
+    E   e_;
 }
     Ex* next;
 
     static
     void
-    _go (O* o, E* e, Ex* ex, void* evt) {
-        //go (o,e,ex,evt);
-
-        // ex.go, ex.go,...
+    _go (O* o, Ex* e, Ex* ex, void* evt) {
+        //e.go (o,e,ex,evt);
         each_ex (o,e,ex,evt);
     }
 
     void
     add_ex (Ex* ex) {
         // find end
-        auto _ex = &this;
+        Ex* _ex = &this;
         for (; _ex.next !is null; _ex = _ex.next) {
             if (_ex is ex) {
                 return;  // skip existent
@@ -131,7 +129,7 @@ union {
 
     bool
     has_ex (Ex* ex) {
-        auto _ex = next;
+        auto _ex = &this;
         for (; _ex !is null; _ex = _ex.next) {
             if (_ex is ex) {
                 return true;
@@ -142,10 +140,8 @@ union {
 
     void
     del_ex (Ex* ex) {
-        auto _pre = next;
-        if (_pre is null) return;
+        auto _pre = &this;
         auto _ex  = _pre.next;
-        if (_pre is ex) { next = _ex; return; }
         for (; _ex !is null; _pre = _ex, _ex = _ex.next) {
             if (_ex is ex) {
                 _pre.next = _ex.next;
@@ -156,12 +152,14 @@ union {
 
     static
     void
-    each_ex (O* o, E* e, Ex* ex, void* evt) {
-        for (auto _ex = ex.next; _ex !is null; _ex = _ex.next) {
-            _ex.go (o,e,_ex,evt);
+    each_ex (O* o, Ex* e, Ex* ex, void* evt) {
+        for (auto _ex = e.next; _ex !is null; _ex = _ex.next) {
+            _ex.go (o,cast(E*)e,_ex,evt);
         }
     }
 }
+
+
 
 //
 alias Code  = int;
@@ -170,9 +168,9 @@ struct
 E_ui {
 union {
     GO     go = cast (GO) &_go;
-    E      _e;
-    Ex     ex;     // with next
-    Klass  klass;  // with data1
+    E      e_;
+    Ex     ex_;     // with next
+    Klass  klass_;  // with data1
 }
     //
     A.Coord x,y,w,h;
@@ -209,7 +207,7 @@ union {
         }
 
         // klass.go, klass.go, ...
-        Ex.each_ex (o,cast (E*) e,e.klass.ex.next,evt);
+        Ex.each_ex (o,cast(Ex*)e,cast(Ex*)k,evt);
     }
 
     enum CLICK  = 1;
@@ -235,7 +233,7 @@ union {
                 (
                     (cast (E_ui_childed*)e).parent
                 )
-                ._e_ui.canvased.w * w._perc.a / 100;
+                .e_ui_.canvased.w * w._perc.a / 100;
         }
     }
 }
@@ -244,8 +242,8 @@ struct
 Klass {
 union {
     GO      go = cast (GO) &_go;
-    E       _e;
-    Ex      ex;
+    E       e_;
+    Ex      ex_;
 }
     void*   data1;
 
@@ -264,20 +262,20 @@ union {
     }
     E_ui_childed*
     opCall (E_ui_childed* e) {
-        (cast (Ex*) e).add_ex (cast (Ex*) new Klass (this.go));
+        e.ex_.add_ex (cast (Ex*) new Klass (this.go));
         return e;
     }
 }
 
 struct
 E_ui_childed {
-    union {
-        GO    go;
-        E     _e;
-        Ex    ex;    // with next
-        Klass klass;  // with data1
-        E_ui  _e_ui;
-    }    
+union {
+    GO    go;
+    E     e_;
+    Ex    ex_;     // with next
+    Klass klass_;  // with data1
+    E_ui  e_ui_;
+}    
     //
     E_ui_childed* l;
     E_ui_childed* r;
@@ -328,7 +326,7 @@ parent (E_ui_childed* e) {
 
 Klass
 window = {
-    cast (GO) (O* o, E* e, Ex* ex, void* evt) {
+    (O* o, E* e, Ex* ex, void* evt) {
         with (cast (E_ui*) e) {
             x = 0;
             y = 0;
@@ -353,7 +351,7 @@ Klass panel;
 Klass canvas;
 Klass 
 loc1 = {
-    cast (GO) (O* o, E* e, Ex* ex, void* evt) {
+    (O* o, E* e, Ex* ex, void* evt) {
         with (cast (E_ui*) e) {
            x = A.Coord.left;
            y = 0;
@@ -368,7 +366,7 @@ Klass _2;
 Klass _3;
 Klass 
 loc2 = {
-    cast (GO) (O* o, E* e, Ex* ex, void* evt) {
+    (O* o, E* e, Ex* ex, void* evt) {
         with (cast (E_ui*) e) {
            x = A.Coord.center;
            y = 0;
@@ -380,7 +378,7 @@ loc2 = {
 Klass clock;
 Klass 
 loc3 = {
-    cast (GO) (O* o, E* e, Ex* ex, void* evt) {
+    (O* o, E* e, Ex* ex, void* evt) {
         with (cast (E_ui*) e) {
            x = A.Coord.right;
            y = 0;
@@ -529,7 +527,7 @@ dump_tree (E_ui_childed* e, int level=0) {
 
     for (auto i = level; i > 0; i--)  printf ("  ");
     printf ("e");
-    for (auto ex = e.ex.next; ex != null; ex = ex.next) printf (" %x", ex);
+    for (auto ex = e.ex_.next; ex != null; ex = ex.next) printf (" %x", ex);
     printf ("\n");
 
     // childs
