@@ -201,7 +201,7 @@ union {
     void
     _go (O* o, E_ui* e, Klass* k, Event* evt) {
         // go
-        switch ((cast (Event*) evt).type) {
+        switch (evt.type) {
             case CLICK  : put (o,e,k,e.on_click_send_evt_code); break;
             case UPDATE : on_update (o,e,k,evt); break;
             default:
@@ -329,17 +329,16 @@ Klass
 window = {
     (O* o, E* e, Ex* ex, Event* evt) {
         enum SET_E_PROP = 11;
-        GO on_set_e_prop = (O* o, E* e, Ex* ex, Event* evt) {
-            with (cast (E_ui*) e) {
-                x = 0;
-                y = 0;
-                w = Desktop.w;
-                h = 64;
-            }
-        };
 
-        switch ((cast (Event*) evt).type) {
-            case SET_E_PROP : on_set_e_prop (o,e,ex,evt); break;
+        switch (evt.type) {
+            case SET_E_PROP : 
+                with (cast (E_ui*) e) {
+                    x = 0;
+                    y = 0;
+                    w = Desktop.w;
+                    h = 64;
+                }            
+                break;
             default:
         }
     }
