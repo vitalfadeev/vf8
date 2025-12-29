@@ -7,7 +7,7 @@ mai () {
     // SET_E_PROP
     O    o;
     auto evt = Event (SET_E_PROP);
-    e.call_go (&o,e,null,&evt);
+    e.go (&o,e,null,&evt);
 }
 
 auto
@@ -169,13 +169,14 @@ alias Code  = int;
 
 struct
 E_ui {
+// Klass {
 // Ex {
-    GO      go    = cast (GO) &Ex._all_ex_go;
+    GO      go    = &_all_ex_go;
     GO      ex_go = &_ex_go;
-    Ex*     next;
+    E_ui*   next;
 // }
-    //Ex      ex_;  // = {&Ex._all_ex_go,cast(Ex.GO)&_ex_go};
     void*   data1;
+// }
 
     //
     A.Coord x,y,w,h;
@@ -206,9 +207,7 @@ E_ui {
     static
     void
     _all_ex_go (O* o, E_ui* e, Klass* k, Event* evt) {
-        for (auto _k = cast (Klass*) e; _k !is null; _k = cast (Klass*) (cast (Ex*) _k).next) {
-            _k.go (o,e,_k,evt);
-        }
+        Ex._all_ex_go (o,cast(Ex*)e,cast(Ex*)k,evt);
     }
 
     static
@@ -253,11 +252,10 @@ E_ui {
 struct
 Klass {
 // Ex {
-    GO      go    = cast (GO) &Ex._all_ex_go;
+    GO      go    = &_all_ex_go;
     GO      ex_go = &_klass_go;
-    Ex*     next;
+    Klass*  next;
 // }
-    //Ex      ex_;  // = {&Ex._all_ex_go,cast(Ex.GO)&_ex_go};
     void*   data1;
 
     alias GO = void function (O* o, E_ui* e, Klass* k, Event* evt);
@@ -265,6 +263,12 @@ Klass {
     //this (GO _klass_go) {
     //    this.ex_.go = _klass_go;
     //}
+
+    static
+    void
+    _all_ex_go (O* o, E_ui* e, Klass* k, Event* evt) {
+        Ex._all_ex_go (o,cast(Ex*)e,cast(Ex*)k,evt);
+    }
 
     static
     void
@@ -289,12 +293,14 @@ Klass {
 struct
 E_ui_childed {
 // E_ui {
+// Klass {
 // Ex {
-    GO      go    = cast (GO) &Ex._all_ex_go;
+    GO      go    = &_all_ex_go;
     GO      ex_go = &_ex_go;
-    Ex*     next;
+    Klass*  next;
 // }
     void*   data1;
+// }
     A.Coord x,y,w,h;
     Color   bg;
     Code    on_click_send_evt_code;  // PLAY_1
@@ -308,6 +314,12 @@ E_ui_childed {
     E_ui_childed* parent;
 
     alias GO = void function (O* o, E_ui_childed* e, Klass* k, Event* evt);
+
+    static
+    void
+    _all_ex_go (O* o, E_ui_childed* e, Klass* k, Event* evt) {
+        Ex._all_ex_go (o,cast(Ex*)e,cast(Ex*)k,evt);
+    }
 
     static
     void 
@@ -343,14 +355,6 @@ E_ui_childed {
             _e.go (o,e,k,evt);
         }
     }
-
-    static
-    void
-    call_go (O* o, E_ui_childed* e, Klass* k, Event* evt) {
-        for (auto _k = cast (Klass*) e; _k !is null; _k = cast (Klass*) (cast (Ex*) _k).next) {
-            (cast (E_ui_childed*) _k).go (o,e,_k,evt);
-        }
-    }
 }
 
 //
@@ -368,7 +372,7 @@ parent (E_ui_childed* e) {
 }
 
 Klass
-window = {cast (Klass.GO) &Ex._all_ex_go,
+window = {&Klass._all_ex_go,
     (O* o, E_ui* e, Klass* k, Event* evt) {
         switch (evt.type) {
             case SET_E_PROP : 
@@ -387,7 +391,7 @@ window = {cast (Klass.GO) &Ex._all_ex_go,
 Klass panel;
 Klass canvas;
 Klass 
-loc1 = {cast (Klass.GO) &Ex._all_ex_go,
+loc1 = {&Klass._all_ex_go,
     (O* o, E_ui* e, Klass* k, Event* evt) {
         with (e) {
            x = A.Coord.left;
@@ -402,7 +406,7 @@ Klass _1;
 Klass _2;
 Klass _3;
 Klass 
-loc2 = {cast (Klass.GO) &Ex._all_ex_go,
+loc2 = {&Klass._all_ex_go,
     (O* o, E_ui* e, Klass* k, Event* evt) {
         with (e) {
            x = A.Coord.center;
@@ -414,7 +418,7 @@ loc2 = {cast (Klass.GO) &Ex._all_ex_go,
 };
 Klass clock;
 Klass 
-loc3 = {cast (Klass.GO) &Ex._all_ex_go,
+loc3 = {&Klass._all_ex_go,
     (O* o, E_ui* e, Klass* k, Event* evt) {
         with (e) {
            x = A.Coord.right;
