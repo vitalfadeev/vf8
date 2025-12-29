@@ -8,6 +8,7 @@ mai () {
     O    o;
     auto evt = Event (SET_E_PROP);
     e.go (&o,e,null,&evt);
+    dump_tree (e);
 }
 
 auto
@@ -218,6 +219,11 @@ E_ui {
         }
     }
 
+    void
+    add_klass (Klass* k) {
+        (cast (Ex*) &this).add_ex (cast (Ex*) k);
+    }
+
     static
     void
     on_update (O* o, E_ui* e, Klass* k, Event* evt) {
@@ -268,12 +274,12 @@ Klass {
     // e .window
     E_ui*
     opCall (E_ui* e) {
-        (cast (Ex*) e).add_ex (cast (Ex*) new Klass (this.go));
+        e.add_klass (&this);
         return e;
     }
     E_ui_childed*
     opCall (E_ui_childed* e) {
-        (cast (Ex*) e).add_ex (cast (Ex*) new Klass (this.go));
+        e.add_klass (&this);
         return e;
     }
 }
@@ -283,15 +289,15 @@ E_ui_childed {
 // E_ui {
 // Klass {
 // Ex {
-    GO      go    = &_all_ex_go;
-    GO      ex_go = &_ex_go;
-    Klass*  next;
+    GO       go    = &_all_ex_go;
+    GO       ex_go = &_ex_go;
+    Klass*   next;
 // }
-    void*   data1;
+    void*    data1;
 // }
-    A.Coord x,y,w,h;
-    Color   bg;
-    Code    on_click_send_evt_code;  // PLAY_1
+    A.Coord  x,y,w,h;
+    Color    bg;
+    Code     on_click_send_evt_code;  // PLAY_1
     Canvased canvased;
 // }
     //
@@ -316,6 +322,11 @@ E_ui_childed {
             case SET_E_PROP : break;
             default:
         }
+    }
+
+    void
+    add_klass (Klass* k) {
+        (cast (Ex*) &this).add_ex (cast (Ex*) k);
     }
 
     E_ui_childed*
@@ -362,6 +373,8 @@ parent (E_ui_childed* e) {
 Klass
 window = {&Klass._all_ex_go,
     (O* o, E_ui* e, Klass* k, Event* evt) {
+        import core.stdc.stdio : printf;
+        printf ("Klass window\n");
         switch (evt.type) {
             case SET_E_PROP : 
                 with (e) {
@@ -566,9 +579,13 @@ void
 dump_tree (E_ui_childed* e, int level=0) {
     import core.stdc.stdio : printf;
 
+    // e
     for (auto i = level; i > 0; i--)  printf ("  ");
     printf ("e");
+    // klasses
     for (auto ex = (cast (Ex*) e).next; ex != null; ex = ex.next) printf (" %x", ex);
+    // properties
+    printf (" w=%d", e.w.type);
     printf ("\n");
 
     // childs
