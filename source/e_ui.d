@@ -3,7 +3,6 @@ module e_ui;
 void
 mai () {
     auto e = test ();
-    dump_tree (e);
     // SET_E_PROP
     O    o;
     auto evt = Event (SET_E_PROP);
@@ -211,10 +210,11 @@ E_ui {
     static
     void
     _ex_go (O* o, E_ui* e, Klass* k, Event* evt) {
-        // go
+        // this
         switch (evt.type) {
-            case CLICK  : put (o,e,k,e.on_click_send_evt_code); break;
-            case UPDATE : on_update (o,e,k,evt); break;
+            case SET_E_PROP : break;
+            case CLICK      : put (o,e,k,e.on_click_send_evt_code); break;
+            case UPDATE     : on_update (o,e,k,evt); break;
             default:
         }
     }
@@ -331,11 +331,7 @@ E_ui_childed {
     static
     void 
     _ex_go (O* o, E_ui_childed* e, Klass* k, Event* evt) {
-        // this
-        switch (evt.type) {
-            case SET_E_PROP : break;
-            default:
-        }
+        E_ui._ex_go (o,cast (E_ui*) e,k,evt);
     }
 
     void
@@ -359,14 +355,6 @@ E_ui_childed {
         c.parent = t;
 
         return c;
-    }
-
-    static
-    void
-    each_child (O* o, E_ui_childed* e, Klass* k, Event* evt) {
-        for (auto _e = e.cl; _e !is null; _e = _e.r) {
-            _e.go (o,e,k,evt);
-        }
     }
 }
 
