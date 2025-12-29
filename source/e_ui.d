@@ -121,7 +121,7 @@ union {
         Ex* _pre = &this;
         Ex* _ex  = _pre.next;
         for (; _ex !is null; _pre = _ex, _ex = _ex.next) {
-            if (_ex is ex) {
+            if (_pre is ex) {
                 return;  // skip existent
             }
         }
