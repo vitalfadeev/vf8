@@ -31,8 +31,11 @@ enum ulong PLAY_3          = (10            << 16) | EVT_UI;
 extern(C)
 void 
 main () {
-    import e_ui : mai;
+    //import e_ui : mai;
+    //mai ();
+    import e_class : mai;
     mai ();
+
     //tvg_engine_init(4);
         
     //O o;

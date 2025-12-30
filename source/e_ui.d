@@ -3,11 +3,16 @@ module e_ui;
 void
 mai () {
     auto e = test ();
-    // SET_E_PROP
     O    o;
+
+    // SET_E_PROP
     auto evt = Event (SET_E_PROP);
     e.go (&o,e,null,&evt);
     dump_tree (e);
+
+    // UPDATE
+    auto evt2 = Event (UPDATE);
+    e.go (&o,e,null,&evt2);
 }
 
 auto
@@ -253,10 +258,6 @@ Klass {
     void*   data1;
 
     alias GO = void function (O* o, E_ui* e, Klass* k, Event* evt);
-
-    //this (GO _klass_go) {
-    //    this.ex_.go = _klass_go;
-    //}
 
     static
     void
@@ -595,69 +596,15 @@ dump_tree (E_ui_childed* e, int level=0) {
     // klasses
     for (auto ex = (cast (Ex*) e).next; ex != null; ex = ex.next) printf (" %x", ex);
     // properties
-    printf (" w=%d", e.w.type);
+    printf (" w=%d,h=%d", e.w.type, e.h.type);
     printf ("\n");
 
     // childs
     for (auto _e = e.cl; _e !is null; _e = _e.r) {
         dump_tree (_e,level+1);
     }
-
-    //foreach (t; WalkTree (e,&skip)) {
-    //    printf ("e\n");
-    //}
 }
 
-
-//auto 
-//WalkTree (Tree,Skip) (Tree* t, Skip skip) {
-//    return _WalkTree!(Tree,Skip) (cast (Tree*) t,skip);
-//}
-
-//struct
-//_WalkTree (Tree,Skip) {
-//    Tree* t;
-//    Skip  skip;
-
-//    int
-//    opApply (int delegate (Tree* t) dg) {
-//        Tree*  next = t;
-//        Tree* _next = t;
-
-//        loop:
-//            if (skip (cast (Tree*) next)) {
-//                _next = next;
-//                goto go_right;
-//            }
-
-//            if (auto result = dg (cast (Tree*) next))
-//                return result;
-
-//            _next = next;
-
-//            go_down:   // v
-//                next = _next.cl;
-//                if (next !is null)
-//                    goto loop;  // go_down
-//            go_right:  // >
-//                next = _next.r;
-//                if (next !is null)
-//                    goto loop;  // go_down
-//            go_up:     // ^
-//                next = _next.parent;
-//                if (next !is null) {
-//                    _next = next;
-//                    goto go_right;
-//                }
-
-//        return 0;
-//    }
-//}
-
-//bool
-//skip (Tree) (Tree* e) {
-//    return false;
-//}
 
 
 // e .panel .window .canvas
