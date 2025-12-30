@@ -7,14 +7,16 @@ mai () {
     O o = new O ();
     o.e = test ();
 
-    // SET_E_PROP
-    auto evt = Event (SET_E_PROP);
-    o.go (&evt);
-    dump_tree (o.e);
+    with (Event.Type) {        
+        // SET_E_PROP
+        auto evt = Event (SET_E_PROP);
+        o.go (&evt);
+        dump_tree (o.e);
 
-    // UPDATE
-    auto evt2 = Event (UPDATE);
-    o.go (&evt2);
+        // UPDATE
+        auto evt2 = Event (UPDATE);
+        o.go (&evt2);
+    }
 }
 
 auto
@@ -81,10 +83,10 @@ Ex : E {
 
 class
 E_ui : Ex {
-    void*    data1;
-    A.Coord  x,y,w,h;
-    Color    bg;
-    Code     on_click_send_evt_code;  // PLAY_1
+    void*      data1;
+    A.Coord    x,y,w,h;
+    Color      bg;
+    Event.Type on_click_send_evt_code;  // PLAY_1
     //Canvased canvased;
 
     override
@@ -110,6 +112,7 @@ Klass : Ex {
     override
     void  
     go (O o, E_ui_childed e, Event* evt) {
+        with (Event.Type)
         switch (evt.type) {
             case SET_E_PROP : _set_e_prop (o,e,evt); break;
             default:
@@ -269,13 +272,15 @@ class Indicator : Klass {}
 //
 struct
 Event {
-    Code         type;
-}
+    Type type;
 
-alias Code  = int;
-enum CLICK  = 1;
-enum UPDATE = 2;
-enum SET_E_PROP = 11;
+    enum
+    Type {
+        CLICK  = 1,
+        UPDATE = 2,
+        SET_E_PROP = 11,
+    }
+}
 
 class
 O {
