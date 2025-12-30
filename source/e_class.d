@@ -53,16 +53,30 @@ E : GO {
 
 class
 Ex : E {
-    Ex next;
+    Ex    next;
+    void* data1;
 
     override
-    void 
+    void  
     go (O o, E_ui_childed e, Event* evt) {
         // ...
+        with (Event.Type)
+        switch (evt.type) {
+            case SET_E_PROP : _set_e_prop (o,e,evt); break;
+            default:
+        }
 
         // next
         if (next !is null) {
             next.go (o,e,evt);
+        }
+    }
+
+    void  
+    _set_e_prop (O o, E_ui_childed e, Event* evt) {
+        //with (o)
+        with (e) {
+            // ...
         }
     }
 
@@ -97,39 +111,6 @@ E_ui : Ex {
         // next
         super.go (o,e,evt);
     }
-
-    //void
-    //add_klass (Klass k) {
-    //    this.add_ex (k);
-    //}
-    alias add_klass = add_ex;
-}
-
-class
-Klass : Ex {
-    void* data1;
-
-    override
-    void  
-    go (O o, E_ui_childed e, Event* evt) {
-        with (Event.Type)
-        switch (evt.type) {
-            case SET_E_PROP : _set_e_prop (o,e,evt); break;
-            default:
-        }
-
-        // next
-        super.go (o,e,evt);
-    }
-
-    void  
-    _set_e_prop (O o, E_ui_childed e, Event* evt) {
-        //with (o)
-        with (e) {
-            // ...
-        }
-    }
-
 }
 
 class
@@ -183,9 +164,9 @@ parent (E_ui_childed e) {
     return e.parent;
 }
 
-auto window (E_ui_childed e) { return e.add_klass (new Window); }
+auto window (E_ui_childed e) { return e.add_ex (new Window); }
 class
-Window : Klass {
+Window : Ex {
     override
     void  
     _set_e_prop (O o, E_ui_childed e, Event* evt) {
@@ -197,13 +178,13 @@ Window : Klass {
         }
     }
 }
-auto panel (E_ui_childed e) { return e.add_klass (new Panel); }
-class Panel  : Klass {}
-auto canvas (E_ui_childed e) { return e.add_klass (new Canvas); }
-class Canvas : Klass {}
-auto loc1 (E_ui_childed e) { return e.add_klass (new Loc1); }
+auto panel (E_ui_childed e) { return e.add_ex (new Panel); }
+class Panel  : Ex {}
+auto canvas (E_ui_childed e) { return e.add_ex (new Canvas); }
+class Canvas : Ex {}
+auto loc1 (E_ui_childed e) { return e.add_ex (new Loc1); }
 class 
-Loc1 : Klass {
+Loc1 : Ex {
     override
     void  
     _set_e_prop (O o, E_ui_childed e, Event* evt) {
@@ -215,17 +196,17 @@ Loc1 : Klass {
         }
     }
 }
-auto button (E_ui_childed e) { return e.add_klass (new Button); }
-class Button : Klass {}
-auto _1 (E_ui_childed e) { return e.add_klass (new __1); }
-class __1 : Klass {}
-auto _2 (E_ui_childed e) { return e.add_klass (new __2); }
-class __2 : Klass {}
-auto _3 (E_ui_childed e) { return e.add_klass (new __3); }
-class __3 : Klass {}
-auto loc2 (E_ui_childed e) { return e.add_klass (new Loc2); }
+auto button (E_ui_childed e) { return e.add_ex (new Button); }
+class Button : Ex {}
+auto _1 (E_ui_childed e) { return e.add_ex (new __1); }
+class __1 : Ex {}
+auto _2 (E_ui_childed e) { return e.add_ex (new __2); }
+class __2 : Ex {}
+auto _3 (E_ui_childed e) { return e.add_ex (new __3); }
+class __3 : Ex {}
+auto loc2 (E_ui_childed e) { return e.add_ex (new Loc2); }
 class 
-Loc2 : Klass {
+Loc2 : Ex {
     override
     void  
     _set_e_prop (O o, E_ui_childed e, Event* evt) {
@@ -237,9 +218,9 @@ Loc2 : Klass {
         }
     }
 }
-auto clock (E_ui_childed e) { return e.add_klass (new Clock); }
+auto clock (E_ui_childed e) { return e.add_ex (new Clock); }
 class 
-Clock : Klass {
+Clock : Ex {
     override
     void  
     _set_e_prop (O o, E_ui_childed e, Event* evt) {
@@ -251,9 +232,9 @@ Clock : Klass {
         }
     }
 }
-auto loc3 (E_ui_childed e) { return e.add_klass (new Loc3); }
+auto loc3 (E_ui_childed e) { return e.add_ex (new Loc3); }
 class 
-Loc3 : Klass {
+Loc3 : Ex {
     override
     void  
     _set_e_prop (O o, E_ui_childed e, Event* evt) {
@@ -265,8 +246,8 @@ Loc3 : Klass {
         }
     }
 }
-auto indicator (E_ui_childed e) { return e.add_klass (new Indicator); }
-class Indicator : Klass {}
+auto indicator (E_ui_childed e) { return e.add_ex (new Indicator); }
+class Indicator : Ex {}
 
 
 //
