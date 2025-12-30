@@ -38,13 +38,13 @@ test () {
 //
 interface 
 GO {
-    void go (Event* evt);
+    void go (O o, E_ui_childed e, Event* evt);
 }
 
 class
 E : GO {
     void 
-    go (Event* evt) {
+    go (O o, E_ui_childed e, Event* evt) {
         //
     }
 }
@@ -55,12 +55,12 @@ Ex : E {
 
     override
     void 
-    go (Event* evt) {
+    go (O o, E_ui_childed e, Event* evt) {
         // ...
 
         // next
         if (next !is null) {
-            next.go (evt);
+            next.go (o,e,evt);
         }
     }
 
@@ -89,11 +89,11 @@ E_ui : Ex {
 
     override
     void 
-    go (Event* evt) {
+    go (O o, E_ui_childed e, Event* evt) {
         // ...
 
         // next
-        super.go (evt);
+        super.go (o,e,evt);
     }
 
     //void
@@ -109,32 +109,24 @@ Klass : Ex {
 
     override
     void  
-    go (Event* evt) {
+    go (O o, E_ui_childed e, Event* evt) {
         switch (evt.type) {
-            case SET_E_PROP : _set_e_prop (evt); break;
+            case SET_E_PROP : _set_e_prop (o,e,evt); break;
             default:
         }
 
         // next
-        super.go (evt);
+        super.go (o,e,evt);
     }
 
     void  
-    _set_e_prop (Event* evt) {
-        with (evt.o)
-        with (evt.e) {
+    _set_e_prop (O o, E_ui_childed e, Event* evt) {
+        //with (o)
+        with (e) {
             // ...
         }
     }
 
-    //
-    // e .window
-    //static
-    //E_ui_childed
-    //opCall (this T) (E_ui_childed e) {
-    //    e.add_klass (new T);
-    //    return e;
-    //}
 }
 
 class
@@ -147,11 +139,11 @@ E_ui_childed : E_ui {
 
     override
     void 
-    go (Event* evt) {
+    go (O o, E_ui_childed e, Event* evt) {
         // ...
 
         // next
-        super.go (evt);
+        super.go (o,e,evt);
     }
 
     E_ui_childed
@@ -193,8 +185,8 @@ class
 Window : Klass {
     override
     void  
-    _set_e_prop (Event* evt) {
-        with (evt.e) {
+    _set_e_prop (O o, E_ui_childed e, Event* evt) {
+        with (e) {
             x = 0;
             y = 0;
             w = Desktop.w;
@@ -211,8 +203,8 @@ class
 Loc1 : Klass {
     override
     void  
-    _set_e_prop (Event* evt) {
-        with (evt.e) {
+    _set_e_prop (O o, E_ui_childed e, Event* evt) {
+        with (e) {
            x = A.Coord.left;
            y = 0;
            w = 33.perc;
@@ -233,8 +225,8 @@ class
 Loc2 : Klass {
     override
     void  
-    _set_e_prop (Event* evt) {
-        with (evt.e) {
+    _set_e_prop (O o, E_ui_childed e, Event* evt) {
+        with (e) {
             x = A.Coord.center;
             y = 0;
             w = 34.perc;
@@ -247,8 +239,8 @@ class
 Clock : Klass {
     override
     void  
-    _set_e_prop (Event* evt) {
-        with (evt.e) {
+    _set_e_prop (O o, E_ui_childed e, Event* evt) {
+        with (e) {
             x = A.Coord.center;
             y = 0;
             w = 33.perc;
@@ -261,8 +253,8 @@ class
 Loc3 : Klass {
     override
     void  
-    _set_e_prop (Event* evt) {
-        with (evt.e) {
+    _set_e_prop (O o, E_ui_childed e, Event* evt) {
+        with (e) {
             x = A.Coord.right;
             y = 0;
             w = 33.perc;
@@ -278,8 +270,6 @@ class Indicator : Klass {}
 struct
 Event {
     Code         type;
-    O            o;
-    E_ui_childed e;  
 }
 
 alias Code  = int;
@@ -293,9 +283,7 @@ O {
 
     void 
     go (Event* evt) {
-        evt.o = this;
-        evt.e = e;
-        e.go (evt);
+        e.go (this,e,evt);
     }
 }
 
