@@ -1,6 +1,8 @@
 module e_class;
 
-import e_ui : A,perc,Desktop,Color;
+import e_ui : A,perc,Desktop,Color,Canvased;
+import std.stdio : writefln;
+import std.format : format;
 
 void
 mai () {
@@ -11,11 +13,16 @@ mai () {
         // SET_E_PROP
         auto evt = Event (SET_E_PROP);
         o.go (&evt);
-        dump_tree (o.e);
 
         // UPDATE
         auto evt2 = Event (UPDATE);
         o.go (&evt2);
+
+        // UPDATE_W
+        auto evt3 = Event (UPDATE_W);
+        o.go (&evt3);
+
+        dump_tree (o.e);
     }
 }
 
@@ -59,10 +66,12 @@ Ex : E {
     override
     void  
     go (O o, E_ui_childed e, Event* evt) {
+        writefln ("Event: %s", *evt);
         // ...
         with (Event.Type)
         switch (evt.type) {
             case SET_E_PROP : _set_e_prop (o,e,evt); break;
+            case UPDATE_W   : _update_w (o,e,evt); break;
             default:
         }
 
@@ -74,6 +83,14 @@ Ex : E {
 
     void  
     _set_e_prop (O o, E_ui_childed e, Event* evt) {
+        //with (o)
+        with (e) {
+            // ...
+        }
+    }
+
+    void  
+    _update_w (O o, E_ui_childed e, Event* evt) {
         //with (o)
         with (e) {
             // ...
@@ -101,7 +118,7 @@ E_ui : Ex {
     A.Coord    x,y,w,h;
     Color      bg;
     Event.Type on_click_send_evt_code;  // PLAY_1
-    //Canvased canvased;
+    Canvased   canvased;
 
     override
     void 
@@ -128,6 +145,11 @@ E_ui_childed : E_ui {
 
         // next
         super.go (o,e,evt);
+
+        // childs
+        for (auto _e = cl; _e !is null; _e = _e.r) {
+            _e.go (o,_e,evt);
+        }
     }
 
     E_ui_childed
@@ -146,6 +168,16 @@ E_ui_childed : E_ui {
         c.parent = t;
 
         return c;
+    }
+
+    override
+    void  
+    _update_w (O o, E_ui_childed e, Event* evt) {
+        //with (o)
+        with (e) {
+            // ...
+            canvased.w = 1;
+        }
     }
 }
 
@@ -253,15 +285,64 @@ class Indicator : Ex {}
 //
 struct
 Event {
+union {
     Type type;
+    Event_click      click;
+    Event_update     update;
+    Event_set_e_prop set_e_prop;
+    Event_update_w   update_w;
+    Event_update_h   update_h;
+    Event_update_xy  update_xy;
+}
 
     enum
     Type {
-        CLICK  = 1,
-        UPDATE = 2,
+        CLICK      =  1,
+        UPDATE     =  2,
         SET_E_PROP = 11,
+        UPDATE_W   = 12,
+        UPDATE_H   = 13,
+        UPDATE_XY  = 14,
+    }
+
+    string
+    toString () {
+        return format!"Event(%s)" (type);
     }
 }
+
+struct
+Event_click {
+    auto type = Event.Type.CLICK;
+}
+
+struct
+Event_update {
+    auto type = Event.Type.UPDATE;
+}
+
+struct
+Event_set_e_prop {
+    auto type = Event.Type.SET_E_PROP;
+}
+
+struct
+Event_update_w {
+    auto type = Event.Type.UPDATE_W;
+}
+
+struct
+Event_update_h {
+    auto type = Event.Type.UPDATE_H;
+}
+
+struct
+Event_update_xy {
+    auto type = Event.Type.UPDATE_XY;
+    int cursor_x;
+    int cursor_y;
+}
+
 
 class
 O {
@@ -283,7 +364,7 @@ dump_tree (E_ui_childed e, int level=0) {
     // klasses
     for (auto ex = e.next; ex !is null; ex = ex.next) printf (" %x", ex);
     // properties
-    printf (" w=%d,h=%d", e.w.type, e.h.type);
+    printf (" w=%d,h=%d, cw=%1.1f", e.w.type, e.h.type, e.canvased.w);
     printf ("\n");
 
     // childs
