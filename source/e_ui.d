@@ -475,6 +475,7 @@ A {
         Center   _center;
         Right    _right;
         Parent_h _parent_h;
+        Parent_w _parent_w;
     }
 
         void
@@ -512,6 +513,11 @@ A {
             type = Type._parent_h;
             _parent_h = b;
         }
+        void
+        opAssign (Parent_w b) {
+            type = Type._parent_w;
+            _parent_w = b;
+        }
 
         static left     = Left ();
         static center   = Center ();
@@ -528,6 +534,7 @@ A {
         _center,
         _right,
         _parent_h,
+        _parent_w,
     }
 
     struct
@@ -562,6 +569,11 @@ A {
 
     struct
     Parent_h {
+        int a;
+    }
+
+    struct
+    Parent_w {
         int a;
     }
 }

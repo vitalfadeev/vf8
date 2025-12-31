@@ -22,6 +22,10 @@ mai () {
         auto evt3 = Event (UPDATE_W);
         o.go (&evt3);
 
+        // UPDATE_H
+        auto evt4 = Event (UPDATE_H);
+        o.go (&evt4);
+
         dump_tree (o.e);
     }
 }
@@ -72,6 +76,8 @@ Ex : E {
         switch (evt.type) {
             case SET_E_PROP : _set_e_prop (o,e,evt); break;
             case UPDATE_W   : _update_w (o,e,evt); break;
+            case UPDATE_H   : _update_h (o,e,evt); break;
+            case UPDATE_XY  : _update_xy (o,e,evt); break;
             default:
         }
 
@@ -91,6 +97,22 @@ Ex : E {
 
     void  
     _update_w (O o, E_ui_childed e, Event* evt) {
+        //with (o)
+        with (e) {
+            // ...
+        }
+    }
+
+    void  
+    _update_h (O o, E_ui_childed e, Event* evt) {
+        //with (o)
+        with (e) {
+            // ...
+        }
+    }
+
+    void  
+    _update_xy (O o, E_ui_childed e, Event* evt) {
         //with (o)
         with (e) {
             // ...
@@ -174,10 +196,36 @@ E_ui_childed : E_ui {
     void  
     _update_w (O o, E_ui_childed e, Event* evt) {
         //with (o)
-        with (e) {
-            // ...
-            canvased.w = 1;
+        with (A.Type) {
+            switch (e.w.type) {
+                case _parent_w : this.canvased.w = this.parent.canvased.w; break;
+                case _parent_h : this.canvased.w = this.parent.canvased.h; break;
+                case _int      : this.canvased.w = this.w._int.a; break;
+                case _perc     : this.canvased.w = (cast (float) w._perc.a) * this.parent.canvased.w / 100; break;
+                default: this.canvased.w = this.parent.canvased.w;
+            }
         }
+    }
+
+    override
+    void  
+    _update_h (O o, E_ui_childed e, Event* evt) {
+        //with (o)
+        with (A.Type) {
+            switch (e.w.type) {
+                case _parent_w : this.canvased.h = this.parent.canvased.w; break;
+                case _parent_h : this.canvased.h = this.parent.canvased.h; break;
+                case _int      : this.canvased.h = this.h._int.a; break;
+                case _perc     : this.canvased.h = (cast (float) h._perc.a) * this.parent.canvased.h / 100; break;
+                default: this.canvased.h = this.parent.canvased.h;
+            }
+        }
+    }
+
+    override
+    void  
+    _update_xy (O o, E_ui_childed e, Event* evt) {
+        // ...
     }
 }
 
@@ -364,7 +412,7 @@ dump_tree (E_ui_childed e, int level=0) {
     // klasses
     for (auto ex = e.next; ex !is null; ex = ex.next) printf (" %x", ex);
     // properties
-    printf (" w=%d,h=%d, cw=%1.1f", e.w.type, e.h.type, e.canvased.w);
+    printf (" wh=(%dx%d), cw,ch:(%1.1f,%1.1f)", e.w.type, e.h.type, e.canvased.w,e.canvased.h);
     printf ("\n");
 
     // childs
