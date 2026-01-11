@@ -474,8 +474,8 @@ A {
         Left     _left;
         Center   _center;
         Right    _right;
-        Parent_h _parent_h;
         Parent_w _parent_w;
+        Parent_h _parent_h;
     }
 
         void
@@ -509,14 +509,14 @@ A {
             _right = b;
         }
         void
-        opAssign (Parent_h b) {
-            type = Type._parent_h;
-            _parent_h = b;
-        }
-        void
         opAssign (Parent_w b) {
             type = Type._parent_w;
             _parent_w = b;
+        }
+        void
+        opAssign (Parent_h b) {
+            type = Type._parent_h;
+            _parent_h = b;
         }
 
         static left     = Left ();

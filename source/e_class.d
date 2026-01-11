@@ -212,7 +212,7 @@ E_ui_childed : E_ui {
     _update_h (O o, E_ui_childed e, Event* evt) {
         //with (o)
         with (A.Type) {
-            switch (e.w.type) {
+            switch (e.h.type) {
                 case _parent_w : this.canvased.h = this.parent.canvased.w; break;
                 case _parent_h : this.canvased.h = this.parent.canvased.h; break;
                 case _int      : this.canvased.h = this.h._int.a; break;
@@ -225,7 +225,29 @@ E_ui_childed : E_ui {
     override
     void  
     _update_xy (O o, E_ui_childed e, Event* evt) {
-        // ...
+        //with (o)
+        with (A.Type) {
+            switch (e.x.type) {
+                case _left     : _step__at_left (o,e,evt); break;
+                case _center   : break;
+                case _right    : break;
+                case _int      : this.canvased.x = this.x._int.a; break;
+                default: 
+            }
+        }
+    }
+
+    void
+    _step__at_left (O o, E_ui_childed e, Event* evt) {
+        this.canvased.x = evt.update_xy.cursor_x;
+        this.canvased.y = evt.update_xy.cursor_y;
+        evt.update_xy.cursor_x += this.canvased.w;
+        evt.update_xy.cursor_x_max = this.parent.canvased.x + this.parent.canvased.w;
+        evt.update_xy.start_x = this.parent.canvased.x;
+        if (evt.update_xy.cursor_x > evt.update_xy.cursor_x_max) {
+            evt.update_xy.cursor_y += evt.update_xy.line_height;
+            evt.update_xy.cursor_x  = evt.update_xy.start_x;
+        }        
     }
 }
 
@@ -386,9 +408,12 @@ Event_update_h {
 
 struct
 Event_update_xy {
-    auto type = Event.Type.UPDATE_XY;
-    int cursor_x;
-    int cursor_y;
+    auto  type = Event.Type.UPDATE_XY;
+    float cursor_x;
+    float cursor_y;
+    float cursor_x_max = 640;
+    float start_x = 0;
+    float line_height = 64.0;
 }
 
 
@@ -412,7 +437,7 @@ dump_tree (E_ui_childed e, int level=0) {
     // klasses
     for (auto ex = e.next; ex !is null; ex = ex.next) printf (" %x", ex);
     // properties
-    printf (" wh=(%dx%d), cw,ch:(%1.1f,%1.1f)", e.w.type, e.h.type, e.canvased.w,e.canvased.h);
+    printf (" wh=(%dx%d), c.wh:(%1.1f,%1.1f) , c.xy:(%1.1f,%1.1f)", e.w.type, e.h.type,  e.canvased.w,e.canvased.h,  e.canvased.x,e.canvased.y);
     printf ("\n");
 
     // childs
