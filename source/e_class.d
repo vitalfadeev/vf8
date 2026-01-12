@@ -1,7 +1,6 @@
 module e_class;
 
-import e_ui : A,perc,Desktop,Color,Canvased;
-import std.stdio : writefln;
+import std.stdio  : writefln;
 import std.format : format;
 
 void
@@ -25,6 +24,16 @@ mai () {
         // UPDATE_H
         auto evt4 = Event (UPDATE_H);
         o.go (&evt4);
+
+        // UPDATE_XY
+        auto evt5 = Event (UPDATE_XY);
+        evt5.update_xy.totals .length = 1;
+        evt5.update_xy.cursors.length = 1;
+        o.go (&evt5);
+
+        // ...
+        //auto evt6 = Event (...);
+        //o.go (&evt6);
 
         dump_tree (o.e);
     }
@@ -74,10 +83,10 @@ Ex : E {
         // ...
         with (Event.Type)
         switch (evt.type) {
-            case SET_E_PROP : _set_e_prop (o,e,evt); break;
-            case UPDATE_W   : _update_w (o,e,evt); break;
-            case UPDATE_H   : _update_h (o,e,evt); break;
-            case UPDATE_XY  : _update_xy (o,e,evt); break;
+            case SET_E_PROP  : _set_e_prop (o,e,evt); break;
+            case UPDATE_W    : _update_w (o,e,evt); break;
+            case UPDATE_H    : _update_h (o,e,evt); break;
+            case UPDATE_XY   : _update_xy (o,e,evt); break;
             default:
         }
 
@@ -119,6 +128,14 @@ Ex : E {
         }
     }
 
+    void  
+    _update_xy_c (O o, E_ui_childed e, Event* evt) {
+        //with (o)
+        with (e) {
+            // ...
+        }
+    }
+
     T
     add_ex (this T) (Ex ex) {
         // find end
@@ -139,7 +156,7 @@ E_ui : Ex {
     void*      data1;
     A.Coord    x,y,w,h;
     Color      bg;
-    Event.Type on_click_send_evt_code;  // PLAY_1
+    Event.Type on_click_send_evt_code;  // PLLAY_1
     Canvased   canvased;
 
     override
@@ -169,9 +186,63 @@ E_ui_childed : E_ui {
         super.go (o,e,evt);
 
         // childs
-        for (auto _e = cl; _e !is null; _e = _e.r) {
-            _e.go (o,_e,evt);
+        with (Event.Type)
+        switch (evt.type) {
+            case UPDATE_XY :
+                with (A.Type)
+                switch (e.x.type) {
+                    case _left: 
+                        inc_cursor  (o,e,evt);
+                        each        (o,e,evt);
+                        dec_cursor  (o,e,evt);
+                        break;
+                    case _center: 
+                        inc_total   (o,e,evt); 
+                        each        (o,e,evt); 
+                        update_xy_c (o,e,evt); 
+                        dec_total   (o,e,evt); 
+                        break;
+                    default: 
+                        each        (o,e,evt);
+                }
+                break;
+            default: each (o,e,evt);
         }
+    }
+
+    void
+    each (O o, E_ui_childed e, Event* evt) {
+        for (auto _e = e.cl; _e !is null; _e = _e.r)
+            _e.go (o,_e,evt);
+    }
+
+    alias DGO = void delegate (O o, E_ui_childed e, Event* evt);
+
+    void
+    inc_cursor (O o, E_ui_childed e, Event* evt) {
+        evt.update_xy.cursors.length += 1;
+    }
+
+    void
+    dec_cursor (O o, E_ui_childed e, Event* evt) {
+        evt.update_xy.cursors.length -= 1;
+    }
+
+    void
+    inc_total (O o, E_ui_childed e, Event* evt) {
+        evt.update_xy.totals.length += 1;
+    }
+
+    void
+    dec_total (O o, E_ui_childed e, Event* evt) {
+        evt.update_xy.totals.length -= 1;
+    }
+
+    void
+    update_xy_c (O o, E_ui_childed e, Event* evt) {
+        auto dx = e.parent.canvased.w / 2 - evt.update_xy.total.w / 2;
+        for (auto _e = e.cl; _e !is null; _e = _e.r)
+            _e.canvased.x += dx;
     }
 
     E_ui_childed
@@ -196,14 +267,13 @@ E_ui_childed : E_ui {
     void  
     _update_w (O o, E_ui_childed e, Event* evt) {
         //with (o)
-        with (A.Type) {
-            switch (e.w.type) {
-                case _parent_w : this.canvased.w = this.parent.canvased.w; break;
-                case _parent_h : this.canvased.w = this.parent.canvased.h; break;
-                case _int      : this.canvased.w = this.w._int.a; break;
-                case _perc     : this.canvased.w = (cast (float) w._perc.a) * this.parent.canvased.w / 100; break;
-                default: this.canvased.w = this.parent.canvased.w;
-            }
+        with (A.Type)
+        switch (e.w.type) {
+            case _parent_w : this.canvased.w = this.parent.canvased.w; break;
+            case _parent_h : this.canvased.w = this.parent.canvased.h; break;
+            case _int      : this.canvased.w = this.w._int.a; break;
+            case _perc     : this.canvased.w = (cast (float) w._perc.a) * this.parent.canvased.w / 100; break;
+            default: this.canvased.w = this.parent.canvased.w;
         }
     }
 
@@ -211,14 +281,13 @@ E_ui_childed : E_ui {
     void  
     _update_h (O o, E_ui_childed e, Event* evt) {
         //with (o)
-        with (A.Type) {
-            switch (e.h.type) {
-                case _parent_w : this.canvased.h = this.parent.canvased.w; break;
-                case _parent_h : this.canvased.h = this.parent.canvased.h; break;
-                case _int      : this.canvased.h = this.h._int.a; break;
-                case _perc     : this.canvased.h = (cast (float) h._perc.a) * this.parent.canvased.h / 100; break;
-                default: this.canvased.h = this.parent.canvased.h;
-            }
+        with (A.Type)
+        switch (e.h.type) {
+            case _parent_w : this.canvased.h = this.parent.canvased.w; break;
+            case _parent_h : this.canvased.h = this.parent.canvased.h; break;
+            case _int      : this.canvased.h = this.h._int.a; break;
+            case _perc     : this.canvased.h = (cast (float) h._perc.a) * this.parent.canvased.h / 100; break;
+            default: this.canvased.h = this.parent.canvased.h;
         }
     }
 
@@ -226,28 +295,77 @@ E_ui_childed : E_ui {
     void  
     _update_xy (O o, E_ui_childed e, Event* evt) {
         //with (o)
-        with (A.Type) {
-            switch (e.x.type) {
-                case _left     : _step__at_left (o,e,evt); break;
-                case _center   : break;
-                case _right    : break;
-                case _int      : this.canvased.x = this.x._int.a; break;
-                default: 
+        with (A.Type)
+        switch (e.x.type) {
+            case _left     : _step__left_to_right (o,e,evt); break;
+            case _center   : _step__center_to_right (o,e,evt); break;
+            case _right    : break;
+            case _int      : this.canvased.x = this.x._int.a; break;
+            default: 
+        }
+    }
+
+    override
+    void  
+    _update_xy_c (O o, E_ui_childed e, Event* evt) {
+        //with (o)
+        with (A.Type)
+        switch (e.x.type) {
+            case _center : _step__center_to_right__center (o,e,evt); break;
+            default: 
+        }
+    }
+
+    void
+    _step__left_to_right (O o, E_ui_childed e, Event* evt) {
+        with (evt.update_xy) {
+            this.canvased.x = cursor.x;
+            this.canvased.y = cursor.y;
+            cursor.x       += this.canvased.w;
+            cursor.start_x  = this.parent.canvased.x;
+            cursor.limit_x  = this.parent.canvased.x + this.parent.canvased.w;
+            if (cursor.x > cursor.limit_x) {
+                cursor.y += line_height;  // wrap line
+                cursor.x  = cursor.start_x;
             }
         }
     }
 
     void
-    _step__at_left (O o, E_ui_childed e, Event* evt) {
-        this.canvased.x = evt.update_xy.cursor_x;
-        this.canvased.y = evt.update_xy.cursor_y;
-        evt.update_xy.cursor_x += this.canvased.w;
-        evt.update_xy.cursor_x_max = this.parent.canvased.x + this.parent.canvased.w;
-        evt.update_xy.start_x = this.parent.canvased.x;
-        if (evt.update_xy.cursor_x > evt.update_xy.cursor_x_max) {
-            evt.update_xy.cursor_y += evt.update_xy.line_height;
-            evt.update_xy.cursor_x  = evt.update_xy.start_x;
-        }        
+    _step__center_to_right (O o, E_ui_childed e, Event* evt) {
+        // each child
+        //   calc xy, from 0,0
+        //   calc total.w
+        // each child update xy
+        //   x += area.w / 2 - total.w / 2
+
+        with (evt.update_xy) {
+            this.canvased.x = cursor.x;
+            this.canvased.y = cursor.y;
+            cursor.x       += this.canvased.w;
+            cursor.start_x  = this.parent.canvased.x;
+            cursor.limit_x  = this.parent.canvased.x + this.parent.canvased.w;
+            if (cursor.x > cursor.limit_x) {
+                cursor.y += line_height;  // wrap line
+                cursor.x  = cursor.start_x;
+            }
+
+            // update total w
+            total.w += this.canvased.w;
+        }
+    }
+
+    void
+    _step__center_to_right__center (O o, E_ui_childed e, Event* evt) {
+        // each child
+        //   calc xy, from 0,0
+        //   calc total.w
+        // each child update xy
+        //   x += area.w / 2 - total.w / 2
+
+        with (evt.update_xy) {
+            //
+        }
     }
 }
 
@@ -368,11 +486,11 @@ union {
     enum
     Type {
         CLICK      =  1,
-        UPDATE     =  2,
+        UPDATE,
         SET_E_PROP = 11,
-        UPDATE_W   = 12,
-        UPDATE_H   = 13,
-        UPDATE_XY  = 14,
+        UPDATE_W,
+        UPDATE_H,
+        UPDATE_XY,
     }
 
     string
@@ -409,11 +527,27 @@ Event_update_h {
 struct
 Event_update_xy {
     auto  type = Event.Type.UPDATE_XY;
-    float cursor_x;
-    float cursor_y;
-    float cursor_x_max = 640;
-    float start_x = 0;
+    // left
     float line_height = 64.0;
+    Cursor[] cursors;
+    auto ref cursor () { import std.range : back; return cursors.back; }  // current cursor
+    struct
+    Cursor {
+        float x = 0;         // start location
+        float y = 0;         // 
+        float start_x = 0;   // area xy
+        float start_y = 0;   //
+        float limit_x = 0;   // area (xy+wh from parent + vars)
+        float limit_y = 0;   // 
+    }
+    // center
+    Total[] totals;
+    auto ref total () { import std.range : back; return totals.back; }  // current total
+    struct
+    Total {
+        float w = 0;
+        float h = 0;
+    }
 }
 
 
@@ -426,6 +560,153 @@ O {
         e.go (this,e,evt);
     }
 }
+
+struct
+Canvased {
+    Coord x,y,w,h;
+    Color color;
+
+    alias Coord = float;
+}
+alias Color = uint;
+
+struct
+Desktop {
+    static
+    int 
+    w () {
+        return 1366;
+    }
+    static
+    int 
+    h () {
+        return 768;
+    }
+}
+
+struct
+A {
+    Coord x;
+    Coord y;
+
+    struct
+    Coord {
+        Type     type;
+    union {
+        Int      _int;
+        Perc     _perc;
+        Left     _left;
+        Center   _center;
+        Right    _right;
+        Parent_w _parent_w;
+        Parent_h _parent_h;
+    }
+
+        void
+        opAssign (int b) {
+            type = Type._int;
+            _int = Int (b);
+        }
+        void
+        opAssign (Int b) {
+            type = Type._int;
+            _int = b;
+        }
+        void
+        opAssign (Perc b) {
+            type = Type._perc;
+            _perc = b;
+        }
+        void
+        opAssign (Left b) {
+            type = Type._left;
+            _left = b;
+        }
+        void
+        opAssign (Center b) {
+            type = Type._center;
+            _center = b;
+        }
+        void
+        opAssign (Right b) {
+            type = Type._right;
+            _right = b;
+        }
+        void
+        opAssign (Parent_w b) {
+            type = Type._parent_w;
+            _parent_w = b;
+        }
+        void
+        opAssign (Parent_h b) {
+            type = Type._parent_h;
+            _parent_h = b;
+        }
+
+        static left     = Left ();
+        static center   = Center ();
+        static right    = Right ();
+        static parent_h = Parent_h ();
+    }
+
+    enum
+    Type {
+        _,
+        _int,
+        _perc,
+        _left,
+        _center,
+        _right,
+        _parent_h,
+        _parent_w,
+    }
+
+    struct
+    Int {
+        int a;
+    }
+
+    struct
+    Perc {
+        int a;
+
+        //auto 
+        //opBinaryRight (string op : "*") (float rhs) {
+        //    return a * rhs;
+        //}
+    }
+
+    struct
+    Left {
+        int a;
+    }
+
+    struct
+    Center {
+        int a;
+    }
+
+    struct
+    Right {
+        int a;
+    }
+
+    struct
+    Parent_h {
+        int a;
+    }
+
+    struct
+    Parent_w {
+        int a;
+    }
+}
+
+auto
+perc (int a) {
+    return A.Perc (a);
+}
+
 
 void
 dump_tree (E_ui_childed e, int level=0) {
