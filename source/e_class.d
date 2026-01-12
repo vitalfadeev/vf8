@@ -17,13 +17,13 @@ mai () {
         auto evt2 = Event (UPDATE);
         o.go (&evt2);
 
-        // UPDATE_W
-        auto evt3 = Event (UPDATE_W);
-        o.go (&evt3);
-
         // UPDATE_H
         auto evt4 = Event (UPDATE_H);
         o.go (&evt4);
+
+        // UPDATE_W
+        auto evt3 = Event (UPDATE_W);
+        o.go (&evt3);
 
         // UPDATE_XY
         auto evt5 = Event (UPDATE_XY);
@@ -83,9 +83,9 @@ Ex : E {
         with (Event.Type)
         switch (evt.type) {
             case SET_E_PROP  : _set_e_prop (o,e,evt); break;
-            case UPDATE_W    : _update_w (o,e,evt); break;
-            case UPDATE_H    : _update_h (o,e,evt); break;
-            case UPDATE_XY   : _update_xy (o,e,evt); break;
+            case UPDATE_W    : _update_w   (o,e,evt); break;
+            case UPDATE_H    : _update_h   (o,e,evt); break;
+            case UPDATE_XY   : _update_xy  (o,e,evt); break;
             default:
         }
 
@@ -188,10 +188,11 @@ E_ui_childed : E_ui {
         with (Event.Type)
         switch (evt.type) {
             case UPDATE_XY :
+                with (evt.update_xy)
                 if (has_childs) {                    
-                    evt.update_xy.inc_cursor ();
+                    inc_cursor ();
                     each (o,e,evt);
-                    evt.update_xy.dec_cursor ();
+                    dec_cursor ();
                 }
                 break;
             default: each (o,e,evt);
@@ -351,7 +352,15 @@ Loc1 : Ex {
     }
 }
 auto button (E_ui_childed e) { return e.add_ex (new Button); }
-class Button : Ex {}
+class Button : Ex {
+    override
+    void  
+    _set_e_prop (O o, E_ui_childed e, Event* evt) {
+        with (e) {
+           w = A.Coord.parent_h;
+        }
+    }    
+}
 auto _1 (E_ui_childed e) { return e.add_ex (new __1); }
 class __1 : Ex {}
 auto _2 (E_ui_childed e) { return e.add_ex (new __2); }
@@ -480,6 +489,7 @@ Event_update_xy {
     void
     inc_cursor () {
         cursors.length += 1;
+        cursor = Cursor ();  // init
     }
 
     void
@@ -657,7 +667,10 @@ dump_tree (E_ui_childed e, int level=0) {
     // klasses
     for (auto ex = e.next; ex !is null; ex = ex.next) printf (" %x", ex);
     // properties
-    printf (" wh=(%dx%d), c.wh:(%1.1f,%1.1f) , c.xy:(%1.1f,%1.1f)", e.w.type, e.h.type,  e.canvased.w,e.canvased.h,  e.canvased.x,e.canvased.y);
+    printf (" wh=(%dx%d), c.wh:(%1.1f,%1.1f) , c.xy:(%1.1f,%1.1f)", 
+        e.w.type,     e.h.type,  
+        e.canvased.w, e.canvased.h,  
+        e.canvased.x, e.canvased.y);
     printf ("\n");
 
     // childs
