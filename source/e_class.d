@@ -27,7 +27,6 @@ mai () {
 
         // UPDATE_XY
         auto evt5 = Event (UPDATE_XY);
-        evt5.update_xy.totals .length = 1;
         evt5.update_xy.cursors.length = 1;
         o.go (&evt5);
 
@@ -189,25 +188,19 @@ E_ui_childed : E_ui {
         with (Event.Type)
         switch (evt.type) {
             case UPDATE_XY :
-                with (A.Type)
-                switch (e.x.type) {
-                    case _left: 
-                        inc_cursor  (o,e,evt);
-                        each        (o,e,evt);
-                        dec_cursor  (o,e,evt);
-                        break;
-                    case _center: 
-                        inc_total   (o,e,evt); 
-                        each        (o,e,evt); 
-                        update_xy_c (o,e,evt); 
-                        dec_total   (o,e,evt); 
-                        break;
-                    default: 
-                        each        (o,e,evt);
+                if (has_childs) {                    
+                    evt.update_xy.inc_cursor ();
+                    each (o,e,evt);
+                    evt.update_xy.dec_cursor ();
                 }
                 break;
             default: each (o,e,evt);
         }
+    }
+
+    auto
+    has_childs () {
+        return cl;
     }
 
     void
@@ -219,28 +212,8 @@ E_ui_childed : E_ui {
     alias DGO = void delegate (O o, E_ui_childed e, Event* evt);
 
     void
-    inc_cursor (O o, E_ui_childed e, Event* evt) {
-        evt.update_xy.cursors.length += 1;
-    }
-
-    void
-    dec_cursor (O o, E_ui_childed e, Event* evt) {
-        evt.update_xy.cursors.length -= 1;
-    }
-
-    void
-    inc_total (O o, E_ui_childed e, Event* evt) {
-        evt.update_xy.totals.length += 1;
-    }
-
-    void
-    dec_total (O o, E_ui_childed e, Event* evt) {
-        evt.update_xy.totals.length -= 1;
-    }
-
-    void
     update_xy_c (O o, E_ui_childed e, Event* evt) {
-        auto dx = e.parent.canvased.w / 2 - evt.update_xy.total.w / 2;
+        auto dx = e.parent.canvased.w / 2 - evt.update_xy.cursor.total_w / 2;
         for (auto _e = e.cl; _e !is null; _e = _e.r)
             _e.canvased.x += dx;
     }
@@ -297,11 +270,11 @@ E_ui_childed : E_ui {
         //with (o)
         with (A.Type)
         switch (e.x.type) {
-            case _left     : _step__left_to_right (o,e,evt); break;
-            case _center   : _step__center_to_right (o,e,evt); break;
+            case _left     : import update.xy.step.left;   to_right (this,o,e,evt); break;
+            case _center   : import update.xy.step.center; to_right (this,o,e,evt); break;
             case _right    : break;
             case _int      : this.canvased.x = this.x._int.a; break;
-            default: 
+            default        : import update.xy.step.left;   to_right (this,o,e,evt);
         }
     }
 
@@ -313,45 +286,6 @@ E_ui_childed : E_ui {
         switch (e.x.type) {
             case _center : _step__center_to_right__center (o,e,evt); break;
             default: 
-        }
-    }
-
-    void
-    _step__left_to_right (O o, E_ui_childed e, Event* evt) {
-        with (evt.update_xy) {
-            this.canvased.x = cursor.x;
-            this.canvased.y = cursor.y;
-            cursor.x       += this.canvased.w;
-            cursor.start_x  = this.parent.canvased.x;
-            cursor.limit_x  = this.parent.canvased.x + this.parent.canvased.w;
-            if (cursor.x > cursor.limit_x) {
-                cursor.y += line_height;  // wrap line
-                cursor.x  = cursor.start_x;
-            }
-        }
-    }
-
-    void
-    _step__center_to_right (O o, E_ui_childed e, Event* evt) {
-        // each child
-        //   calc xy, from 0,0
-        //   calc total.w
-        // each child update xy
-        //   x += area.w / 2 - total.w / 2
-
-        with (evt.update_xy) {
-            this.canvased.x = cursor.x;
-            this.canvased.y = cursor.y;
-            cursor.x       += this.canvased.w;
-            cursor.start_x  = this.parent.canvased.x;
-            cursor.limit_x  = this.parent.canvased.x + this.parent.canvased.w;
-            if (cursor.x > cursor.limit_x) {
-                cursor.y += line_height;  // wrap line
-                cursor.x  = cursor.start_x;
-            }
-
-            // update total w
-            total.w += this.canvased.w;
         }
     }
 
@@ -537,17 +471,22 @@ Event_update_xy {
         float y = 0;         // 
         float start_x = 0;   // area xy
         float start_y = 0;   //
-        float limit_x = 0;   // area (xy+wh from parent + vars)
+        float limit_x = 0;   // area (wh from parent + vars)
         float limit_y = 0;   // 
+        float total_w = 0;
+        float total_h = 0;
     }
-    // center
-    Total[] totals;
-    auto ref total () { import std.range : back; return totals.back; }  // current total
-    struct
-    Total {
-        float w = 0;
-        float h = 0;
+
+    void
+    inc_cursor () {
+        cursors.length += 1;
     }
+
+    void
+    dec_cursor () {
+        cursors.length -= 1;
+    }
+
 }
 
 
