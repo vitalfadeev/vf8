@@ -106,6 +106,7 @@ Ex : E {
             case UPDATE      : _update     (o,e,evt); break;
             case SET_E_PROP  : _set_e_prop (o,e,evt); break;
             case UPDATE_XY   : _update_xy  (o,e,evt); break;
+            case DRAW        : _draw       (o,e,evt); break;
             default:
         }
 
@@ -126,7 +127,8 @@ Ex : E {
     void  
     _set_e_prop (O o, E_ui e, Event* evt) {
         //with (o)
-        with (e) {
+        with (e)
+        with (evt.set_e_prop) {
             // ...
         }
     }
@@ -134,7 +136,17 @@ Ex : E {
     void  
     _update_xy (O o, E_ui e, Event* evt) {
         //with (o)
-        with (e) {
+        with (e) 
+        with (evt.update_xy) {
+            // ...
+        }
+    }
+
+    void  
+    _draw (O o, E_ui e, Event* evt) {
+        //with (o)
+        with (e)
+        with (evt.draw) {
             // ...
         }
     }
@@ -188,6 +200,16 @@ E_ui : Ex {
                 foreach (_e; childs) _e.go (o,_e,evt);
                 break;
             default: /*each (o,e,evt);*/
+        }
+    }
+
+    override
+    void  
+    _draw (O o, E_ui e, Event* evt) {
+        //with (o)
+        with (e)
+        with (evt.draw) {
+            // ...
         }
     }
 
@@ -351,6 +373,7 @@ union {
     Event_update_w   update_w;
     Event_update_h   update_h;
     Event_update_xy  update_xy;
+    Event_draw       draw;
 }
 
     enum
@@ -361,6 +384,7 @@ union {
         UPDATE_W,
         UPDATE_H,
         UPDATE_XY,
+        DRAW,
     }
 
     string
@@ -435,6 +459,10 @@ Event_update_xy {
 
 }
 
+struct
+Event_draw {
+    auto  type = Event.Type.DRAW;
+}
 
 class
 O {
