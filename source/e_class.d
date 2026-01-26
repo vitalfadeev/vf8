@@ -1,7 +1,10 @@
 module e_class;
 
 import std.stdio  : writefln;
+import std.stdio  : writeln;
 import std.format : format;
+import childs_parent;
+import layout;
 
 void
 mai () {
@@ -17,13 +20,31 @@ mai () {
         auto evt2 = Event (UPDATE);
         o.go (&evt2);
 
-        // UPDATE_H
-        auto evt4 = Event (UPDATE_H);
-        o.go (&evt4);
+        //with (evt2.update)
+        //with (evt2.update.strategy)
+        //switch (strategy) {
+        //    case wh: {
+        //        // UPDATE_W
+        //        auto evt3 = Event (UPDATE_W);
+        //        o.go (&evt3);
+        //        // UPDATE_H
+        //        auto evt4 = Event (UPDATE_H);
+        //        o.go (&evt4);
+        //        break;
+        //    }
+        //    case hw: {
+        //        // UPDATE_H
+        //        auto evt4 = Event (UPDATE_H);
+        //        o.go (&evt4);
+        //        // UPDATE_W
+        //        auto evt3 = Event (UPDATE_W);
+        //        o.go (&evt3);
+        //        break;
+        //    }
+        //    default:
+        //}
 
-        // UPDATE_W
-        auto evt3 = Event (UPDATE_W);
-        o.go (&evt3);
+
 
         // UPDATE_XY
         auto evt5 = Event (UPDATE_XY);
@@ -59,13 +80,13 @@ test () {
 //
 interface 
 GO {
-    void go (O o, E_ui_childed e, Event* evt);
+    void go (O o, E_ui e, Event* evt);
 }
 
 class
 E : GO {
     void 
-    go (O o, E_ui_childed e, Event* evt) {
+    go (O o, E_ui e, Event* evt) {
         //
     }
 }
@@ -77,14 +98,13 @@ Ex : E {
 
     override
     void  
-    go (O o, E_ui_childed e, Event* evt) {
+    go (O o, E_ui e, Event* evt) {
         writefln ("Event: %s", *evt);
         // ...
-        with (Event.Type)
+        with (evt.Type)
         switch (evt.type) {
+            case UPDATE      : _update     (o,e,evt); break;
             case SET_E_PROP  : _set_e_prop (o,e,evt); break;
-            case UPDATE_W    : _update_w   (o,e,evt); break;
-            case UPDATE_H    : _update_h   (o,e,evt); break;
             case UPDATE_XY   : _update_xy  (o,e,evt); break;
             default:
         }
@@ -96,7 +116,7 @@ Ex : E {
     }
 
     void  
-    _set_e_prop (O o, E_ui_childed e, Event* evt) {
+    _update (O o, E_ui e, Event* evt) {
         //with (o)
         with (e) {
             // ...
@@ -104,7 +124,7 @@ Ex : E {
     }
 
     void  
-    _update_w (O o, E_ui_childed e, Event* evt) {
+    _set_e_prop (O o, E_ui e, Event* evt) {
         //with (o)
         with (e) {
             // ...
@@ -112,23 +132,7 @@ Ex : E {
     }
 
     void  
-    _update_h (O o, E_ui_childed e, Event* evt) {
-        //with (o)
-        with (e) {
-            // ...
-        }
-    }
-
-    void  
-    _update_xy (O o, E_ui_childed e, Event* evt) {
-        //with (o)
-        with (e) {
-            // ...
-        }
-    }
-
-    void  
-    _update_xy_c (O o, E_ui_childed e, Event* evt) {
+    _update_xy (O o, E_ui e, Event* evt) {
         //with (o)
         with (e) {
             // ...
@@ -152,155 +156,65 @@ Ex : E {
 
 class
 E_ui : Ex {
+    mixin Xywh!E_ui;
     void*      data1;
-    A.Coord    x,y,w,h;
     Color      bg;
     Event.Type on_click_send_evt_code;  // PLLAY_1
-    Canvased   canvased;
+    mixin Childs_parent!E_ui;
+    mixin Layout!E_ui;
+
+    Get_width get_width;
+
 
     override
     void 
-    go (O o, E_ui_childed e, Event* evt) {
-        // ...
-
-        // next
-        super.go (o,e,evt);
-    }
-}
-
-class
-E_ui_childed : E_ui {
-    E_ui_childed l;
-    E_ui_childed r;
-    E_ui_childed cl;
-    E_ui_childed cr;
-    E_ui_childed parent;
-
-    override
-    void 
-    go (O o, E_ui_childed e, Event* evt) {
+    go (O o, E_ui e, Event* evt) {
         // ...
 
         // next
         super.go (o,e,evt);
 
         // childs
-        with (Event.Type)
+        with (evt.Type)
         switch (evt.type) {
-            case UPDATE_XY :
-                with (evt.update_xy)
-                if (has_childs) {                    
-                    inc_cursor ();
-                    each (o,e,evt);
-                    dec_cursor ();
-                }
+            case SET_E_PROP :
+                with (evt.set_e_prop)
+                foreach (_e; childs) _e.go (o,_e,evt);
                 break;
-            default: each (o,e,evt);
+            case UPDATE_XY :
+                writefln ("%s: %s", this, childs_layout.a);
+                with (evt.update_xy)
+                if (has_childs) go_layout (o,e,evt);
+                foreach (_e; childs) _e.go (o,_e,evt);
+                break;
+            default: /*each (o,e,evt);*/
         }
     }
 
-    auto
-    has_childs () {
-        return cl;
-    }
-
     void
-    each (O o, E_ui_childed e, Event* evt) {
-        for (auto _e = e.cl; _e !is null; _e = _e.r)
+    each (O o, E e, Event* evt) {
+        foreach (_e; childs)
             _e.go (o,_e,evt);
     }
 
-    alias DGO = void delegate (O o, E_ui_childed e, Event* evt);
+    alias DGO = void delegate (O o, E_ui e, Event* evt);
+}
 
-    void
-    update_xy_c (O o, E_ui_childed e, Event* evt) {
-        auto dx = e.parent.canvased.w / 2 - evt.update_xy.cursor.total_w / 2;
-        for (auto _e = e.cl; _e !is null; _e = _e.r)
-            _e.canvased.x += dx;
-    }
+void
+layout_fn () {
+    // stacked.to_right__align_left
+    // stacked.to_right__align_center
+    // stacked.to_left
+}
 
-    E_ui_childed
-    add_child (E_ui_childed c) {
-        auto t = this;
-        auto tr = t.cr;
-        if (tr is null) {
-            t.cr = c;
-            t.cl = c;
-        }
-        else {
-            c.l = tr;
-            tr.r = c;
-            t.cr = c;
-        }
-        c.parent = t;
+void
+detect_strategy (O o, E_ui e, Event_update* evt) {
+    with (evt) {
+        if (e.w.type == e.w.Type._parent_h)
+            strategy = Strategy.hw;
 
-        return c;
-    }
-
-    override
-    void  
-    _update_w (O o, E_ui_childed e, Event* evt) {
-        //with (o)
-        with (A.Type)
-        switch (e.w.type) {
-            case _parent_w : this.canvased.w = this.parent.canvased.w; break;
-            case _parent_h : this.canvased.w = this.parent.canvased.h; break;
-            case _int      : this.canvased.w = this.w._int.a; break;
-            case _perc     : this.canvased.w = (cast (float) w._perc.a) * this.parent.canvased.w / 100; break;
-            default: this.canvased.w = this.parent.canvased.w;
-        }
-    }
-
-    override
-    void  
-    _update_h (O o, E_ui_childed e, Event* evt) {
-        //with (o)
-        with (A.Type)
-        switch (e.h.type) {
-            case _parent_w : this.canvased.h = this.parent.canvased.w; break;
-            case _parent_h : this.canvased.h = this.parent.canvased.h; break;
-            case _int      : this.canvased.h = this.h._int.a; break;
-            case _perc     : this.canvased.h = (cast (float) h._perc.a) * this.parent.canvased.h / 100; break;
-            default: this.canvased.h = this.parent.canvased.h;
-        }
-    }
-
-    override
-    void  
-    _update_xy (O o, E_ui_childed e, Event* evt) {
-        //with (o)
-        with (A.Type)
-        switch (e.x.type) {
-            case _left     : import update.xy.step.left;   to_right (this,o,e,evt); break;
-            case _center   : import update.xy.step.center; to_right (this,o,e,evt); break;
-            case _right    : break;
-            case _int      : this.canvased.x = this.x._int.a; break;
-            default        : import update.xy.step.left;   to_right (this,o,e,evt);
-        }
-    }
-
-    override
-    void  
-    _update_xy_c (O o, E_ui_childed e, Event* evt) {
-        //with (o)
-        with (A.Type)
-        switch (e.x.type) {
-            case _center : _step__center_to_right__center (o,e,evt); break;
-            default: 
-        }
-    }
-
-    void
-    _step__center_to_right__center (O o, E_ui_childed e, Event* evt) {
-        // each child
-        //   calc xy, from 0,0
-        //   calc total.w
-        // each child update xy
-        //   x += area.w / 2 - total.w / 2
-
-        with (evt.update_xy) {
-            //
-        }
+        if (e.h.type == e.h.Type._parent_w)
+            strategy = Strategy.wh;
     }
 }
 
@@ -308,23 +222,23 @@ E_ui_childed : E_ui {
 //
 auto 
 e () {
-    return new E_ui_childed ();
+    return new E_ui ();
 }
 auto
-e (E_ui_childed _e) {
-    return _e.add_child (new E_ui_childed ());
+e (E_ui _e) {
+    return _e.add_child (new E_ui ());
 }
 auto
-parent (E_ui_childed e) {
+parent (E_ui e) {
     return e.parent;
 }
 
-auto window (E_ui_childed e) { return e.add_ex (new Window); }
+auto window (E_ui e) { return e.add_ex (new Window); }
 class
 Window : Ex {
     override
     void  
-    _set_e_prop (O o, E_ui_childed e, Event* evt) {
+    _set_e_prop (O o, E_ui e, Event* evt) {
         with (e) {
             x = 0;
             y = 0;
@@ -333,84 +247,97 @@ Window : Ex {
         }
     }
 }
-auto panel (E_ui_childed e) { return e.add_ex (new Panel); }
+auto panel (E_ui e) { return e.add_ex (new Panel); }
 class Panel  : Ex {}
-auto canvas (E_ui_childed e) { return e.add_ex (new Canvas); }
+auto canvas (E_ui e) { return e.add_ex (new Canvas); }
 class Canvas : Ex {}
-auto loc1 (E_ui_childed e) { return e.add_ex (new Loc1); }
+auto loc1 (E_ui e) { return e.add_ex (new Loc1); }
 class 
 Loc1 : Ex {
     override
     void  
-    _set_e_prop (O o, E_ui_childed e, Event* evt) {
-        with (e) {
-           x = A.Coord.left;
-           y = 0;
+    _set_e_prop (O o, E_ui e, Event* evt) {        
+        with (e) with (Coord) {
            w = 33.perc;
-           h = A.Coord.parent_h;
+           h = parent_h;
+        }
+        with (e) {
+           //childs_layout = left_aligned.stacked.to_right;
+           childs_layout = A.left_aligned_stacked_to_right;
         }
     }
 }
-auto button (E_ui_childed e) { return e.add_ex (new Button); }
+auto button (E_ui e) { return e.add_ex (new Button); }
 class Button : Ex {
     override
     void  
-    _set_e_prop (O o, E_ui_childed e, Event* evt) {
+    _set_e_prop (O o, E_ui e, Event* evt) {
         with (e) {
-           w = A.Coord.parent_h;
+           w = Coord.parent_h;
         }
     }    
 }
-auto _1 (E_ui_childed e) { return e.add_ex (new __1); }
+auto _1 (E_ui e) { return e.add_ex (new __1); }
 class __1 : Ex {}
-auto _2 (E_ui_childed e) { return e.add_ex (new __2); }
+auto _2 (E_ui e) { return e.add_ex (new __2); }
 class __2 : Ex {}
-auto _3 (E_ui_childed e) { return e.add_ex (new __3); }
+auto _3 (E_ui e) { return e.add_ex (new __3); }
 class __3 : Ex {}
-auto loc2 (E_ui_childed e) { return e.add_ex (new Loc2); }
+auto loc2 (E_ui e) { return e.add_ex (new Loc2); }
 class 
 Loc2 : Ex {
     override
     void  
-    _set_e_prop (O o, E_ui_childed e, Event* evt) {
+    _set_e_prop (O o, E_ui e, Event* evt) {
         with (e) {
-            x = A.Coord.center;
-            y = 0;
             w = 34.perc;
-            h = A.Coord.parent_h;
+            h = Coord.parent_h;
+        }
+        with (e) {
+           //childs_layout = center_aligned.stacked.to_right;
+           childs_layout = A.center_aligned_stacked_to_right;
         }
     }
 }
-auto clock (E_ui_childed e) { return e.add_ex (new Clock); }
+auto clock (E_ui e) { return e.add_ex (new Clock); }
 class 
 Clock : Ex {
     override
     void  
-    _set_e_prop (O o, E_ui_childed e, Event* evt) {
+    _set_e_prop (O o, E_ui e, Event* evt) {
         with (e) {
-            x = A.Coord.center;
-            y = 0;
             w = 33.perc;
-            h = A.Coord.parent_h;
+            h = Coord.parent_h;
         }
     }
 }
-auto loc3 (E_ui_childed e) { return e.add_ex (new Loc3); }
+auto loc3 (E_ui e) { return e.add_ex (new Loc3); }
 class 
 Loc3 : Ex {
     override
     void  
-    _set_e_prop (O o, E_ui_childed e, Event* evt) {
+    _set_e_prop (O o, E_ui e, Event* evt) {
         with (e) {
-            x = A.Coord.right;
-            y = 0;
             w = 33.perc;
-            h = A.Coord.parent_h;
+            h = Coord.parent_h;
+        }
+        with (e) {
+           //childs_layout = right_aligned.stacked.to_left;
+           childs_layout = A.right_aligned_stacked_to_left;
         }
     }
 }
-auto indicator (E_ui_childed e) { return e.add_ex (new Indicator); }
-class Indicator : Ex {}
+auto indicator (E_ui e) { return e.add_ex (new Indicator); }
+class Indicator : Ex {
+    override
+    void  
+    _set_e_prop (O o, E_ui e, Event* evt) {
+        with (e) {
+            w = Coord.parent_h;
+            h = Coord.parent_h;
+        }
+    }
+}
 
 
 //
@@ -442,6 +369,7 @@ union {
     }
 }
 
+
 struct
 Event_click {
     auto type = Event.Type.CLICK;
@@ -449,7 +377,15 @@ Event_click {
 
 struct
 Event_update {
-    auto type = Event.Type.UPDATE;
+    auto type     = Event.Type.UPDATE;
+    auto strategy = Strategy._;
+
+    enum
+    Strategy {
+        _,
+        wh,
+        hw,
+    }
 }
 
 struct
@@ -502,7 +438,7 @@ Event_update_xy {
 
 class
 O {
-    E_ui_childed e;
+    E_ui e;
 
     void 
     go (Event* evt) {
@@ -533,132 +469,10 @@ Desktop {
     }
 }
 
-struct
-A {
-    Coord x;
-    Coord y;
-
-    struct
-    Coord {
-        Type     type;
-    union {
-        Int      _int;
-        Perc     _perc;
-        Left     _left;
-        Center   _center;
-        Right    _right;
-        Parent_w _parent_w;
-        Parent_h _parent_h;
-    }
-
-        void
-        opAssign (int b) {
-            type = Type._int;
-            _int = Int (b);
-        }
-        void
-        opAssign (Int b) {
-            type = Type._int;
-            _int = b;
-        }
-        void
-        opAssign (Perc b) {
-            type = Type._perc;
-            _perc = b;
-        }
-        void
-        opAssign (Left b) {
-            type = Type._left;
-            _left = b;
-        }
-        void
-        opAssign (Center b) {
-            type = Type._center;
-            _center = b;
-        }
-        void
-        opAssign (Right b) {
-            type = Type._right;
-            _right = b;
-        }
-        void
-        opAssign (Parent_w b) {
-            type = Type._parent_w;
-            _parent_w = b;
-        }
-        void
-        opAssign (Parent_h b) {
-            type = Type._parent_h;
-            _parent_h = b;
-        }
-
-        static left     = Left ();
-        static center   = Center ();
-        static right    = Right ();
-        static parent_h = Parent_h ();
-    }
-
-    enum
-    Type {
-        _,
-        _int,
-        _perc,
-        _left,
-        _center,
-        _right,
-        _parent_h,
-        _parent_w,
-    }
-
-    struct
-    Int {
-        int a;
-    }
-
-    struct
-    Perc {
-        int a;
-
-        //auto 
-        //opBinaryRight (string op : "*") (float rhs) {
-        //    return a * rhs;
-        //}
-    }
-
-    struct
-    Left {
-        int a;
-    }
-
-    struct
-    Center {
-        int a;
-    }
-
-    struct
-    Right {
-        int a;
-    }
-
-    struct
-    Parent_h {
-        int a;
-    }
-
-    struct
-    Parent_w {
-        int a;
-    }
-}
-
-auto
-perc (int a) {
-    return A.Perc (a);
-}
 
 
 void
-dump_tree (E_ui_childed e, int level=0) {
+dump_tree (E_ui e, int level=0) {
     import core.stdc.stdio : printf;
 
     // e
@@ -669,12 +483,97 @@ dump_tree (E_ui_childed e, int level=0) {
     // properties
     printf (" wh=(%dx%d), c.wh:(%1.1f,%1.1f) , c.xy:(%1.1f,%1.1f)", 
         e.w.type,     e.h.type,  
-        e.canvased.w, e.canvased.h,  
-        e.canvased.x, e.canvased.y);
+        e.wh.w, e.wh.h,  
+        e.xy.x, e.xy.y);
     printf ("\n");
 
     // childs
     for (auto _e = e.cl; _e !is null; _e = _e.r) {
         dump_tree (_e,level+1);
+    }
+}
+
+struct
+Get_width {
+    FN _get_width = &fixed;
+
+    alias FN = void function ();
+
+    void
+    opAssign (FN b) {
+        _get_width = b;
+    }
+
+    void
+    opCall () {
+        _get_width ();
+    }
+
+    static
+    void
+    fixed () {
+        //
+    }
+
+    static
+    void
+    by_content () {
+        //
+    }
+}
+
+
+
+// e
+//   e
+//
+// klass
+//   x = left stack
+//   w = parent
+//
+//   x = left stack
+//   x = center stack
+//   x = right stack
+
+
+
+struct
+Universal_emitter {
+    Rec* a;
+    Rec* z;
+
+    alias Type = typeof (Event.type);
+    alias CB   = void function (O o, E_ui e, Event* evt);
+
+    void
+    check_and_emit (O o, E_ui e, Event* evt) {
+        for (auto rec=a; rec !is null; rec = rec.next) {
+            if (rec.type == evt.type) {
+                rec.cb (o,e,evt);
+            }
+        }
+    }
+
+    void
+    connect (Type type, CB cb) {
+        auto rec = new Rec (type,cb);
+
+        if (z is null) {
+            z = rec;
+            a = rec;
+        }
+        else {
+            rec.prev = z;
+            z.next = rec;
+            z = rec;
+        }
+    }
+
+    struct
+    Rec {
+        Type type;
+        CB   cb;   // DList!CB
+        Rec* prev;
+        Rec* next;
     }
 }
