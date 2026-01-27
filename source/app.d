@@ -1,53 +1,110 @@
 import core.stdc.stdio : printf;
 import vf.types        : GO,REG;
 import vf.o_base       : O;
-import vf.input        : Event;
 import vf.local_input  : Local_input;
+import vf.audio       : Audio;
+import vf.video       : Video;
+import event;
 import importc;
-
-import mod.quit   : mod_quit_go = go,go_quit;
-import mod.player : mod_player_go = go;
-import mod.print  : mod_print_go = go,go_printf;
-import mod.send   : mod_send_go = go,go_send;
-import mod.ui     : mod_ui_go = go;
-import mod.key    : mod_key_go = go;
-import mod.ui : Uni_e;
-
-enum       EVT_APP         = 0x0100;
-enum       APP_CODE_QUIT   = 0x0001;
-enum ulong EVT_APP_QUIT    = (APP_CODE_QUIT << 16) | EVT_APP;
-enum       EVT_UI          = 0x0200;
-enum ulong UI_POINTER_IN   = (2             << 16) | EVT_UI;
-enum ulong UI_POINTER_OVER = (3             << 16) | EVT_UI;
-enum ulong UI_POINTER_OUT  = (4             << 16) | EVT_UI;
-enum ulong CLICKED         = (5             << 16) | EVT_UI;
-enum ulong OPEN            = (6             << 16) | EVT_UI;
-enum ulong DRAW            = (7             << 16) | EVT_UI;
-enum ulong PLAY_1          = (8             << 16) | EVT_UI;
-enum ulong PLAY_2          = (9             << 16) | EVT_UI;
-enum ulong PLAY_3          = (10            << 16) | EVT_UI;
 
 
 extern(C)
 void 
 main () {
-    tvg_engine_init(4);
-        
-    O o;
+    //tvg_engine_init(4);
+
+    auto o = new O3 ();
     o.open ();
-    //
-    import e_class : mai;
-    mai ();
-    // event loop
-    o.go (&o,&_app_ego,null,0);
+    o.go ();   // event loop
 }
 
-void
-_app_ego (void* o, void* e, void* evt, REG d) {
-    mod_quit_go   (o,e,evt,d);
-    mod_player_go (o,e,evt,d);
-    mod_ui_go     (o,e,evt,d);
-    mod_key_go    (o,e,evt,d);
+class
+O3 : O!(Event) {
+    //Audio audio;
+    Video video;
+    //Gui   gui;
+
+    override
+    void
+    open () {
+        //SDL_Init (SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_EVENTS);
+        SDL_Init (SDL_INIT_EVERYTHING);
+        //audio.open ();
+        video.open ();
+        super.open ();
+        //gui.open ();
+    }
+
+    override
+    void
+    ego (Event* evt) {
+        mod_quit_go   (evt);
+        //mod_player_go (evt,e);
+        //mod_ui_go     (evt,e);
+        //mod_key_go    (evt,e);
+    }
+
+    void
+    mod_quit_go (Event* evt) {
+        with (evt.Type)
+        switch (evt.type) {
+            case SDL: 
+                if (evt.sdl.sdl_event.type ==  SDL_QUIT) {
+                    printf ("on QUIT\n");
+                    send (Event.Type.QUIT);
+                    go_flag = false;
+                }
+                break;
+            default:
+        }
+    }
+
+    void
+    mod_player_go (E e, Event* evt) {
+        with (evt.Type)
+        switch (evt.type) {
+            case PLAY:
+                printf ("on PLAY %d\n", evt.play.id);
+                //audio.play_wav (evt.play.id);
+                break;
+            default:
+        }
+    }
+
+    void
+    mod_ui_go (E e, Event* evt) {
+        with (evt.Type)
+        switch (evt.type) {
+            case DRAW:
+                break;
+            default:
+        }
+    }
+
+    void
+    mod_key_go (E e, Event* evt) {
+        with (evt.Type)
+        switch (evt.type) {
+            case SDL:
+                break;
+            default:
+        }
+    }
+}
+
+import e_class : E_ui;
+alias E = E_ui;
+
+struct
+Gui {
+    E e;
+
+    void
+    open () {
+        // load ui
+        import e_class : load_ui;
+        e = load_ui ();
+    }
 }
 
 // area

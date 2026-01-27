@@ -7,11 +7,6 @@ import std.conv         : to;
 import importc;
 import vf.types : GO;
 import vf.types : REG;
-import vf.o_base : send_now;
-
-enum       EVT_UI          = 0x0200;
-enum ulong OPEN            = (6             << 16) | EVT_UI;
-enum ulong DRAW            = (7             << 16) | EVT_UI;
 
 
 struct
@@ -35,11 +30,11 @@ Video {
     void
     new_window_ () {
         window   = new_window ();
-        //renderer = new_renderer (window);        
+        //renderer = new_renderer (window);
     }
 
     void
-    draw (void* o, void* e, void* evt, REG d) {
+    draw (O,Event) (O o, void* e, Event* evt, REG d) {
         // SDL_SetRenderDrawColor (renderer, 0x00, 0x00, 0x00, 0xFF);
         // SDL_RenderClear (renderer);
         // SDL_SetRenderDrawColor (renderer, 0xFF, 0xFF, 0xFF, 0xFF);
@@ -58,7 +53,7 @@ Video {
         //// Rasterize
         //SDL_RenderPresent (renderer);
 
-        auto ptime = SDL_GetTicks();
+        auto ptime = SDL_GetTicks ();
 
         //
         auto surface = SDL_GetWindowSurface (window);
@@ -327,7 +322,9 @@ if (0) {
 }
 
         // DRAW
-        send_now!(SDL_USEREVENT,DRAW) (o,e,evt,d, canvas);
+        auto event = Event (Event_draw ());
+        event.draw.canvas = canvas;
+        o.send_now (&event);
 
 
         //
@@ -354,14 +351,14 @@ if (0) {
     }
 }
 
-struct
-Event_draw {
-    //SDL_CommonEvent _common;
-    Uint32      type;
-    Uint32      timestamp;   /**< In milliseconds, populated using SDL_GetTicks() */
-    SDL_Window* window;
-    Tvg_Canvas  canvas;
-}
+//struct
+//Event_draw {
+//    //SDL_CommonEvent _common;
+//    Uint32      type;
+//    Uint32      timestamp;   /**< In milliseconds, populated using SDL_GetTicks() */
+//    SDL_Window* window;
+//    Tvg_Canvas  canvas;
+//}
 
 
 void 

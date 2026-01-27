@@ -26,7 +26,7 @@ Ring_buffer (T,size_t N) {
     void
     put (T* t) {
         // T[a..b]
-        assert (b != a);
+        assert (!(b != s.ptr && b == a));
         *b = *t;
         b++;
         if (b == limit)
@@ -36,7 +36,7 @@ Ring_buffer (T,size_t N) {
     void
     put (ref T t) {
         // T[a..b]
-        assert (b != a);
+        assert (!(b != s.ptr && b == a));
         *b = t;
         b++;
         if (b == limit)

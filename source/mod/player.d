@@ -3,7 +3,6 @@ module mod.player;
 import core.stdc.stdio : printf;
 import vf.types        : GO,REG;
 import vf.o_base       : O;
-import vf.input        : Event;
 import importc;
 
 enum       EVT_UI          = 0x0200;
@@ -13,11 +12,8 @@ enum ulong PLAY_3          = (10            << 16) | EVT_UI;
 
 
 void
-go (void* o, void* e, void* evt, REG d) {
-    auto _evt = cast (Event*) evt;
-    REG   typ = _evt.type;
-
-    switch (typ) {
+go (Event) (void* o, void* e, Event* evt, REG d) {
+    switch (evt.type) {
         case SDL_USEREVENT:
             switch (_evt.user.code) {
                 case PLAY_1: 
@@ -40,17 +36,17 @@ go (void* o, void* e, void* evt, REG d) {
 }
 
 alias
-_go_play_1 = go_play!(1);
+_go_play_1 (Event) = go_play!(Event,1);
 
 alias
-_go_play_2 = go_play!(2);
+_go_play_2 (Event) = go_play!(Event,2);
 
 alias
-_go_play_3 = go_play!(3);
+_go_play_3 (Event)  = go_play!(Event,3);
 
 
 void
-go_play (int resource_id) (void* o, void* e, void* evt, REG d) {
+go_play (Event, int resource_id) (void* o, void* e, Event* evt, REG d) {
     printf ("Play %d\n", resource_id);
     with (cast(O*)o) {
         audio.play_wav (resource_id);

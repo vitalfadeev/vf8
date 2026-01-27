@@ -10,26 +10,25 @@ Map_rec {
     GO  go;
 }
 
-import vf.input : Event;
 import importc;
 void
-process_map (void* o, void* e, void* evt, REG d,  size_t map_length, Map_rec* map_ptr) {
-    auto _evt = cast (Event*) evt;
-    REG   typ = d;
-    REG   key;
+process_map (Event) (void* o, void* e, Event* evt, REG d,  size_t map_length, Map_rec* map_ptr) {
+    REG  _key;
+    auto _type = evt.sdl.sdl_event.type;
 
-    switch (typ) {
-        case SDL_KEYDOWN     : key = _evt.key.keysym.sym; break;
-        case SDL_KEYUP       : key = _evt.key.keysym.sym; break;
-        case SDL_WINDOWEVENT : key = _evt.window.event; break;
+    with (evt.sdl.sdl_event)
+    switch (type)  {
+        case SDL_KEYDOWN     : _key = key.keysym.sym; break;
+        case SDL_KEYUP       : _key = key.keysym.sym; break;
+        case SDL_WINDOWEVENT : _key = window.event; break;
         default: 
     }
 
     auto RCX = map_length;
     auto rec = map_ptr;
     for (; RCX != 0; rec++, RCX--)
-        if (typ == rec.type)
-            if (key == rec.key)
+        if (rec.type == _type)
+            if (rec.key == _key)
                 rec.go (o,e,evt,d);
 }
 
@@ -39,7 +38,7 @@ alias KEY = REG;
 
 //
 void
-GO_map (Triads...) (void* o, void* e, void* evt, REG d) {
+GO_map (Event,Triads...) (void* o, void* e, Event* evt, REG d) {
     alias _array = GO_map_array!Triads;  // [Rec (Key,Value), ...]
     
     static Map_rec[ _array.length ] map = _array;

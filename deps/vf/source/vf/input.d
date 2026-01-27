@@ -4,7 +4,7 @@ import importc;
 
 
 struct
-Input {
+Input (Event) {
     void
     open () {
         //SDL_Init (SDL_INIT_EVENTS);
@@ -12,7 +12,8 @@ Input {
 
     bool 
     read (Event* event) {
-        return (SDL_WaitEvent (cast(SDL_Event*)event) == 1);
+        event.type = Event.Type.SDL;
+        return (SDL_WaitEvent (&event.sdl.sdl_event) == 1);
     }
 
     //void
@@ -23,10 +24,3 @@ Input {
     //    }
     //}
 }
-
-struct 
-Event {
-    SDL_Event _this;
-    alias _this this;
-}
-

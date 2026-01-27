@@ -1,11 +1,8 @@
 module mod.ui;
 
+version (NEVER):
 import core.stdc.stdio : printf;
 import vf.types        : GO,REG;
-import vf.o_base       : O;
-import vf.o_base : send;
-import vf.o_base : send_d_code;
-import vf.input        : Event;
 import mod.quit        : go_quit;
 import importc;
 
@@ -20,12 +17,10 @@ enum ulong PLAY_3          = (10            << 16) | EVT_UI;
 static Uni_e uni_e;
 
 void
-go (void* o, void* e, void* evt, REG d) {
-    auto _evt = cast (Event*) evt;
-    REG   typ = _evt.type;
+go (O,Event) (void* o, void* e, Event* evt, REG d) {
 
     with (cast(O*)o) {
-        switch (typ) {
+        switch (evt.type) {
             case SDL_MOUSEBUTTONDOWN:
                 // ...
                 break;

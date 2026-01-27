@@ -9,7 +9,7 @@ import layout;
 void
 mai () {
     O o = new O ();
-    o.e = test ();
+    o.e = load_ui ();
 
     with (Event.Type) {        
         // SET_E_PROP
@@ -60,7 +60,7 @@ mai () {
 }
 
 auto
-test () {
+load_ui () {
     return
     e .window .panel .canvas
     .e .loc1
