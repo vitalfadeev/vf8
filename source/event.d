@@ -17,9 +17,15 @@ union {
         SDL,
         OPEN,
         QUIT,
+        // video
         DRAW,
         //CLICKED,
+        // audio
         PLAY,
+        // ui
+        SET_E_PROP,
+        UPDATE,
+        UPDATE_XY,
     }
 }
 struct
@@ -47,4 +53,32 @@ struct
 Event_play {
     Event.Type type = Event.Type.PLAY;
     int id;
+}
+struct
+Event_update {
+    auto type     = Event.Type.UPDATE;
+    auto strategy = Strategy._;
+
+    enum
+    Strategy {
+        _,
+        wh,
+        hw,
+    }
+}
+struct
+Event_set_e_prop {
+    auto type = Event.Type.SET_E_PROP;
+}
+struct
+Event_update_xy {
+    auto  type = Event.Type.UPDATE_XY;
+    // left
+    float line_height = 64.0;
+
+    template
+    tpl () {
+        mixin Xywh!E_ui;
+        mixin Layout!E_ui;        
+    }
 }

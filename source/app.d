@@ -6,6 +6,7 @@ import vf.audio       : Audio;
 import vf.video       : Video;
 import event;
 import importc;
+import std.stdio : writeln;
 
 
 extern(C)
@@ -13,6 +14,14 @@ void
 main () {
     auto o = new O3 ();
     o.open ();
+
+    o.send (Event.Type.SET_E_PROP);
+    o.send (Event.Type.UPDATE);
+    o.send (Event.Type.UPDATE_XY);
+    import e_class : dump_tree;
+    writeln (o.gui.e);
+    dump_tree (o.gui.e);
+
     o.go ();   // event loop
 }
 
@@ -84,7 +93,23 @@ O3 : O!(Event) {
     mod_ui_go (Event* evt) {
         with (evt.Type)
         switch (evt.type) {
+            case SDL:
+                if (evt.sdl.sdl_event.type == SDL_WINDOWEVENT) {
+                    with (evt.sdl.sdl_event)
+                    switch (window.event) {
+                        case SDL_WINDOWEVENT_EXPOSED: 
+                            printf ("SDL_WINDOWEVENT_EXPOSED\n");
+                            video.draw (this,evt);
+                            break;
+                        case SDL_WINDOWEVENT_CLOSE: 
+                            send (Event.Type.QUIT);
+                            break;
+                        default:
+                    }
+                }
+                break;
             case DRAW:
+                // canvas
                 break;
             default:
         }
@@ -141,8 +166,8 @@ Gui {
 
     void
     load_ui () {
-        import e_class : load_ui;
-        e = load_ui ();
+        import e_class;
+        e = e_class.load_ui ();
     }
 }
 

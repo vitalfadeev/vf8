@@ -34,7 +34,7 @@ Video {
     }
 
     void
-    draw (O,Event) (O o, void* e, Event* evt, REG d) {
+    draw (O,Event) (O o, Event* evt) {
         // SDL_SetRenderDrawColor (renderer, 0x00, 0x00, 0x00, 0xFF);
         // SDL_RenderClear (renderer);
         // SDL_SetRenderDrawColor (renderer, 0xFF, 0xFF, 0xFF, 0xFF);
@@ -84,8 +84,135 @@ Video {
         //SDL_UpdateWindowSurface (window);
 
 
+        // DRAW
+        Event event;
+        event.type = event.Type.DRAW;
+        event.draw.canvas = canvas;
+        o.send_now (event);
+
+
+        //
+        auto ctime = SDL_GetTicks ();
+        elapsed += (ctime - ptime);
+        ptime = ctime;
+
+        
+
+
+        //draw the canvas
+        tvg_canvas_update (canvas);
+        tvg_canvas_draw (canvas, true);
+        tvg_canvas_sync (canvas);
+
+        SDL_UpdateWindowSurface (window);
+    }
+
+    float 
+    progress (uint32_t elapsed, float durationInSec) {
+        auto duration = (durationInSec * 1000.0f).to!uint32_t; //sec -> millisec.
+        auto clamped = elapsed % duration;
+        return (cast(float)clamped / cast(float)duration);
+    }
+}
+
+//struct
+//Event_draw {
+//    //SDL_CommonEvent _common;
+//    Uint32      type;
+//    Uint32      timestamp;   /**< In milliseconds, populated using SDL_GetTicks() */
+//    SDL_Window* window;
+//    Tvg_Canvas  canvas;
+//}
+
+
+void 
+init_sdl () {
+    // SDL_Init (SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_EVENTS);
+    if (SDL_Init (SDL_INIT_VIDEO) < 0) {
+        printf ("Failed to initialize SDL video: %s\n", SDL_GetError ());
+        abort ();
+    }
+
+    // IMG
+    version (SDLImage) {
+        auto flags = IMG_INIT_PNG | IMG_INIT_JPG;
+        if (IMG_Init (flags) != flags)
+            throw new IMGException ("The SDL_Image init failed");
+    }
+
+    // TTF
+    version (SDLTTF) {
+        if (TTF_Init () == -1)
+            throw new TTFException ("Failed to initialise SDL_TTF");
+    }
+}
+
+//
+SDL_Window* 
+new_window () {
+    // Window
+    SDL_Window* window = 
+        SDL_CreateWindow (
+            __FILE_FULL_PATH__, // "SDL2 Window",
+            SDL_WINDOWPOS_CENTERED_DISPLAY (0),
+            SDL_WINDOWPOS_CENTERED_DISPLAY (0),
+            800, 800,
+            SDL_WINDOW_RESIZABLE
+            | SDL_WINDOW_VULKAN
+            | SDL_WINDOW_ALLOW_HIGHDPI
+        );
+
+    if (!window)
+        throw new SDLException ("Failed to create window");
+
+    // Update
+    SDL_UpdateWindowSurface (window);
+
+    return window;
+}
+
+
+//
+SDL_Renderer* 
+new_renderer (SDL_Window* window) {
+    return SDL_CreateRenderer (window, -1, SDL_RENDERER_SOFTWARE);
+}
+
+
+//
+class 
+SDLException : Exception {
+    this (string msg) {
+        super (format!"%s: %s" (SDL_GetError().to!string, msg));
+    }
+}
+
+version (SDLTTF)
+class 
+TTFException : Exception{
+    this (string s) {
+        import std.string : fromStringz;
+        super (
+            format!"%s: %s"(s, fromStringz(TTF_GetError()))
+        );
+    }
+}
+
+version (SDLImage)
+class 
+IMGException : Exception{
+    this (string s) {
+        import std.string : fromStringz;
+        super (
+            format!"%s: %s"(s, fromStringz(IMG_GetError()))
+        );
+    }
+}
+
+
         // contents
-if (0) {
+void
+examples (T) (T t) {
         //Linear gradient shape with a linear gradient stroke
         {
             // Set a shape
@@ -319,128 +446,4 @@ if (0) {
             tvg_animation_get_total_frame (animation, &totalFrame);
             tvg_animation_set_frame (animation, totalFrame * progress (elapsed, duration));
         }
-}
-
-        // DRAW
-        auto event = Event (Event_draw ());
-        event.draw.canvas = canvas;
-        o.send_now (&event);
-
-
-        //
-        auto ctime = SDL_GetTicks ();
-        elapsed += (ctime - ptime);
-        ptime = ctime;
-
-        
-
-
-        //draw the canvas
-        tvg_canvas_update (canvas);
-        tvg_canvas_draw (canvas, true);
-        tvg_canvas_sync (canvas);
-
-        SDL_UpdateWindowSurface (window);
-    }
-
-    float 
-    progress (uint32_t elapsed, float durationInSec) {
-        auto duration = (durationInSec * 1000.0f).to!uint32_t; //sec -> millisec.
-        auto clamped = elapsed % duration;
-        return (cast(float)clamped / cast(float)duration);
-    }
-}
-
-//struct
-//Event_draw {
-//    //SDL_CommonEvent _common;
-//    Uint32      type;
-//    Uint32      timestamp;   /**< In milliseconds, populated using SDL_GetTicks() */
-//    SDL_Window* window;
-//    Tvg_Canvas  canvas;
-//}
-
-
-void 
-init_sdl () {
-    // SDL_Init (SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_EVENTS);
-    if (SDL_Init (SDL_INIT_VIDEO) < 0) {
-        printf ("Failed to initialize SDL video: %s\n", SDL_GetError ());
-        abort ();
-    }
-
-    // IMG
-    version (SDLImage) {
-        auto flags = IMG_INIT_PNG | IMG_INIT_JPG;
-        if (IMG_Init (flags) != flags)
-            throw new IMGException ("The SDL_Image init failed");
-    }
-
-    // TTF
-    version (SDLTTF) {
-        if (TTF_Init () == -1)
-            throw new TTFException ("Failed to initialise SDL_TTF");
-    }
-}
-
-//
-SDL_Window* 
-new_window () {
-    // Window
-    SDL_Window* window = 
-        SDL_CreateWindow (
-            __FILE_FULL_PATH__, // "SDL2 Window",
-            SDL_WINDOWPOS_CENTERED_DISPLAY (0),
-            SDL_WINDOWPOS_CENTERED_DISPLAY (0),
-            800, 800,
-            SDL_WINDOW_RESIZABLE
-            | SDL_WINDOW_VULKAN
-            | SDL_WINDOW_ALLOW_HIGHDPI
-        );
-
-    if (!window)
-        throw new SDLException ("Failed to create window");
-
-    // Update
-    SDL_UpdateWindowSurface (window);
-
-    return window;
-}
-
-
-//
-SDL_Renderer* 
-new_renderer (SDL_Window* window) {
-    return SDL_CreateRenderer (window, -1, SDL_RENDERER_SOFTWARE);
-}
-
-
-//
-class 
-SDLException : Exception {
-    this (string msg) {
-        super (format!"%s: %s" (SDL_GetError().to!string, msg));
-    }
-}
-
-version (SDLTTF)
-class 
-TTFException : Exception{
-    this (string s) {
-        import std.string : fromStringz;
-        super (
-            format!"%s: %s"(s, fromStringz(TTF_GetError()))
-        );
-    }
-}
-
-version (SDLImage)
-class 
-IMGException : Exception{
-    this (string s) {
-        import std.string : fromStringz;
-        super (
-            format!"%s: %s"(s, fromStringz(IMG_GetError()))
-        );
-    }
 }
