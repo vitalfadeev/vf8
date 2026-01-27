@@ -15,11 +15,19 @@ main () {
     auto o = new O3 ();
     o.open ();
 
-    o.send (Event.Type.SET_E_PROP);
-    o.send (Event.Type.UPDATE);
-    o.send (Event.Type.UPDATE_XY);
+    Event e1;
+    e1.type = Event.Type.SET_E_PROP;
+    o.send_now (e1);
+
+    Event e2;
+    e2.type = Event.Type.UPDATE;
+    o.send_now (e2);
+
+    Event e3;
+    e3.type = Event.Type.UPDATE_XY;
+    o.send_now (e3);
+
     import e_class : dump_tree;
-    writeln (o.gui.e);
     dump_tree (o.gui.e);
 
     o.go ();   // event loop
@@ -38,7 +46,7 @@ O3 : O!(Event) {
         audio.open ();
         video.open ();
         super.open ();
-        //gui.open ();
+        gui.open ();
     }
 
     override
@@ -172,7 +180,7 @@ Gui {
     void
     load_ui () {
         import e_class;
-        e = e_class.load_ui ();
+        this.e = e_class.load_ui ();
     }
 }
 

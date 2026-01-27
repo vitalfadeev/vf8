@@ -94,7 +94,7 @@ E : GO {
 
 class
 Ex : E {
-    Ex    next;
+    Ex    next_ex;
     void* data1;
 
     override
@@ -112,8 +112,8 @@ Ex : E {
         }
 
         // next
-        if (next !is null) {
-            next.go (e,evt);
+        if (next_ex !is null) {
+            next_ex.go (e,evt);
         }
     }
 
@@ -156,13 +156,13 @@ Ex : E {
     add_ex (this T) (Ex ex) {
         // find end
         Ex _pre = this;
-        Ex _ex  = _pre.next;
-        for (; _ex !is null; _pre = _ex, _ex = _ex.next) {
+        Ex _ex  = _pre.next_ex;
+        for (; _ex !is null; _pre = _ex, _ex = _ex.next_ex) {
             if (_pre is ex) {
                 return cast (T) this;  // skip existent
             }
         }
-        _pre.next = ex;  // to end
+        _pre.next_ex = ex;  // to end
         return cast (T)  this;
     }
 }
@@ -386,11 +386,11 @@ dump_tree (E_ui e, int level=0) {
     for (auto i = level; i > 0; i--)  printf ("  ");
     printf ("e");
     // klasses
-    for (auto ex = e.next; ex !is null; ex = ex.next) printf (" %x", ex);
+    for (auto ex = e.next_ex; ex !is null; ex = ex.next_ex) printf (" %x", ex);
     // properties
     printf (" wh=(%dx%d), c.wh:(%1.1f,%1.1f) , c.xy:(%1.1f,%1.1f)", 
         e.w.type,     e.h.type,  
-        e.wh.w, e.wh.h,  
+        e.wh.w, e.wh.h,
         e.xy.x, e.xy.y);
     printf ("\n");
 

@@ -1,6 +1,7 @@
 module layout.xywh;
 
 import layout.xy;
+import std.stdio : writeln;
 
 alias W = X;
 alias H = Y;
@@ -9,11 +10,11 @@ alias H = Y;
 mixin template
 Xywh (E) {
     Coord x,y,w,h;
+    //XY wh;
 
     XY
-    wh (this T) () {
-        auto _wh = XY (_w (this), _h (this));
-        return _wh;
+    wh () {
+        return XY (_w (this), _h (this));
     }
 }
 
@@ -21,11 +22,11 @@ W
 _w (E) (E e) {
     with (e.w.type)
     switch (e.w.type) {
-        case _parent_w : return e.parent.wh.w;
-        case _parent_h : return e.parent.wh.h; 
+        case _parent_w : return e.parent ? e.parent.wh.w : 0;
+        case _parent_h : return e.parent ? e.parent.wh.h : 0; 
         case _int      : return e.w._int.a; 
-        case _perc     : return (cast (W) e.w._perc.a) * e.parent.wh.w / 100; 
-        default        : return e.parent.wh.w;
+        case _perc     : return (cast (W) e.w._perc.a) * (e.parent ? e.parent.wh.w : 0) / 100; 
+        default        : return e.parent ? e.parent.wh.w : 0;
     }
 }
 
@@ -33,11 +34,11 @@ H
 _h (E) (E e) {
     with (e.h.type)
     switch (e.h.type) {
-        case _parent_w : return e.parent.wh.w; 
-        case _parent_h : return e.parent.wh.h;
+        case _parent_w : return e.parent ? e.parent.wh.w : 0; 
+        case _parent_h : return e.parent ? e.parent.wh.h : 0;
         case _int      : return e.h._int.a; 
-        case _perc     : return (cast (H) e.h._perc.a) * e.parent.wh.h / 100; 
-        default        : return e.parent.wh.h;
+        case _perc     : return (cast (H) e.h._perc.a) * (e.parent ? e.parent.wh.h : 0) / 100; 
+        default        : return e.parent ? e.parent.wh.h : 0;
     }
 }
 
