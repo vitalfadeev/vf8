@@ -22,24 +22,6 @@ O {
     Video       video;
     void*       ego;
     //
-    Style       style;
-    struct
-    Style {
-        Font  font;
-        Color bg;
-        Color fg;
-
-        struct
-        Font {
-            string name;
-            int    size;
-            void*  ptr;
-        }
-        struct
-        Color {
-            int a;
-        }
-    }
     // update
     // output
     // wait

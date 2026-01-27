@@ -204,8 +204,8 @@ E_ui : Ex {
         //with (o)
         with (e)
         with (evt.draw) {
-            draw_rect (xy,wh);
-            draw_text (xy,wh,text);
+            draw_rect (canvas,xy,wh);
+            draw_text (canvas,xy,wh,text);
         }
     }
 
@@ -469,23 +469,24 @@ struct
 Event_draw {
     auto  type = Event.Type.DRAW;
 
+    import importc;
+    Tvg_Canvas  canvas;
+
     void
-    draw_rect (XY xy, XY wh) {
-        {
-            //Tvg_Canvas canvas = cast (Tvg_Canvas) evt.user.data1;
+    draw_rect (Tvg_Canvas canvas, XY xy, XY wh) {
+        ubyte bg_r, bg_g, bg_b, bg_a;
+        bg_r = bg_g = bg_b = bg_a = 255;
+        Tvg_Paint shape = tvg_shape_new ();
+        //tvg_shape_append_rect (shape, x, y, w, h, 0.0f, 0.0f, true);
+        tvg_shape_append_rect (shape, xy.x, xy.y, wh.w, wh.h, 0.0f, 0.0f, true);
+        tvg_shape_set_fill_color (shape, bg_r, bg_g, bg_b, bg_a);
 
-            //Tvg_Paint shape = tvg_shape_new ();
-            ////tvg_shape_append_rect (shape, x, y, w, h, 0.0f, 0.0f, true);
-            //tvg_shape_append_rect (shape, x, y, w, h, 0.0f, 0.0f, true);
-            //tvg_shape_set_fill_color (shape, bg_r, bg_g, bg_b, bg_a);
-
-            ////Push the shape into the canvas
-            //tvg_canvas_push (canvas, shape);
-        }
+        //Push the shape into the canvas
+        tvg_canvas_push (canvas, shape);
     }
 
     void
-    draw_text (XY xy, XY wh, string text) {
+    draw_text (Tvg_Canvas canvas, XY xy, XY wh, string text) {
         {
             //import importc;
 

@@ -12,7 +12,7 @@ Input {
 
     bool 
     read (Event* event) {
-        return (SDL_WaitEvent (event) == 1);
+        return (SDL_WaitEvent (cast(SDL_Event*)event) == 1);
     }
 
     //void
@@ -24,4 +24,9 @@ Input {
     //}
 }
 
-alias Event = SDL_Event;
+struct 
+Event {
+    SDL_Event _this;
+    alias _this this;
+}
+

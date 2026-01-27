@@ -354,6 +354,15 @@ if (0) {
     }
 }
 
+struct
+Event_draw {
+    //SDL_CommonEvent _common;
+    Uint32      type;
+    Uint32      timestamp;   /**< In milliseconds, populated using SDL_GetTicks() */
+    SDL_Window* window;
+    Tvg_Canvas  canvas;
+}
+
 
 void 
 init_sdl () {
