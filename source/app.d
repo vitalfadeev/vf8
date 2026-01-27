@@ -16,11 +16,11 @@ main () {
     o.open ();
 
     Event e1;
-    e1.type = Event.Type.SET_E_PROP;
+    e1.type = Event.Type.UPDATE;
     o.send_now (e1);
 
     Event e2;
-    e2.type = Event.Type.UPDATE;
+    e2.type = Event.Type.SET_E_PROP;
     o.send_now (e2);
 
     Event e3;
@@ -56,7 +56,7 @@ O3 : O!(Event) {
         mod_sdl_quit_go (evt);
         mod_player_go   (evt);
         mod_key_go      (evt);
-        //mod_ui_go       (evt);
+        mod_ui_go       (evt);
     }
 
     void

@@ -165,6 +165,12 @@ Ex : E {
         _pre.next_ex = ex;  // to end
         return cast (T)  this;
     }
+
+    override
+    string
+    toString () {
+        return typeof(this).stringof;
+    }
 }
 
 class
@@ -218,6 +224,19 @@ E_ui : Ex {
     }
 
     alias DGO = void delegate (E_ui e, Event* evt);
+
+    override
+    string
+    toString () {
+        string s;
+        s = typeof(this).stringof ~ "(";
+        for (auto _ex = next_ex; _ex !is null; _ex = _ex.next_ex) {
+            s ~= " " ~ _ex.toString;
+        }
+        s ~= ")";
+        return s;
+
+    }
 }
 
 void
@@ -269,12 +288,18 @@ Window : Ex {
     }
 }
 auto panel (E_ui e) { return e.add_ex (new Panel); }
-class Panel  : Ex {}
+class Panel  : Ex {
+    override string toString () { return typeof(this).stringof; }    
+}
 auto canvas (E_ui e) { return e.add_ex (new Canvas); }
-class Canvas : Ex {}
+class Canvas : Ex {
+    override string toString () { return typeof(this).stringof; }
+}
 auto loc1 (E_ui e) { return e.add_ex (new Loc1); }
 class 
 Loc1 : Ex {
+    override string toString () { return typeof(this).stringof; }
+
     override
     void  
     _set_e_prop (E_ui e, Event* evt) {        
@@ -290,6 +315,8 @@ Loc1 : Ex {
 }
 auto button (E_ui e) { return e.add_ex (new Button); }
 class Button : Ex {
+    override string toString () { return typeof(this).stringof; }
+
     override
     void  
     _set_e_prop (E_ui e, Event* evt) {
@@ -299,14 +326,22 @@ class Button : Ex {
     }    
 }
 auto _1 (E_ui e) { return e.add_ex (new __1); }
-class __1 : Ex {}
+class __1 : Ex {
+    override string toString () { return typeof(this).stringof; }
+}
 auto _2 (E_ui e) { return e.add_ex (new __2); }
-class __2 : Ex {}
+class __2 : Ex {
+    override string toString () { return typeof(this).stringof; }    
+}
 auto _3 (E_ui e) { return e.add_ex (new __3); }
-class __3 : Ex {}
+class __3 : Ex {
+    override string toString () { return typeof(this).stringof; }    
+}
 auto loc2 (E_ui e) { return e.add_ex (new Loc2); }
 class 
 Loc2 : Ex {
+    override string toString () { return typeof(this).stringof; }
+
     override
     void  
     _set_e_prop (E_ui e, Event* evt) {
@@ -323,6 +358,8 @@ Loc2 : Ex {
 auto clock (E_ui e) { return e.add_ex (new Clock); }
 class 
 Clock : Ex {
+    override string toString () { return typeof(this).stringof; }
+
     override
     void  
     _set_e_prop (E_ui e, Event* evt) {
@@ -335,6 +372,8 @@ Clock : Ex {
 auto loc3 (E_ui e) { return e.add_ex (new Loc3); }
 class 
 Loc3 : Ex {
+    override string toString () { return typeof(this).stringof; }
+
     override
     void  
     _set_e_prop (E_ui e, Event* evt) {
@@ -350,6 +389,8 @@ Loc3 : Ex {
 }
 auto indicator (E_ui e) { return e.add_ex (new Indicator); }
 class Indicator : Ex {
+    override string toString () { return typeof(this).stringof; }
+
     override
     void  
     _set_e_prop (E_ui e, Event* evt) {

@@ -15,6 +15,12 @@ union {
     Event_update_xy  update_xy;
 }
 
+    string
+    toString () {
+        import std.format;
+        return format!"%s (%s)" (typeof(this).stringof, type);
+    }
+
     enum
     Type {
         _,

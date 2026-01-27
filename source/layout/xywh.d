@@ -10,7 +10,6 @@ alias H = Y;
 mixin template
 Xywh (E) {
     Coord x,y,w,h;
-    //XY wh;
 
     XY
     wh () {
@@ -20,6 +19,7 @@ Xywh (E) {
 
 W  
 _w (E) (E e) {
+    //writeln (e, " - ", e.parent);
     with (e.w.type)
     switch (e.w.type) {
         case _parent_w : return e.parent ? e.parent.wh.w : 0;
