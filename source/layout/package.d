@@ -17,7 +17,7 @@ Layout (E) {
     Childs_layout!E childs_layout;
 
     void
-    go_layout (O o, E e, Event* evt) {
+    go_layout (E e, Event* evt) {
         switch (childs_layout.a) with (A) {
             case _: 
                 break;

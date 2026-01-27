@@ -38,7 +38,7 @@ O3 : O!(Event) {
         audio.open ();
         video.open ();
         super.open ();
-        gui.open ();
+        //gui.open ();
     }
 
     override
@@ -48,7 +48,7 @@ O3 : O!(Event) {
         mod_sdl_quit_go (evt);
         mod_player_go   (evt);
         mod_key_go      (evt);
-        mod_ui_go       (evt);
+        //mod_ui_go       (evt);
     }
 
     void
@@ -91,6 +91,11 @@ O3 : O!(Event) {
 
     void
     mod_ui_go (Event* evt) {
+        if (gui.e is null)
+            return;
+
+        gui.e.go (gui.e,evt);
+
         with (evt.Type)
         switch (evt.type) {
             case SDL:
@@ -156,7 +161,7 @@ alias E = E_ui;
 
 struct
 Gui {
-    E e;
+    E_ui e;
 
     void
     open () {
