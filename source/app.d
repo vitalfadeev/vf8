@@ -11,8 +11,6 @@ import importc;
 extern(C)
 void 
 main () {
-    //tvg_engine_init(4);
-
     auto o = new O3 ();
     o.open ();
     o.go ();   // event loop
@@ -20,39 +18,50 @@ main () {
 
 class
 O3 : O!(Event) {
-    //Audio audio;
+    Audio audio;
     Video video;
-    //Gui   gui;
+    Gui   gui;
 
     override
     void
     open () {
-        //SDL_Init (SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_EVENTS);
-        SDL_Init (SDL_INIT_EVERYTHING);
-        //audio.open ();
+        SDL_Init (SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_EVENTS);
+        audio.open ();
         video.open ();
         super.open ();
-        //gui.open ();
+        gui.open ();
     }
 
     override
     void
     ego (Event* evt) {
-        mod_quit_go   (evt);
-        //mod_player_go (evt,e);
-        //mod_ui_go     (evt,e);
-        //mod_key_go    (evt,e);
+        mod_quit_go     (evt);
+        mod_sdl_quit_go (evt);
+        mod_player_go   (evt);
+        mod_key_go      (evt);
+        mod_ui_go       (evt);
     }
 
     void
     mod_quit_go (Event* evt) {
         with (evt.Type)
         switch (evt.type) {
+            case QUIT: 
+                printf ("on QUIT\n");
+                go_flag = false;
+                break;
+            default:
+        }
+    }
+
+    void
+    mod_sdl_quit_go (Event* evt) {
+        with (evt.Type)
+        switch (evt.type) {
             case SDL: 
                 if (evt.sdl.sdl_event.type ==  SDL_QUIT) {
-                    printf ("on QUIT\n");
+                    printf ("on SQL QUIT\n");
                     send (Event.Type.QUIT);
-                    go_flag = false;
                 }
                 break;
             default:
@@ -60,19 +69,19 @@ O3 : O!(Event) {
     }
 
     void
-    mod_player_go (E e, Event* evt) {
+    mod_player_go (Event* evt) {
         with (evt.Type)
         switch (evt.type) {
             case PLAY:
                 printf ("on PLAY %d\n", evt.play.id);
-                //audio.play_wav (evt.play.id);
+                audio.play_wav (evt.play.id);
                 break;
             default:
         }
     }
 
     void
-    mod_ui_go (E e, Event* evt) {
+    mod_ui_go (Event* evt) {
         with (evt.Type)
         switch (evt.type) {
             case DRAW:
@@ -82,10 +91,35 @@ O3 : O!(Event) {
     }
 
     void
-    mod_key_go (E e, Event* evt) {
+    mod_key_go (Event* evt) {
         with (evt.Type)
         switch (evt.type) {
             case SDL:
+                with (event.sdl.sdl_event) {
+                    if (type == SDL_KEYDOWN && key.keysym.sym == SDLK_ESCAPE)  {
+                        Event event;
+                        event.type = Event.Type.QUIT;
+                        send (&event);
+                    }
+                    if (type == SDL_KEYDOWN && key.keysym.sym == SDLK_q)  {
+                        Event event;
+                        event.type = Event.Type.PLAY;
+                        event.play.id = 1;
+                        send (&event);
+                    }
+                    if (type == SDL_KEYDOWN && key.keysym.sym == SDLK_w)  {
+                        Event event;
+                        event.type = Event.Type.PLAY;
+                        event.play.id = 2;
+                        send (&event);
+                    }
+                    if (type == SDL_KEYDOWN && key.keysym.sym == SDLK_e)  {
+                        Event event;
+                        event.type = Event.Type.PLAY;
+                        event.play.id = 3;
+                        send (&event);
+                    }
+                }
                 break;
             default:
         }
@@ -101,7 +135,12 @@ Gui {
 
     void
     open () {
-        // load ui
+        tvg_engine_init(4);
+        load_ui ();
+    }
+
+    void
+    load_ui () {
         import e_class : load_ui;
         e = load_ui ();
     }

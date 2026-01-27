@@ -54,6 +54,11 @@ O (Event) {
         event.type = type;
         local_input.put (&event);
     }
+
+    void
+    send (Event* event) {
+        local_input.put (event);
+    }
 }
 
 // input  line
