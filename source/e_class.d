@@ -100,7 +100,6 @@ Ex : E {
     override
     void  
     go (E_ui e, Event* evt) {
-        writefln ("Event: %s", *evt);
         // ...
         with (evt.Type)
         switch (evt.type) {
@@ -212,8 +211,9 @@ E_ui : Ex {
         //with (o)
         with (e)
         with (evt.draw) {
-            draw_rect (canvas,xy,wh);
+            draw_rect (canvas,xy,wh,fg);
             draw_text (canvas,xy,wh,text);
+            foreach (_e; childs) _e.go (_e,evt);
         }
     }
 
@@ -285,6 +285,10 @@ Window : Ex {
             w = Desktop.w;
             h = 64;
         }
+        with (e) {
+           fg = 0xFF00FF00;
+           //     aabbggrr
+        }
     }
 }
 auto panel (E_ui e) { return e.add_ex (new Panel); }
@@ -311,6 +315,9 @@ Loc1 : Ex {
            //childs_layout = left_aligned.stacked.to_right;
            childs_layout = A.left_aligned_stacked_to_right;
         }
+        with (e) {
+           fg = 0x88444444;
+        }
     }
 }
 auto button (E_ui e) { return e.add_ex (new Button); }
@@ -322,6 +329,9 @@ class Button : Ex {
     _set_e_prop (E_ui e, Event* evt) {
         with (e) {
            w = Coord.parent_h;
+        }
+        with (e) {
+           fg = 0xFFFF0000;
         }
     }    
 }
@@ -353,6 +363,9 @@ Loc2 : Ex {
            //childs_layout = center_aligned.stacked.to_right;
            childs_layout = A.center_aligned_stacked_to_right;
         }
+        with (e) {
+            fg = 0x88444444;
+        }
     }
 }
 auto clock (E_ui e) { return e.add_ex (new Clock); }
@@ -366,6 +379,9 @@ Clock : Ex {
         with (e) {
             w = 33.perc;
             h = Coord.parent_h;
+        }
+        with (e) {
+            fg = 0xFFFFFF00;
         }
     }
 }
@@ -382,8 +398,11 @@ Loc3 : Ex {
             h = Coord.parent_h;
         }
         with (e) {
-           //childs_layout = right_aligned.stacked.to_left;
-           childs_layout = A.right_aligned_stacked_to_left;
+            //childs_layout = right_aligned.stacked.to_left;
+            childs_layout = A.right_aligned_stacked_to_left;
+        }
+        with (e) {
+            fg = 0x88444444;
         }
     }
 }
@@ -397,6 +416,9 @@ class Indicator : Ex {
         with (e) {
             w = Coord.parent_h;
             h = Coord.parent_h;
+        }
+        with (e) {
+           fg = 0xFF0000FF;
         }
     }
 }

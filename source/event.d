@@ -58,13 +58,17 @@ Event_draw {
         string text;
         alias Color = uint;
     }
+    alias Color = uint;  // aabbggrr
 
     import importc;
     import layout;
     void
-    draw_rect (Tvg_Canvas canvas, XY xy, XY wh) {
-        ubyte bg_r, bg_g, bg_b, bg_a;
-        bg_r = bg_g = bg_b = bg_a = 255;
+    draw_rect (Tvg_Canvas canvas, XY xy, XY wh, Color fg) {
+        ubyte bg_r = (fg >>  0) & 0xFF;
+        ubyte bg_g = (fg >>  8) & 0xFF;
+        ubyte bg_b = (fg >> 16) & 0xFF;
+        ubyte bg_a = (fg >> 24) & 0xFF;
+
         Tvg_Paint shape = tvg_shape_new ();
         //tvg_shape_append_rect (shape, x, y, w, h, 0.0f, 0.0f, true);
         tvg_shape_append_rect (shape, xy.x, xy.y, wh.w, wh.h, 0.0f, 0.0f, true);
