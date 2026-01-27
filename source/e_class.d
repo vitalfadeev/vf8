@@ -168,15 +168,10 @@ Ex : E {
 
 class
 E_ui : Ex {
-    mixin Xywh!E_ui;
-    void*      data1;
-    Color      bg;
-    Event.Type on_click_send_evt_code;  // PLLAY_1
-    mixin Childs_parent!E_ui;
-    mixin Layout!E_ui;
-
-    Get_width get_width;
-
+    mixin Event_update_xy.tpl;
+    mixin Event_draw.tpl;
+    mixin Event_click.tpl;
+    mixin Childs_parent!(typeof(this));
 
     override
     void 
@@ -209,7 +204,8 @@ E_ui : Ex {
         //with (o)
         with (e)
         with (evt.draw) {
-            // ...
+            draw_rect (xy,wh);
+            draw_text (xy,wh,text);
         }
     }
 
@@ -397,6 +393,11 @@ union {
 struct
 Event_click {
     auto type = Event.Type.CLICK;
+
+    template
+    tpl () {
+        Event.Type on_click_send_evt_code;  // PLLAY_1
+    }
 }
 
 struct
@@ -457,11 +458,60 @@ Event_update_xy {
         cursors.length -= 1;
     }
 
+    template
+    tpl () {
+        mixin Xywh!E_ui;
+        mixin Layout!E_ui;        
+    }
 }
 
 struct
 Event_draw {
     auto  type = Event.Type.DRAW;
+
+    void
+    draw_rect (XY xy, XY wh) {
+        {
+            //Tvg_Canvas canvas = cast (Tvg_Canvas) evt.user.data1;
+
+            //Tvg_Paint shape = tvg_shape_new ();
+            ////tvg_shape_append_rect (shape, x, y, w, h, 0.0f, 0.0f, true);
+            //tvg_shape_append_rect (shape, x, y, w, h, 0.0f, 0.0f, true);
+            //tvg_shape_set_fill_color (shape, bg_r, bg_g, bg_b, bg_a);
+
+            ////Push the shape into the canvas
+            //tvg_canvas_push (canvas, shape);
+        }
+    }
+
+    void
+    draw_text (XY xy, XY wh, string text) {
+        {
+            //import importc;
+
+            //auto canvas = cast (Tvg_Canvas) d;
+
+            ////
+            //if (tvg_font_load (font_file.ptr) != TVG_RESULT_SUCCESS) {
+            //    printf ("Problem with loading the font from the file. Did you enable TTF Loader?\n");
+            //}
+
+            //Tvg_Paint _text = tvg_text_new ();
+            //tvg_text_set_font   (_text, font_name.ptr);
+            //tvg_text_set_size   (_text, font_size);
+            //tvg_text_set_color  (_text, font_color_r, font_color_g, font_color_b);
+            //tvg_text_set_text   (_text, text.ptr);
+            //tvg_paint_translate (_text, x, y);
+            //tvg_canvas_push (canvas, _text);
+        }
+    }
+
+    template
+    tpl () {
+        Color  bg;
+        Color  fg;
+        string text;
+    }
 }
 
 class
