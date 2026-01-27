@@ -10,7 +10,7 @@ Childs_parent (E) {
 
     auto
     childs () {
-        return Iterator (this);
+        return Childs_range (this);
     }
 
     auto
@@ -37,7 +37,7 @@ Childs_parent (E) {
     }
 
     struct
-    Iterator {
+    Childs_range {
         E _this;
 
         int 

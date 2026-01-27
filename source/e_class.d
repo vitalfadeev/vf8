@@ -170,6 +170,31 @@ Ex : E {
     toString () {
         return typeof(this).stringof;
     }
+
+    auto
+    ex_range () {
+        alias T = typeof(this);
+        return Ex_range!T (this);
+    }
+
+    struct
+    Ex_range (T) {
+        T _this;
+
+        int 
+        opApply (scope int delegate(T) dg) {
+            int result = 0;
+
+            for (auto _ex = _this.next_ex; _ex !is null; _ex = _ex.next_ex) {
+                result = dg (_ex);
+
+                if (result)
+                    break;
+            }
+
+            return result;
+        }
+    }    
 }
 
 class
@@ -230,7 +255,7 @@ E_ui : Ex {
     toString () {
         string s;
         s = typeof(this).stringof ~ "(";
-        for (auto _ex = next_ex; _ex !is null; _ex = _ex.next_ex) {
+        foreach (_ex; ex_range) {
             s ~= " " ~ _ex.toString;
         }
         s ~= ")";
@@ -294,6 +319,14 @@ Window : Ex {
 auto panel (E_ui e) { return e.add_ex (new Panel); }
 class Panel  : Ex {
     override string toString () { return typeof(this).stringof; }    
+
+    override
+    void  
+    _set_e_prop (E_ui e, Event* evt) {        
+        with (e) {
+           childs_layout = A.left_aligned_stacked_to_right;
+        }
+    }
 }
 auto canvas (E_ui e) { return e.add_ex (new Canvas); }
 class Canvas : Ex {
@@ -381,7 +414,7 @@ Clock : Ex {
             h = Coord.parent_h;
         }
         with (e) {
-            fg = 0xFFFFFF00;
+            fg = 0xFFFFFFFF;
         }
     }
 }
@@ -438,7 +471,6 @@ Desktop {
 }
 
 
-
 void
 dump_tree (E_ui e, int level=0) {
     import core.stdc.stdio : printf;
@@ -449,7 +481,7 @@ dump_tree (E_ui e, int level=0) {
     for (auto i = level; i > 0; i--)  printf ("  ");
     printf ("e");
     // klasses
-    for (auto ex = e.next_ex; ex !is null; ex = ex.next_ex) printf (" %x", ex);
+    foreach (ex; e.ex_range) printf (" %x", ex);
     // properties
     printf (" wh=(%dx%d), c.wh:(%1.1f,%1.1f) , c.xy:(%1.1f,%1.1f)", 
         e.w.type,     e.h.type,  

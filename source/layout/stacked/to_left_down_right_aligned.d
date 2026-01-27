@@ -10,8 +10,10 @@ to_left_down_right_aligned (E) (E _this) {
     XY space = _this.childs_space;
     XY line  = _this.wh;
     XY limi  = _this.wh;
+    XY total;
     cursor.x = limi.x;
 
+    // setup
     foreach (_e; _this.childs) {
         // each e h = line h
         _e.wh.y = line.y;
@@ -20,6 +22,14 @@ to_left_down_right_aligned (E) (E _this) {
         auto cn = line_step_and_check_overflow (cursor,wh,space,line);
         _e.xy  = cn.cur;
         cursor = cn.next;
+        total.w  = (wh.w > total.w) ? wh.w : total.w;
+        total.h  = (wh.h > total.h) ? wh.h : total.h;
+    }
+
+    // translate
+    auto dx = _this.wh.w - total.w;
+    foreach (_e; _this.childs) {
+        _e.xy.x += dx;
     }
 }
 
