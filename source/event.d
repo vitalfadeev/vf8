@@ -68,7 +68,9 @@ Event_draw {
         Tvg_Paint shape = tvg_shape_new ();
         //tvg_shape_append_rect (shape, x, y, w, h, 0.0f, 0.0f, true);
         tvg_shape_append_rect (shape, xy.x, xy.y, wh.w, wh.h, 0.0f, 0.0f, true);
-        tvg_shape_set_fill_color (shape, bg_r, bg_g, bg_b, bg_a);
+        //tvg_shape_set_fill_color (shape, bg_r, bg_g, bg_b, bg_a);
+        tvg_shape_set_stroke_width (shape, 1);
+        tvg_shape_set_stroke_color (shape, bg_r, bg_g, bg_b, bg_a);
 
         //Push the shape into the canvas
         tvg_canvas_push (canvas, shape);
