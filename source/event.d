@@ -12,7 +12,7 @@ union {
     Event_play       play;
     Event_update     update;
     Event_set_e_prop set_e_prop;
-    Event_update_xy  update_xy;
+    Event_layout     layout;
 }
 
     string
@@ -33,9 +33,9 @@ union {
         // audio
         PLAY,
         // ui
-        SET_E_PROP,
         UPDATE,
-        UPDATE_XY,
+        SET_E_PROP,
+        LAYOUT,
     }
 }
 struct
@@ -142,8 +142,8 @@ Event_set_e_prop {
     auto type = Event.Type.SET_E_PROP;
 }
 struct
-Event_update_xy {
-    auto  type = Event.Type.UPDATE_XY;
+Event_layout {
+    auto  type = Event.Type.LAYOUT;
     // left
     float line_height = 64.0;
 

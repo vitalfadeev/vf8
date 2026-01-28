@@ -25,7 +25,10 @@ Video {
     SDL_Window*   window;
     //SDL_Renderer* renderer;
     static Tvg_Animation animation = null;
-    auto elapsed = 0;
+    auto         elapsed = 0;
+    Uint32       ptime;
+    Tvg_Canvas   canvas;
+    SDL_Surface* surface;
 
     void
     new_window_ () {
@@ -34,31 +37,15 @@ Video {
     }
 
     void
-    draw (O,Event) (O o, Event* evt) {
-        // SDL_SetRenderDrawColor (renderer, 0x00, 0x00, 0x00, 0xFF);
-        // SDL_RenderClear (renderer);
-        // SDL_SetRenderDrawColor (renderer, 0xFF, 0xFF, 0xFF, 0xFF);
-        // SDL_RenderDrawPoint (renderer, x, y);
-        // SDL_RenderDrawLine (renderer,0,0,100,100);
-        // SDL_RenderFillRect (renderer,&rect);
-        // SDL_RenderDrawRect (renderer,&rect);
-        // ...
+    new_canvas () {
+        canvas = tvg_swcanvas_create (Tvg_Engine_Option.TVG_ENGINE_OPTION_DEFAULT);
+    }
 
-        //SDL_SetRenderDrawColor (renderer, 0x00, 0x00, 0x00, 0xFF);
-        //SDL_RenderClear (renderer);
-        //SDL_SetRenderDrawColor (renderer, 0xFF, 0xFF, 0xFF, 0xFF);
-        //auto rect = SDL_Rect (100,100,200,200);
-        //SDL_RenderDrawRect (renderer,&rect);
-
-        //// Rasterize
-        //SDL_RenderPresent (renderer);
-
-        auto ptime = SDL_GetTicks ();
+    void
+    new_surface () {
+        surface = SDL_GetWindowSurface (window);
 
         //
-        auto surface = SDL_GetWindowSurface (window);
-
-        auto canvas  = tvg_swcanvas_create (Tvg_Engine_Option.TVG_ENGINE_OPTION_DEFAULT);
         auto sformat = surface.format.format;
         auto tformat = Tvg_Colorspace.TVG_COLORSPACE_ABGR8888;
         switch (sformat) {
@@ -77,27 +64,21 @@ Video {
             surface.w, 
             surface.h, 
             TVG_COLORSPACE_ARGB8888);
+    }
 
-        //display the first frame
-        //tvg_canvas_draw (canvas, true);
-        //tvg_canvas_sync (canvas);
-        //SDL_UpdateWindowSurface (window);
+    void
+    draw_start (O,Event) (O o, Event* evt) {
+        auto ptime = SDL_GetTicks ();
+        new_canvas ();
+        new_surface ();
+    }
 
-
-        // DRAW
-        Event event;
-        event.type = event.Type.DRAW;
-        event.draw.canvas = canvas;
-        o.send_now (event);
-
-
+    void
+    draw_end (O,Event) (O o, Event* evt) {
         //
         auto ctime = SDL_GetTicks ();
         elapsed += (ctime - ptime);
         ptime = ctime;
-
-        
-
 
         //draw the canvas
         tvg_canvas_update (canvas);
@@ -105,6 +86,10 @@ Video {
         tvg_canvas_sync (canvas);
 
         SDL_UpdateWindowSurface (window);
+
+        //
+        SDL_FreeSurface (surface);
+        tvg_canvas_destroy (canvas);
     }
 
     float 

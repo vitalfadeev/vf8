@@ -24,7 +24,7 @@ main () {
     o.send_now (e2);
 
     Event e3;
-    e3.type = Event.Type.UPDATE_XY;
+    e3.type = Event.Type.LAYOUT;
     o.send_now (e3);
 
     import e_class : dump_tree;
@@ -56,6 +56,7 @@ O3 : O!(Event) {
         mod_sdl_quit_go (evt);
         mod_player_go   (evt);
         mod_key_go      (evt);
+        mod_video       (evt);
         mod_ui_go       (evt);
     }
 
@@ -98,12 +99,7 @@ O3 : O!(Event) {
     }
 
     void
-    mod_ui_go (Event* evt) {
-        if (gui.e is null)
-            return;
-
-        gui.e.go (gui.e,evt);
-
+    mod_video (Event* evt) {
         with (evt.Type)
         switch (evt.type) {
             case SDL:
@@ -112,7 +108,15 @@ O3 : O!(Event) {
                     switch (window.event) {
                         case SDL_WINDOWEVENT_EXPOSED: 
                             printf ("SDL_WINDOWEVENT_EXPOSED\n");
-                            video.draw (this,evt);
+                            video.draw_start (this,evt);
+                            
+                            // DRAW
+                            Event event;
+                            event.type = event.Type.DRAW;
+                            event.draw.canvas = video.canvas;
+                            send_now (event);
+
+                            video.draw_end (this,evt);
                             break;
                         case SDL_WINDOWEVENT_CLOSE: 
                             send (Event.Type.QUIT);
@@ -121,8 +125,21 @@ O3 : O!(Event) {
                     }
                 }
                 break;
+            default:
+        }
+    }
+
+    void
+    mod_ui_go (Event* evt) {
+        if (gui.e is null)
+            return;
+
+        gui.e.go (gui.e,evt);
+
+        with (evt.Type)
+        switch (evt.type) {
             case DRAW:
-                // canvas
+                // evt.draw.canvas
                 break;
             default:
         }

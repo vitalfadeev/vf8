@@ -47,9 +47,9 @@ mai (T) () {
 
 
 
-        // UPDATE_XY
-        auto evt5 = Event (UPDATE_XY);
-        evt5.update_xy.cursors.length = 1;
+        // LAYOUT
+        auto evt5 = Event (LAYOUT);
+        evt5.layout.cursors.length = 1;
         o.go (&evt5);
 
         // ...
@@ -105,7 +105,7 @@ Ex : E {
         switch (evt.type) {
             case UPDATE      : _update     (e,evt); break;
             case SET_E_PROP  : _set_e_prop (e,evt); break;
-            case UPDATE_XY   : _update_xy  (e,evt); break;
+            case LAYOUT      : _layout     (e,evt); break;
             case DRAW        : _draw       (e,evt); break;
             default:
         }
@@ -134,10 +134,10 @@ Ex : E {
     }
 
     void  
-    _update_xy (E_ui e, Event* evt) {
+    _layout (E_ui e, Event* evt) {
         //with (o)
         with (e) 
-        with (evt.update_xy) {
+        with (evt.layout) {
             // ...
         }
     }
@@ -199,7 +199,7 @@ Ex : E {
 
 class
 E_ui : Ex {
-    mixin Event_update_xy.tpl;
+    mixin Event_layout.tpl;
     mixin Event_draw.tpl;
     mixin Event_click.tpl;
     mixin Childs_parent!(typeof(this));
@@ -220,9 +220,9 @@ E_ui : Ex {
                 with (evt.set_e_prop)
                 foreach (_e; childs) _e.go (_e,evt);
                 break;
-            case UPDATE_XY :
+            case LAYOUT :
                 writefln ("%s: %s", this, childs_layout.a);
-                with (evt.update_xy)
+                with (evt.layout)
                 if (has_childs) go_layout (e,evt);
                 foreach (_e; childs) _e.go (_e,evt);
                 break;
