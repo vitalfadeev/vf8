@@ -7,6 +7,7 @@ import vf.video       : Video;
 import event;
 import importc;
 import std.stdio : writeln;
+import universal_event_emitter;
 
 
 extern(C)
@@ -14,6 +15,8 @@ void
 main () {
     auto o = new O3 ();
     o.open ();
+
+    //binds (o);
 
     o.send_now (Event.Type.OPEN);
     o.send_now (Event.Type.UPDATE);
@@ -25,6 +28,24 @@ main () {
 
     o.go ();   // event loop
 }
+
+//void
+//binds (O) (O o) {
+//    Universal_event_emitter!Event.FN fn =
+//    (Event* evt, void* data)  {
+//        with (evt.click) {
+//            Event event;
+//            event.type    = Event.Type.PLAY;
+//            event.play.id = 1;
+//            o.send (&event);
+//        }
+//    };
+
+//    universal_event_emitter.on (
+//        Event.Type.CLICK,
+//        &fn,
+//        null);
+//}
 
 class
 O3 : O!(Event) {
@@ -124,7 +145,7 @@ O3 : O!(Event) {
             case SET_E_PROP:
             case LAYOUT:
             case DRAW:
-                gui.e.go (gui.e,evt);
+                gui.e.go (evt, gui.e);
                 break;
             default:
         }
@@ -139,28 +160,17 @@ O3 : O!(Event) {
                     case SDL_BUTTON_LEFT : 
                         auto _mouse_over_e = gui.select (x,y);
                         if (_mouse_over_e !is null) {
-                            Event event;
-                            event.type = Event.Type.CLICK;
-                            event.click.x = x;
-                            event.click.y = y;
-                            send (&event);
+                            // send_now
+                            // CLICK
+                            auto rec = _mouse_over_e.universal_event_emitter.select (Event.Type.CLICK);
+                            if (rec !is null) {
+                                send (&rec.new_event);
+                            }
                         }
                         break;
                     default:
                 }
                 break;
-            case CLICK: {
-                with (event.click) {
-                    auto _mouse_over_e = gui.select (x,y);
-                    if (_mouse_over_e !is null) {
-                        Event event;
-                        event.type    = _mouse_over_e.on_click_send_evt_type;
-                        event.play.id = _mouse_over_e.on_click_send_evt_arg;
-                        send (&event);
-                    }
-                }
-                break;
-            }
             default:
         }
     }
@@ -187,6 +197,11 @@ O3 : O!(Event) {
 
 import e_class : E_ui;
 alias E = E_ui;
+
+void
+send_e_now (E e, Event* evt) {
+    e.go (evt,e);
+}
 
 struct
 Gui {

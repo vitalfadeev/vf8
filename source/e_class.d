@@ -6,6 +6,7 @@ import std.format : format;
 import childs_parent;
 import layout;
 import event;
+import universal_event_emitter : Universal_event_emitter;
 
 void
 mai (T) () {
@@ -81,13 +82,13 @@ load_ui () {
 //
 interface 
 GO {
-    void go (E_ui e, Event* evt);
+    void go (Event* evt, E_ui e);
 }
 
 class
 E : GO {
     void 
-    go (E_ui e, Event* evt) {
+    go (Event* evt, E_ui e) {
         //
     }
 }
@@ -99,11 +100,11 @@ Ex : E {
 
     override
     void  
-    go (E_ui e, Event* evt) {
+    go (Event* evt, E_ui e) {
         // ...
         with (evt.Type)
         switch (evt.type) {
-            case SET_E_PROP  : _set_e_prop (e,evt); break;
+            case SET_E_PROP  : _set_e_prop (evt,e); break;
             //case UPDATE      : _update     (e,evt); break;
             //case LAYOUT      : _layout     (e,evt); break;
             //case DRAW        : _draw       (e,evt); break;
@@ -112,7 +113,7 @@ Ex : E {
 
         // next
         if (next_ex !is null) {
-            next_ex.go (e,evt);
+            next_ex.go (evt,e);
         }
     }
 
@@ -125,7 +126,7 @@ Ex : E {
     //}
 
     void  
-    _set_e_prop (E_ui e, Event* evt) {
+    _set_e_prop (Event* evt, E_ui e) {
         //with (o)
         with (e)
         with (evt.set_e_prop) {
@@ -203,39 +204,42 @@ E_ui : Ex {
     mixin Event_draw.tpl;
     mixin Event_click.tpl;
     mixin Childs_parent!(typeof(this));
+    Universal_event_emitter!Event universal_event_emitter;
 
     override
     void 
-    go (E_ui e, Event* evt) {
+    go (Event* evt, E_ui e) {
         writefln ("Event: %s", *evt);
-        // ...
+
+        // next
+        Ex.go (evt,e);
+
+        // universal event emitter
+        //universal_event_emitter.go (evt.type);
 
         // childs
         with (evt.Type)
         switch (evt.type) {
             case SET_E_PROP :
                 with (evt.set_e_prop)
-                foreach (_e; childs) _e.go (_e,evt);
+                foreach (_e; childs) _e.go (evt,_e);
                 break;
             case LAYOUT :
                 writefln ("%s: %s", this, childs_layout.a);
                 with (evt.layout)
                 if (has_childs) go_layout (e,evt);
-                foreach (_e; childs) _e.go (_e,evt);
+                foreach (_e; childs) _e.go (evt,_e);
                 break;
             case DRAW :
                 with (e)
                 with (evt.draw) {
                     draw_rect (canvas,xy,wh,fg);
                     draw_text (canvas,xy,wh,text);
-                    foreach (_e; childs) _e.go (_e,evt);
+                    foreach (_e; childs) _e.go (evt,_e);
                 }
                 break;
             default: /*each (o,e,evt);*/
         }
-
-        // next
-        super.go (e,evt);
     }
 
 
@@ -252,9 +256,9 @@ E_ui : Ex {
     //}
 
     void
-    each (E e, Event* evt) {
+    each (Event* evt) {
         foreach (_e; childs)
-            _e.go (_e,evt);
+            _e.go (evt,_e);
     }
 
     override
@@ -290,7 +294,7 @@ class
 Window : Ex {
     override
     void  
-    _set_e_prop (E_ui e, Event* evt) {
+    _set_e_prop (Event* evt, E_ui e) {
         with (e) {
             x = 0;
             y = 0;
@@ -309,7 +313,7 @@ class Panel  : Ex {
 
     override
     void  
-    _set_e_prop (E_ui e, Event* evt) {        
+    _set_e_prop (Event* evt, E_ui e) {        
         with (e) {
            childs_layout = A.left_aligned_stacked_to_right;
         }
@@ -326,7 +330,7 @@ Loc1 : Ex {
 
     override
     void  
-    _set_e_prop (E_ui e, Event* evt) {        
+    _set_e_prop (Event* evt, E_ui e) {        
         with (e) with (Coord) {
            w = 33.perc;
            h = parent_h;
@@ -346,7 +350,7 @@ class Button : Ex {
 
     override
     void  
-    _set_e_prop (E_ui e, Event* evt) {
+    _set_e_prop (Event* evt, E_ui e) {
         with (e) {
            w = Coord.parent_h;
         }
@@ -361,10 +365,10 @@ class __1 : Ex {
 
     override 
     void  
-    _set_e_prop (E_ui e, Event* evt) {
+    _set_e_prop (Event* evt, E_ui e) {
+        with (Event.Type)
         with (e) {
-            on_click_send_evt_type = Event.Type.PLAY;
-            on_click_send_evt_arg  = 1; // Arg (int,string)
+            universal_event_emitter.on (CLICK, Event (Event_play (PLAY,1)));
         }
     }
 }
@@ -374,10 +378,14 @@ class __2 : Ex {
 
     override 
     void  
-    _set_e_prop (E_ui e, Event* evt) {
+    _set_e_prop (Event* evt, E_ui e) {
         with (e) {
             on_click_send_evt_type = Event.Type.PLAY;
             on_click_send_evt_arg  = 2; // Arg (int,string)
+        }
+        with (Event.Type)
+        with (e) {
+            universal_event_emitter.on (CLICK, Event (Event_play (PLAY,2)));
         }
     }
 }
@@ -387,10 +395,14 @@ class __3 : Ex {
 
     override 
     void  
-    _set_e_prop (E_ui e, Event* evt) {
+    _set_e_prop (Event* evt, E_ui e) {
         with (e) {
             on_click_send_evt_type = Event.Type.PLAY;
             on_click_send_evt_arg  = 3; // Arg (int,string)
+        }
+        with (Event.Type)
+        with (e) {
+            universal_event_emitter.on (CLICK, Event (Event_play (PLAY,3)));
         }
     }
 }
@@ -401,7 +413,7 @@ Loc2 : Ex {
 
     override
     void  
-    _set_e_prop (E_ui e, Event* evt) {
+    _set_e_prop (Event* evt, E_ui e) {
         with (e) {
             w = 34.perc;
             h = Coord.parent_h;
@@ -422,7 +434,7 @@ Clock : Ex {
 
     override
     void  
-    _set_e_prop (E_ui e, Event* evt) {
+    _set_e_prop (Event* evt, E_ui e) {
         with (e) {
             w = 33.perc;
             h = Coord.parent_h;
@@ -443,7 +455,7 @@ Loc3 : Ex {
 
     override
     void  
-    _set_e_prop (E_ui e, Event* evt) {
+    _set_e_prop (Event* evt, E_ui e) {
         with (e) {
             w = 33.perc;
             h = Coord.parent_h;
@@ -463,7 +475,7 @@ class Indicator : Ex {
 
     override
     void  
-    _set_e_prop (E_ui e, Event* evt) {
+    _set_e_prop (Event* evt, E_ui e,) {
         with (e) {
             w = Coord.parent_h;
             h = Coord.parent_h;
