@@ -349,14 +349,41 @@ class Button : Ex {
 auto _1 (E_ui e) { return e.add_ex (new __1); }
 class __1 : Ex {
     override string toString () { return typeof(this).stringof; }
+
+    override 
+    void  
+    _set_e_prop (E_ui e, Event* evt) {
+        with (e) {
+            on_click_send_evt_type = Event.Type.PLAY;
+            on_click_send_evt_arg  = 1; // Arg (int,string)
+        }
+    }
 }
 auto _2 (E_ui e) { return e.add_ex (new __2); }
 class __2 : Ex {
     override string toString () { return typeof(this).stringof; }    
+
+    override 
+    void  
+    _set_e_prop (E_ui e, Event* evt) {
+        with (e) {
+            on_click_send_evt_type = Event.Type.PLAY;
+            on_click_send_evt_arg  = 2; // Arg (int,string)
+        }
+    }
 }
 auto _3 (E_ui e) { return e.add_ex (new __3); }
 class __3 : Ex {
     override string toString () { return typeof(this).stringof; }    
+
+    override 
+    void  
+    _set_e_prop (E_ui e, Event* evt) {
+        with (e) {
+            on_click_send_evt_type = Event.Type.PLAY;
+            on_click_send_evt_arg  = 3; // Arg (int,string)
+        }
+    }
 }
 auto loc2 (E_ui e) { return e.add_ex (new Loc2); }
 class 
