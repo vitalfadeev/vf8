@@ -15,17 +15,10 @@ main () {
     auto o = new O3 ();
     o.open ();
 
-    Event e1;
-    e1.type = Event.Type.UPDATE;
-    o.send_now (e1);
-
-    Event e2;
-    e2.type = Event.Type.SET_E_PROP;
-    o.send_now (e2);
-
-    Event e3;
-    e3.type = Event.Type.LAYOUT;
-    o.send_now (e3);
+    o.send_now (Event.Type.OPEN);
+    o.send_now (Event.Type.UPDATE);
+    o.send_now (Event.Type.SET_E_PROP);
+    o.send_now (Event.Type.LAYOUT);
 
     import e_class : dump_tree;
     dump_tree (o.gui.e);
@@ -103,26 +96,19 @@ O3 : O!(Event) {
         with (evt.Type)
         switch (evt.type) {
             case SDL:
-                if (evt.sdl.sdl_event.type == SDL_WINDOWEVENT) {
-                    with (evt.sdl.sdl_event)
-                    switch (window.event) {
-                        case SDL_WINDOWEVENT_EXPOSED: 
-                            printf ("SDL_WINDOWEVENT_EXPOSED\n");
-                            video.draw_start (this,evt);
-                            
-                            // DRAW
-                            Event event;
-                            event.type = event.Type.DRAW;
-                            event.draw.canvas = video.canvas;
-                            send_now (event);
-
-                            video.draw_end (this,evt);
-                            break;
-                        case SDL_WINDOWEVENT_CLOSE: 
-                            send (Event.Type.QUIT);
-                            break;
-                        default:
-                    }
+                with (evt.sdl.sdl_event)
+                if (type == SDL_WINDOWEVENT)
+                switch (window.event) {
+                    case SDL_WINDOWEVENT_EXPOSED: 
+                        //printf ("on SDL_WINDOWEVENT_EXPOSED\n");
+                        video.draw_start (this,evt);
+                        send_now!(Event.Type.DRAW, "draw", "canvas") (video.canvas);
+                        video.draw_end   (this,evt);
+                        break;
+                    case SDL_WINDOWEVENT_CLOSE: 
+                        send (Event.Type.QUIT);
+                        break;
+                    default:
                 }
                 break;
             default:
@@ -131,15 +117,14 @@ O3 : O!(Event) {
 
     void
     mod_ui_go (Event* evt) {
-        if (gui.e is null)
-            return;
-
-        gui.e.go (gui.e,evt);
-
+        if (gui.e !is null)
         with (evt.Type)
         switch (evt.type) {
+            case UPDATE:
+            case SET_E_PROP:
+            case LAYOUT:
             case DRAW:
-                // evt.draw.canvas
+                gui.e.go (gui.e,evt);
                 break;
             default:
         }
@@ -150,30 +135,14 @@ O3 : O!(Event) {
         with (evt.Type)
         switch (evt.type) {
             case SDL:
-                with (event.sdl.sdl_event) {
-                    if (type == SDL_KEYDOWN && key.keysym.sym == SDLK_ESCAPE)  {
-                        Event event;
-                        event.type = Event.Type.QUIT;
-                        send (&event);
-                    }
-                    if (type == SDL_KEYDOWN && key.keysym.sym == SDLK_q)  {
-                        Event event;
-                        event.type = Event.Type.PLAY;
-                        event.play.id = 1;
-                        send (&event);
-                    }
-                    if (type == SDL_KEYDOWN && key.keysym.sym == SDLK_w)  {
-                        Event event;
-                        event.type = Event.Type.PLAY;
-                        event.play.id = 2;
-                        send (&event);
-                    }
-                    if (type == SDL_KEYDOWN && key.keysym.sym == SDLK_e)  {
-                        Event event;
-                        event.type = Event.Type.PLAY;
-                        event.play.id = 3;
-                        send (&event);
-                    }
+                with (event.sdl.sdl_event)
+                if (type == SDL_KEYDOWN)
+                switch (key.keysym.sym) {
+                    case SDLK_ESCAPE : send (Event.Type.QUIT); break;
+                    case SDLK_q      : send!(Event.Type.PLAY, "play", "id") (1); break;
+                    case SDLK_w      : send!(Event.Type.PLAY, "play", "id") (2); break;
+                    case SDLK_e      : send!(Event.Type.PLAY, "play", "id") (3); break;
+                    default:
                 }
                 break;
             default:
@@ -278,281 +247,3 @@ Gui {
 
 
 
-void
-mai () {
-    O2 o;
-    with (o) {
-        put (OPEN,"file.ui");
-        go ();  // event loop
-    }
-}
-
-void
-O2_open (void* o, void* e, void* evt, REG d) {
-    with (cast(O2*)o) {
-        auto file_name = (cast (O2_event*) evt).file_name;
-        input.open (file_name);
-        local_input.open ();
-    }
-}
-
-void
-O2_level2_ego (void* o, void* e, void* evt, REG d) {
-    with (cast (O2*) o)
-    switch ((cast (O2_event*) evt).type) {
-        case OPEN              : O2_open (o,e,evt,d); break;
-        case INDENT_START      : ego = &O2_ego_indent; break;
-        case INDENT_END        : ego = &O2_ego_after_indent; break;
-        case INDENTED_E_START  : ego = &O2_ego_after_indented_e; break;
-        case INDENTED_E_KLASS_NAME_START : break;
-        case INDENTED_E_KLASS_NAME_END   : break;
-        case E_START           : break;
-        case KLASS_NAME_START  : break;
-        case KLASS_NAME_END    : break;
-        case IGNORE_START      : break;
-        case IGNORE_END        : break;
-        default:
-    }
-}
-
-void
-O2_ego (void* o, void* e, void* evt, REG d) {
-    with (cast (O2*) o)
-    switch (cast (dchar) d) {
-        case ' '  : put (INDENT_START); break;
-        case 'e'  : break;
-        case '\n' : break;
-        default:
-    }
-}
-
-void
-O2_ego_indent (void* o, void* e, void* evt, REG d) {
-    with (cast (O2*) o)
-    switch (cast (dchar) d) {
-        case ' ' : break;
-        default  : put (INDENT_END); break;
-    }
-}
-
-void
-O2_ego_after_indent (void* o, void* e, void* evt, REG d) {
-    with (cast (O2*) o)
-    switch (cast (dchar) d) {
-        case 'e'  : put (INDENTED_E_START); break;
-        case '\n' : put (EOL); break;
-        default   : ego = &O2_ego_ignore; put (IGNORE_START); break;
-    }
-}
-
-void
-O2_ego_after_indented_e (void* o, void* e, void* evt, REG d) {
-    with (cast (O2*) o)
-    switch (cast (dchar) d) {
-        case ' '  : put (SPACE); break;
-        case '\n' : put (EOL); break;
-        default   : put (INDENTED_E_KLASS_NAME_START); break;
-    }
-}
-
-void
-O2_ego_ignore (void* o, void* e, void* evt, REG d) {
-    with (cast (O2*) o)
-    switch (cast (dchar) d) {
-        case '\n' : ego = &O2_ego; put (IGNORE_END); break;
-        default   :
-    }
-}
-
-alias
-O2 = _O2!(O2_input,Local_input!O2_event,O2_event,O2_ego);
-
-struct
-_O2 (Input,Local_input,Event,alias base_ego) {
-    GO          __go = &_go;
-    Input       input;
-    Local_input local_input;
-    Event       event;
-    GO          ego = &base_ego;  // current
-
-    alias O = typeof(this);
-
-    enum {
-        OPEN = 1,
-        INDENT_START,
-        INDENT_END,
-        INDENTED_E_START,
-        INDENTED_E_KLASS_NAME_START,
-        INDENTED_E_KLASS_NAME_END,
-        E_START,
-        KLASS_NAME_START,
-        KLASS_NAME_END,
-        IGNORE_START,
-        IGNORE_END,
-        EOL,
-        SPACE,
-    };
-
-    void
-    go () {
-        this.__go (&this,ego,null,0);
-    }
-
-    void
-    opAssign (GO b) {
-        ego = b;
-    }
-
-    void
-    put (Event b) {
-        local_input.put (&b);
-    }
-
-    void
-    put (uint type) {
-        auto evt = Event (type);
-        local_input.put (&evt);
-    }
-
-    void
-    put (uint type, string str) {
-        auto evt = Event (type,str);
-        local_input.put (&evt);
-    }
-
-    // base
-    static
-    void
-    _go (void* o, void* e, void* evt, REG d) {
-        // each input event
-        with (cast(O*)o) {
-            ego = cast (GO) e;
-            evt = &event;
-
-            while (__go !is null) {
-                if (input.read (cast (Event*) evt)) {
-                    _go2 (o,e,evt,d);
-                }
-            }
-        }
-    }
-
-    // with local input
-    static
-    void
-    _go2 (void* o, void* e, void* evt, REG d) {
-        with (cast(O*)o) {
-            // process input event
-            d = event.type;
-            _go3 (o,e,evt,d);
-
-            // each local input event
-            while (!local_input.empty) {
-                local_input.read (cast (Event*) evt);
-                // process local input event
-                d = event.type;
-                _go3 (o,e,evt,d);
-            }
-        }
-    }
-
-    // with map
-    static
-    void
-    _go3 (void* o, void* e, void* evt, REG d) {
-        with (cast(O*)o) {
-            if (e !is null) {
-                (cast (GO) e) (o,e,evt,d);
-            }
-        }
-    }
-}
-
-struct
-O2_input {
-    string filename;
-    string text;
-    size_t i;  // text pos
-
-    void
-    open (string filename) {
-        // open file
-    }
-
-    bool 
-    read (O2_event* event) {
-        if (text.length == 0) return false;
-        if (text.length <= i) return false;
-        event.type = text[i];
-        return true;
-    }
-}
-
-struct
-O2_event {
-    REG    type;
-    size_t pos_a;
-    size_t pos_b;
-    //
-    string file_name;
-
-    this (uint type) {
-        this.type = type;
-    }
-
-    this (REG type, string str) {
-        this.type      = type;
-        this.file_name = str;
-    }
-}
-
-// start
-//   'e' : name_start
-//   ' ' : indent_start
-//   def : name_start
-//
-// name_start
-//   ' '  : name_end
-//   '\n' : name_end
-//   def  : name
-//
-// indent_start
-//   ' '  : indent
-//   '\n' : indent_end
-//   def  : indent_end
-//
-// name_end
-//   if (range == "e") name_e
-//   else              name_klass
-//
-// indent_end
-// 
-
-// name_start pos
-// name_end   pos
-
-// open
-//  ...
-
-// klass
-//  set (pid, void*)
-//   swtich (pid)
-//    case x: e.x = value
-//    case y: e.y = value
-//
-// klass
-//  Pvalue[Pid.max] values;
-//
-// enum 
-// Pid {
-//  name
-//  x
-//  y
-// }
-//
-// Pvalue
-//   type none|string
-
-// o ~= Event (OPEN,filename);
-// o.go ();
-// o  = &O2_ego_indent;

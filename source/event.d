@@ -5,14 +5,14 @@ Event {
 union {
     Type             type;
     Event_sdl        sdl;
-    Event_draw       draw;
-    Event_draw       click;
     Event_open       open;
     Event_quit       quit;
+    Event_draw       draw;
     Event_play       play;
     Event_update     update;
     Event_set_e_prop set_e_prop;
     Event_layout     layout;
+    Event_draw       click;
 }
 
     string
@@ -24,18 +24,19 @@ union {
     enum
     Type {
         _,
-        SDL,
         OPEN,
         QUIT,
+        // SDL
+        SDL,
         // video
         DRAW,
-        CLICK,
         // audio
         PLAY,
         // ui
         UPDATE,
         SET_E_PROP,
         LAYOUT,
+        CLICK,
     }
 }
 struct

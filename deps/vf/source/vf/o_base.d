@@ -6,10 +6,10 @@ import vf.local_input : Local_input;
 ///
 class
 O (Event) {
-    bool        go_flag = true;
-    Input!Event input;
+    bool              go_flag = true;
+    Input!Event       input;
     Local_input!Event local_input;
-    Event       event;
+    Event             event;
 
     void
     open () {
@@ -49,6 +49,21 @@ O (Event) {
     }
 
     void
+    send_now (Event.Type type) {
+        Event event;
+        event.type = type;
+        ego (&event);
+    }
+
+    void
+    send_now (Event.Type type, string ev, string prop, VALUE) (VALUE value) {
+        Event event;
+        event.type = type;
+        __traits (getMember, __traits (getMember, event, ev), prop) = value;
+        ego (&event);
+    }
+
+    void
     send (Event.Type type) {
         Event event;
         event.type = type;
@@ -58,6 +73,14 @@ O (Event) {
     void
     send (Event* event) {
         local_input.put (event);
+    }
+
+    void
+    send (Event.Type type, string ev, string prop, VALUE) (VALUE value) {
+        Event event;
+        event.type = type;
+        __traits (getMember, __traits (getMember, event, ev), prop) = value;
+        local_input.put (&event);
     }
 }
 

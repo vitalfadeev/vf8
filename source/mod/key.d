@@ -8,11 +8,6 @@ import mod.print  : go_printf;
 import mod.send   : go_send;
 import importc;
 
-enum       EVT_UI          = 0x0200;
-enum ulong PLAY_1          = (8             << 16) | EVT_UI;
-enum ulong PLAY_2          = (9             << 16) | EVT_UI;
-enum ulong PLAY_3          = (10            << 16) | EVT_UI;
-
 alias 
 go (O,Event) = GO_map!(
     Event,

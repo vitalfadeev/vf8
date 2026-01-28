@@ -11,7 +11,6 @@ mixin template
 Layout (E) {
     // this
     XY xy;
-//    XY wh;
     // for childs
     XY childs_space;
     Childs_layout!E childs_layout;
@@ -122,31 +121,3 @@ void
 flex () {
     //
 }
-
-
-void
-update_childs_w (E) () {
-    // avg w with fixed w
-    {
-        auto fix_w = 0;
-        auto cnt   = 0;
-        auto min_w = 0;
-
-        // fix_w
-        foreach (_e; childs) {
-            if (_e.fix_w) 
-                fix_w += _e.w;
-            cnt++;
-        }
-
-        auto avg_w = (this.w - fix_w) / cnt;
-        auto _w = (avg_w < min_w) ? avg_w : min_w;
-
-        // set w
-        foreach (_e; childs) {
-            if (!_e.fix_w)
-                _e.w = _w;
-        }
-    }
-}
-

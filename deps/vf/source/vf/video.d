@@ -8,6 +8,8 @@ import importc;
 import vf.types : GO;
 import vf.types : REG;
 
+enum WINDOW_DEFAULT_W = 1024;
+enum WINDOW_DEFAULT_H = 480;
 
 struct
 Video {
@@ -100,15 +102,6 @@ Video {
     }
 }
 
-//struct
-//Event_draw {
-//    //SDL_CommonEvent _common;
-//    Uint32      type;
-//    Uint32      timestamp;   /**< In milliseconds, populated using SDL_GetTicks() */
-//    SDL_Window* window;
-//    Tvg_Canvas  canvas;
-//}
-
 
 void 
 init_sdl () {
@@ -141,7 +134,7 @@ new_window () {
             __FILE_FULL_PATH__, // "SDL2 Window",
             SDL_WINDOWPOS_CENTERED_DISPLAY (0),
             SDL_WINDOWPOS_CENTERED_DISPLAY (0),
-            800, 800,
+            WINDOW_DEFAULT_W, WINDOW_DEFAULT_H,
             SDL_WINDOW_RESIZABLE
             | SDL_WINDOW_VULKAN
             | SDL_WINDOW_ALLOW_HIGHDPI

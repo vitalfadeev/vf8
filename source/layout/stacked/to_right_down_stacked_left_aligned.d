@@ -11,6 +11,7 @@ to_right_down_left_aligned (E) (E _this) {
     XY line  = _this.wh;
     XY limi  = _this.wh;
 
+    // setup
     foreach (_e; _this.childs) {
         // each e h = line h
         _e.wh.y = line.y;
@@ -19,6 +20,13 @@ to_right_down_left_aligned (E) (E _this) {
         auto cn = line_step_and_check_overflow (cursor,wh,space,line);
         _e.xy  = cn.cur;
         cursor = cn.next;
+    }
+
+
+    // translate
+    auto dx = _this.xy.x;
+    foreach (_e; _this.childs) {
+        _e.xy.x += dx;
     }
 }
 
