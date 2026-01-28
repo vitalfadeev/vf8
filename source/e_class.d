@@ -103,10 +103,10 @@ Ex : E {
         // ...
         with (evt.Type)
         switch (evt.type) {
-            case UPDATE      : _update     (e,evt); break;
             case SET_E_PROP  : _set_e_prop (e,evt); break;
-            case LAYOUT      : _layout     (e,evt); break;
-            case DRAW        : _draw       (e,evt); break;
+            //case UPDATE      : _update     (e,evt); break;
+            //case LAYOUT      : _layout     (e,evt); break;
+            //case DRAW        : _draw       (e,evt); break;
             default:
         }
 
@@ -116,13 +116,13 @@ Ex : E {
         }
     }
 
-    void  
-    _update (E_ui e, Event* evt) {
-        //with (o)
-        with (e) {
-            // ...
-        }
-    }
+    //void  
+    //_update (E_ui e, Event* evt) {
+    //    //with (o)
+    //    with (e) {
+    //        // ...
+    //    }
+    //}
 
     void  
     _set_e_prop (E_ui e, Event* evt) {
@@ -133,23 +133,23 @@ Ex : E {
         }
     }
 
-    void  
-    _layout (E_ui e, Event* evt) {
-        //with (o)
-        with (e) 
-        with (evt.layout) {
-            // ...
-        }
-    }
+    //void  
+    //_layout (E_ui e, Event* evt) {
+    //    //with (o)
+    //    with (e) 
+    //    with (evt.layout) {
+    //        // ...
+    //    }
+    //}
 
-    void  
-    _draw (E_ui e, Event* evt) {
-        //with (o)
-        with (e)
-        with (evt.draw) {
-            // ...
-        }
-    }
+    //void  
+    //_draw (E_ui e, Event* evt) {
+    //    //with (o)
+    //    with (e)
+    //    with (evt.draw) {
+    //        // ...
+    //    }
+    //}
 
     T
     add_ex (this T) (Ex ex) {
@@ -210,9 +210,6 @@ E_ui : Ex {
         writefln ("Event: %s", *evt);
         // ...
 
-        // next
-        super.go (e,evt);
-
         // childs
         with (evt.Type)
         switch (evt.type) {
@@ -226,21 +223,33 @@ E_ui : Ex {
                 if (has_childs) go_layout (e,evt);
                 foreach (_e; childs) _e.go (_e,evt);
                 break;
+            case DRAW :
+                with (e)
+                with (evt.draw) {
+                    draw_rect (canvas,xy,wh,fg);
+                    draw_text (canvas,xy,wh,text);
+                    foreach (_e; childs) _e.go (_e,evt);
+                }
+                break;
             default: /*each (o,e,evt);*/
         }
+
+        // next
+        super.go (e,evt);
     }
 
-    override
-    void  
-    _draw (E_ui e, Event* evt) {
-        //with (o)
-        with (e)
-        with (evt.draw) {
-            draw_rect (canvas,xy,wh,fg);
-            draw_text (canvas,xy,wh,text);
-            foreach (_e; childs) _e.go (_e,evt);
-        }
-    }
+
+    //override
+    //void  
+    //_draw (E_ui e, Event* evt) {
+    //    //with (o)
+    //    with (e)
+    //    with (evt.draw) {
+    //        draw_rect (canvas,xy,wh,fg);
+    //        draw_text (canvas,xy,wh,text);
+    //        foreach (_e; childs) _e.go (_e,evt);
+    //    }
+    //}
 
     void
     each (E e, Event* evt) {
