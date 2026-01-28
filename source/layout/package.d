@@ -19,6 +19,7 @@ Layout (E) {
     go_layout (E e, Event* evt) {
         switch (childs_layout.a) with (A) {
             case _: 
+                goto default;
                 break;
             case left_aligned_stacked_to_right: 
                 to_right_down_left_aligned (this);
@@ -30,6 +31,7 @@ Layout (E) {
                 to_left_down_right_aligned (this);
                 break;
             default:
+                to_right_down_left_aligned (this);
         }        
     }
 
