@@ -439,12 +439,14 @@ Desktop {
     static
     int 
     w () {
-        return 640;
+        import vf.video;
+        return WINDOW_DEFAULT_W;
     }
     static
     int 
     h () {
-        return 64;
+        import vf.video;
+        return WINDOW_DEFAULT_H;
     }
 }
 
