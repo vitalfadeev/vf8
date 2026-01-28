@@ -394,6 +394,10 @@ Clock : Ex {
         with (e) {
             fg = 0xFFFFFFFF;
         }
+        with (e) {
+            on_click_send_evt_type = Event.Type.PLAY;
+            on_click_send_evt_arg  = 1; // Arg (int,string)
+        }
     }
 }
 auto loc3 (E_ui e) { return e.add_ex (new Loc3); }

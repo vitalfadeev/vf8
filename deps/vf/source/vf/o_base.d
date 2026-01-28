@@ -82,6 +82,11 @@ O (Event) {
         __traits (getMember, __traits (getMember, event, ev), prop) = value;
         local_input.put (&event);
     }
+
+    void
+    e_send_now (E) (E e, Event* event) {
+        e.go (e,event);
+    }
 }
 
 // input  line

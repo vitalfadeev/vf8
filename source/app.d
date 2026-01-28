@@ -69,7 +69,7 @@ O3 : O!(Event) {
     mod_sdl_quit_go (Event* evt) {
         with (evt.Type)
         switch (evt.type) {
-            case SDL: 
+            case SDL:
                 if (evt.sdl.sdl_event.type ==  SDL_QUIT) {
                     printf ("on SQL QUIT\n");
                     send (Event.Type.QUIT);
@@ -128,6 +128,41 @@ O3 : O!(Event) {
                 break;
             default:
         }
+        // keys
+        with (evt.Type)
+        switch (evt.type) {
+            case SDL:
+                with (event.sdl.sdl_event)
+                if (type == SDL_MOUSEBUTTONDOWN)
+                with (button)
+                switch (button) {
+                    case SDL_BUTTON_LEFT : 
+                        auto _mouse_over_e = gui.select (x,y);
+                        if (_mouse_over_e !is null) {
+                            Event event;
+                            event.type = Event.Type.CLICK;
+                            event.click.x = x;
+                            event.click.y = y;
+                            send (&event);
+                        }
+                        break;
+                    default:
+                }
+                break;
+            case CLICK: {
+                with (event.click) {
+                    auto _mouse_over_e = gui.select (x,y);
+                    if (_mouse_over_e !is null) {
+                        Event event;
+                        event.type    = _mouse_over_e.on_click_send_evt_type;
+                        event.play.id = _mouse_over_e.on_click_send_evt_arg;
+                        send (&event);
+                    }
+                }
+                break;
+            }
+            default:
+        }
     }
 
     void
@@ -167,6 +202,41 @@ Gui {
     load_ui () {
         import e_class;
         this.e = e_class.load_ui ();
+    }
+
+    E_ui
+    select (int x, int y) {
+        return select (e,x,y);
+    }
+
+    E_ui
+    select (E_ui e, int x, int y) {
+        if (e !is null)
+        if (_select (e,x,y)) {
+            // childs
+            foreach (c; e.childs) {
+                if (_select (c,x,y)) {
+                    auto cc = select (c,x,y);
+                    if (cc !is null) return cc;
+                    else return c;
+                }
+            }
+        }
+
+        return e;
+    }
+
+    bool
+    _select (E_ui e, int x, int y) {
+        auto _xy = e.xy;
+        if (_xy.x <= x && _xy.y < y) {
+            auto _wh = e.wh;
+            if (x < (_xy.x + _wh.w) && y < (_xy.y + _wh.h)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
 

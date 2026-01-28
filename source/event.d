@@ -12,7 +12,7 @@ union {
     Event_update     update;
     Event_set_e_prop set_e_prop;
     Event_layout     layout;
-    Event_draw       click;
+    Event_click      click;
 }
 
     string
@@ -106,10 +106,13 @@ Event_draw {
 struct
 Event_click {
     auto type = Event.Type.CLICK;
+    int  x;
+    int  y;
 
     template
     tpl () {
-        Event.Type on_click_send_evt_code;  // PLLAY_1
+        Event.Type on_click_send_evt_type;  // PLLAY
+        int        on_click_send_evt_arg;   // 1
     }
 }
 
