@@ -14,7 +14,8 @@ union {
     Event_layout     layout;
     Event_click      click;
 }
-    this (Event_play evt) { play = evt; }
+    this (Event_play  evt) { play  = evt; }
+    this (Event_click evt) { click = evt; }
 
     string
     toString () {

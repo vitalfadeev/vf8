@@ -357,7 +357,43 @@ class Button : Ex {
         with (e) {
            fg = 0xFFFF0000;
         }
-    }    
+    }
+
+    override
+    void
+    go (Event* evt, E_ui e) {
+        with (e)
+        with (evt.Type)
+        switch (evt.type) {
+            case CLICK: toggle_pressed (); break;
+            default:
+        }
+        super.go (evt,e);
+    }
+
+    void
+    toggle_pressed () {
+        is_pressed ? _release () : _press (); 
+    }
+
+    bool
+    is_pressed () {
+        // has ex pressed
+        return true;
+    }
+
+    void
+    _press () {
+        // add ex pressed
+    }
+
+    void 
+    _release () {
+        // rem ex pressed
+    }
+}
+class Pressed : Ex {
+    override string toString () { return typeof(this).stringof; }
 }
 auto _1 (E_ui e) { return e.add_ex (new __1); }
 class __1 : Ex {

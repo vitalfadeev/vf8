@@ -44,7 +44,7 @@ O (Event) {
     }
 
     void
-    send_now (ref Event evt) {
+    send_now (Event evt) {
         ego (&evt);
     }
 

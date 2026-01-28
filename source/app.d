@@ -153,22 +153,29 @@ O3 : O!(Event) {
         with (evt.Type)
         switch (evt.type) {
             case SDL:
-                with (event.sdl.sdl_event)
+                with (evt.sdl.sdl_event)
                 if (type == SDL_MOUSEBUTTONDOWN)
                 with (button)
                 switch (button) {
                     case SDL_BUTTON_LEFT : 
                         auto _mouse_over_e = gui.select (x,y);
                         if (_mouse_over_e !is null) {
-                            // send_now
-                            // CLICK
-                            auto rec = _mouse_over_e.universal_event_emitter.select (Event.Type.CLICK);
-                            if (rec !is null) {
-                                send (&rec.new_event);
-                            }
+                            send_now (Event (Event_click (CLICK, x, y)));
                         }
                         break;
                     default:
+                }
+                break;
+            case CLICK:
+                with (evt.click) {
+                    auto _mouse_over_e = gui.select (x,y);
+                    if (_mouse_over_e !is null) {
+                        // EMITTER
+                        auto rec = _mouse_over_e.universal_event_emitter.select (CLICK);
+                        if (rec !is null) {
+                            send (&rec.new_event);
+                        }
+                    }
                 }
                 break;
             default:
@@ -201,6 +208,11 @@ alias E = E_ui;
 void
 send_e_now (E e, Event* evt) {
     e.go (evt,e);
+}
+
+void
+send_e_now (E e, Event evt) {
+    e.go (&evt,e);
 }
 
 struct
