@@ -2,12 +2,11 @@ import core.stdc.stdio : printf;
 import vf.types        : GO,REG;
 import vf.o_base       : O;
 import vf.local_input  : Local_input;
-import vf.audio       : Audio;
-import vf.video       : Video;
+import vf.audio        : Audio;
+import vf.video        : Video;
 import event;
 import importc;
 import std.stdio : writeln;
-import universal_event_emitter;
 
 
 extern(C)
@@ -170,11 +169,7 @@ O3 : O!(Event) {
                 with (evt.click) {
                     auto _mouse_over_e = gui.select (x,y);
                     if (_mouse_over_e !is null) {
-                        // EMITTER
-                        auto rec = _mouse_over_e.universal_event_emitter.select (CLICK);
-                        if (rec !is null) {
-                            send (&rec.new_event);
-                        }
+                        _mouse_over_e.on.go (CLICK, this, _mouse_over_e);
                     }
                 }
                 break;
@@ -227,8 +222,8 @@ Gui {
 
     void
     load_ui () {
-        import e_class;
-        this.e = e_class.load_ui ();
+        import load_ui;
+        this.e = load_ui.load_ui ();
     }
 
     E_ui
