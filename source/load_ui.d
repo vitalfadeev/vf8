@@ -2,7 +2,9 @@ module load_ui;
 
 import e_class;
 import event;
+import klass;
 import layout;
+import std.stdio : writeln;
 
 
 void
@@ -79,23 +81,23 @@ load_ui () {
 //
 auto 
 e () {
-    return new E_ui ();
+    return new E ();
 }
 auto
-e (E_ui _e) {
-    return _e.add_child (new E_ui ());
+e (E _e) {
+    return _e.add_child (new E ());
 }
 auto
-parent (E_ui e) {
+parent (E e) {
     return e.parent;
 }
 
-auto window (E_ui e) { return e.add_ex (new Window); }
+auto window (E e) { return e.add_klass (new Window); }
 class
-Window : Ex {
+Window : Klass {
     override
     void  
-    _set_e_prop (Event* evt, E_ui e) {
+    _set_e_prop (Event* evt, E e) {
         with (e) {
             x = 0;
             y = 0;
@@ -108,30 +110,30 @@ Window : Ex {
         }
     }
 }
-auto panel (E_ui e) { return e.add_ex (new Panel); }
-class Panel  : Ex {
+auto panel (E e) { return e.add_klass (new Panel); }
+class Panel  : Klass {
     override string toString () { return typeof(this).stringof; }    
 
     override
     void  
-    _set_e_prop (Event* evt, E_ui e) {        
+    _set_e_prop (Event* evt, E e) {        
         with (e) {
            childs_layout = A.left_aligned_stacked_to_right;
         }
     }
 }
-auto canvas (E_ui e) { return e.add_ex (new Canvas); }
-class Canvas : Ex {
+auto canvas (E e) { return e.add_klass (new Canvas); }
+class Canvas : Klass {
     override string toString () { return typeof(this).stringof; }
 }
-auto loc1 (E_ui e) { return e.add_ex (new Loc1); }
+auto loc1 (E e) { return e.add_klass (new Loc1); }
 class 
-Loc1 : Ex {
+Loc1 : Klass {
     override string toString () { return typeof(this).stringof; }
 
     override
     void  
-    _set_e_prop (Event* evt, E_ui e) {        
+    _set_e_prop (Event* evt, E e) {        
         with (e) with (Coord) {
            w = 33.perc;
            h = parent_h;
@@ -145,13 +147,61 @@ Loc1 : Ex {
         }
     }
 }
-auto button (E_ui e) { return e.add_ex (new Button); }
-class Button : Ex {
+auto button (E e) { return e.add_klass (new Button); }
+class Button : Klass {
+    // childs
+    //   pressed
+    //   released
+    State state;
+
+    enum
+    State {
+        RELEASED,
+        PRESSED,
+    }
+
+    override
+    void
+    go (Event* evt, E e) {
+        switch (state) with (State) {
+            case RELEASED : released.go (evt,e); break;
+            case PRESSED  : pressed .go (evt,e); break;
+            default:
+        }
+        super.go (evt,e);
+    }
+
+    Released released;
+    Pressed  pressed;
+
+    struct
+    Released {
+        string img = "button-released";
+
+        void
+        go (Event* evt, E e) {
+            //
+        }        
+    }
+    struct
+    Pressed {
+        string img = "button-pressed";
+
+        void
+        go (Event* evt, E e) {
+            //
+        }        
+    }
+
     override string toString () { return typeof(this).stringof; }
+
+    //
+    void draw () {};
+    void on () {};
 
     override
     void  
-    _set_e_prop (Event* evt, E_ui e) {
+    _set_e_prop (Event* evt, E e) {
         with (e) {
            w = Coord.parent_h;
         }
@@ -167,6 +217,7 @@ class Button : Ex {
     static
     void
     on_click (Event* evt, void* data, void* o, void* e) {
+        writeln ("on_click");
         with (cast (Button) e) {
             toggle_pressed ();
         }
@@ -174,7 +225,7 @@ class Button : Ex {
 
     //override
     //void
-    //go (Event* evt, E_ui e) {
+    //go (Event* evt, E e) {
     //    with (e)
     //    with (evt.Type)
     //    switch (evt.type) {
@@ -205,29 +256,29 @@ class Button : Ex {
         // rem ex pressed
     }
 }
-class Pressed : Ex {
+class Pressed : Klass {
     override string toString () { return typeof(this).stringof; }
 }
-auto _1 (E_ui e) { return e.add_ex (new __1); }
-class __1 : Ex {
+auto _1 (E e) { return e.add_klass (new __1); }
+class __1 : Klass {
     override string toString () { return typeof(this).stringof; }
 
     override 
     void  
-    _set_e_prop (Event* evt, E_ui e) {
+    _set_e_prop (Event* evt, E e) {
         with (Event.Type)
         with (e) {
             on (CLICK, Event (Event_play (PLAY,1)));
         }
     }
 }
-auto _2 (E_ui e) { return e.add_ex (new __2); }
-class __2 : Ex {
+auto _2 (E e) { return e.add_klass (new __2); }
+class __2 : Klass {
     override string toString () { return typeof(this).stringof; }    
 
     override 
     void  
-    _set_e_prop (Event* evt, E_ui e) {
+    _set_e_prop (Event* evt, E e) {
         with (e) {
             on_click_send_evt_type = Event.Type.PLAY;
             on_click_send_evt_arg  = 2; // Arg (int,string)
@@ -238,13 +289,13 @@ class __2 : Ex {
         }
     }
 }
-auto _3 (E_ui e) { return e.add_ex (new __3); }
-class __3 : Ex {
+auto _3 (E e) { return e.add_klass (new __3); }
+class __3 : Klass {
     override string toString () { return typeof(this).stringof; }    
 
     override 
     void  
-    _set_e_prop (Event* evt, E_ui e) {
+    _set_e_prop (Event* evt, E e) {
         with (e) {
             on_click_send_evt_type = Event.Type.PLAY;
             on_click_send_evt_arg  = 3; // Arg (int,string)
@@ -255,14 +306,14 @@ class __3 : Ex {
         }
     }
 }
-auto loc2 (E_ui e) { return e.add_ex (new Loc2); }
+auto loc2 (E e) { return e.add_klass (new Loc2); }
 class 
-Loc2 : Ex {
+Loc2 : Klass {
     override string toString () { return typeof(this).stringof; }
 
     override
     void  
-    _set_e_prop (Event* evt, E_ui e) {
+    _set_e_prop (Event* evt, E e) {
         with (e) {
             w = 34.perc;
             h = Coord.parent_h;
@@ -276,14 +327,14 @@ Loc2 : Ex {
         }
     }
 }
-auto clock (E_ui e) { return e.add_ex (new Clock); }
+auto clock (E e) { return e.add_klass (new Clock); }
 class 
-Clock : Ex {
+Clock : Klass {
     override string toString () { return typeof(this).stringof; }
 
     override
     void  
-    _set_e_prop (Event* evt, E_ui e) {
+    _set_e_prop (Event* evt, E e) {
         with (e) {
             w = 33.perc;
             h = Coord.parent_h;
@@ -297,14 +348,14 @@ Clock : Ex {
         }
     }
 }
-auto loc3 (E_ui e) { return e.add_ex (new Loc3); }
+auto loc3 (E e) { return e.add_klass (new Loc3); }
 class 
-Loc3 : Ex {
+Loc3 : Klass {
     override string toString () { return typeof(this).stringof; }
 
     override
     void  
-    _set_e_prop (Event* evt, E_ui e) {
+    _set_e_prop (Event* evt, E e) {
         with (e) {
             w = 33.perc;
             h = Coord.parent_h;
@@ -318,13 +369,13 @@ Loc3 : Ex {
         }
     }
 }
-auto indicator (E_ui e) { return e.add_ex (new Indicator); }
-class Indicator : Ex {
+auto indicator (E e) { return e.add_klass (new Indicator); }
+class Indicator : Klass {
     override string toString () { return typeof(this).stringof; }
 
     override
     void  
-    _set_e_prop (Event* evt, E_ui e,) {
+    _set_e_prop (Event* evt, E e,) {
         with (e) {
             w = Coord.parent_h;
             h = Coord.parent_h;

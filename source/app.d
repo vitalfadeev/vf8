@@ -144,7 +144,7 @@ O3 : O!(Event) {
             case SET_E_PROP:
             case LAYOUT:
             case DRAW:
-                gui.e.go (evt, gui.e);
+                gui.e.go (evt);
                 break;
             default:
         }
@@ -197,22 +197,21 @@ O3 : O!(Event) {
     }
 }
 
-import e_class : E_ui;
-alias E = E_ui;
+import e_class : E;
 
 void
 send_e_now (E e, Event* evt) {
-    e.go (evt,e);
+    e.go (evt);
 }
 
 void
 send_e_now (E e, Event evt) {
-    e.go (&evt,e);
+    e.go (&evt);
 }
 
 struct
 Gui {
-    E_ui e;
+    E e;
 
     void
     open () {
@@ -226,13 +225,13 @@ Gui {
         this.e = load_ui.load_ui ();
     }
 
-    E_ui
+    E
     select (int x, int y) {
         return select (e,x,y);
     }
 
-    E_ui
-    select (E_ui e, int x, int y) {
+    E
+    select (E e, int x, int y) {
         if (e !is null)
         if (_select (e,x,y)) {
             // childs
@@ -249,7 +248,7 @@ Gui {
     }
 
     bool
-    _select (E_ui e, int x, int y) {
+    _select (E e, int x, int y) {
         auto _xy = e.xy;
         if (_xy.x <= x && _xy.y < y) {
             auto _wh = e.wh;
@@ -336,6 +335,3 @@ Gui {
 // on e-end
 
 // on char
-
-
-

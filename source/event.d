@@ -155,7 +155,7 @@ Event_layout {
 
     template
     tpl () {
-        mixin Xywh!E_ui;
-        mixin Layout!E_ui;        
+        mixin Xywh!E;
+        mixin Layout!E;        
     }
 }
