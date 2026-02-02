@@ -3,11 +3,13 @@ module e_class;
 import std.stdio  : writefln;
 import std.stdio  : writeln;
 import std.format : format;
+import attrs;
 import klass;
 import childs_parent;
 import layout;
 import event;
 import on;
+import app : O=O3;
 import std.string : toStringz;
 
 //
@@ -19,54 +21,33 @@ GO {
 class
 E_base {
     void 
-    go (Event* evt, E_base e) {
+    go (Event* evt) {
         //
     }
 }
 
 class
 E {
-    mixin Klass.tpl;
-    mixin Event_layout.tpl;
-    mixin Event_draw.tpl;
-    mixin Event_click.tpl;
-    mixin Childs_parent!(typeof(this));
+    Type     type;
+    mixin    Attrs;
+    mixin    Klass.tpl;
+    mixin    Event_layout.tpl;
+    mixin    Event_draw.tpl;
+    mixin    Event_click.tpl;
+    mixin    Childs_parent!(typeof(this));
     On!Event on;
 
     void 
-    go (Event* evt) {
-        writefln ("Event: %s", *evt);
-
-        // next
-        foreach (k; klasses) k.go (evt,this);
-
-        // universal event emitter
-        //universal_event_emitter.go (evt.type);
-
-        // childs
-        with (evt.Type)
-        switch (evt.type) {
-            case SET_E_PROP :
-                with (evt.set_e_prop)
-                foreach (_e; childs) _e.go (evt);
-                break;
-            case LAYOUT :
-                writefln ("%s:", this, childs_layout.a);
-                with (evt.layout)
-                if (has_childs) go_layout (evt);
-                foreach (_e; childs) _e.go (evt);
-                break;
-            case DRAW :
-                with (evt.draw) {
-                    draw_rect (canvas,xy,wh,fg);
-                    draw_text (canvas,xy,wh,text);
-                    foreach (_e; childs) _e.go (evt);
-                }
-                break;
-            default: /*each (o,e,evt);*/
-        }
+    go (Event* evt, O o) {
+        //
     }
 
+    void
+    set_e_prop (Klass k) {
+        foreach (a; k.attrs) {
+            this.attrs[a.id] = a.value;
+        }
+    }
 
     //override
     //void  
@@ -81,9 +62,9 @@ E {
     //}
 
     void
-    each (Event* evt) {
+    each (Event* evt, O o) {
         foreach (_e; childs)
-            _e.go (evt);
+            _e.go (evt,o);
     }
 
     override
@@ -97,6 +78,16 @@ E {
         s ~= ")";
         return s;
 
+    }
+
+    enum 
+    Type {
+        _,
+        BUTTON,
+        CHECK,
+        RADIO,
+        TEXT,
+        TEXTAREA,
     }
 }
 
@@ -160,10 +151,22 @@ dump_tree (E e, int level=0) {
 
 // e
 //   e button
+//   e button pressed
+//   e button released
+//   e button undefined
+//   e
+//   e button group pressed
+//   e button group
+//   e button group
 //
 // button
-//   released
-//     img = btn-released
-//   pressed
-//     img = btn-pressed
-
+//   img = btn-released
+//   state = pressed                      // auto-dublicate stato by adding klass "pressed"
+//   state = pressed,released
+//   state = released,pressed
+//   state = pressed,released,undefined   // 1st sstate - current, rotate, next released
+//   state =         released,undefined,pressed  
+//   state =                  undefined,pressed,released
+//
+// pressed
+//   img = btn-pressed

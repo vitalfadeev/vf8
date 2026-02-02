@@ -131,6 +131,11 @@ O3 : O!(Event) {
                     default:
                 }
                 break;
+            case REDRAW:
+                video.draw_start (this,evt);
+                send_now!(Event.Type.DRAW, "draw", "canvas") (video.canvas);
+                video.draw_end   (this,evt);
+                break;
             default:
         }
     }
@@ -144,32 +149,80 @@ O3 : O!(Event) {
             case SET_E_PROP:
             case LAYOUT:
             case DRAW:
-                gui.e.go (evt);
+                gui.e.go (evt,this);
                 break;
             default:
         }
         // keys
         with (evt.Type)
         switch (evt.type) {
+            case SET_E_PROP :
+                with (evt.set_e_prop)
+                foreach (e; gui.e.childs_recursive ()) {
+                    foreach (k; e.klasses) e.set_e_prop (k);
+                }
+                break;
+            case LAYOUT :
+                with (evt.layout)
+                foreach (e; gui.e.childs_recursive ()) {
+                    if (e.has_childs) e.go_layout (evt);
+                }
+                break;
+            case DRAW :
+                with (evt.draw)
+                foreach (e; gui.e.childs_recursive ()) {
+                    with (e) 
+                    switch (e.type) with (e.type) {
+                    case BUTTON:
+                        //switch (e.state) {
+                        //case PRESSED:
+                        //    draw_rect (canvas,xy,wh,bg,fg);
+                        //    draw_text (canvas,xy,wh,text);
+                        //    break;
+                        //case RELEASED:
+                        //    draw_rect (canvas,xy,wh,bg,fg);
+                        //    draw_text (canvas,xy,wh,text);
+                        //    break;
+                        //default:
+                        //}
+                        break;
+                    default:
+                        //draw_rect (canvas,xy,wh,bg,fg);
+                        //draw_text (canvas,xy,wh,text);
+                    }
+                }
+                break;
             case SDL:
                 with (evt.sdl.sdl_event)
                 if (type == SDL_MOUSEBUTTONDOWN)
                 with (button)
                 switch (button) {
-                    case SDL_BUTTON_LEFT : 
-                        auto _mouse_over_e = gui.select (x,y);
-                        if (_mouse_over_e !is null) {
-                            send_now (Event (Event_click (CLICK, x, y)));
+                case SDL_BUTTON_LEFT : 
+                    auto _mouse_over_e = gui.select (x,y);
+                    if (_mouse_over_e !is null) {
+                        writeln ("_mouse_over_e");
+                        switch (_mouse_over_e.type) {
+                        case E.Type.BUTTON:
+                            // call button.SDL.SDL_BUTTON_LEFT ()
+                            //_mouse_over_e.go (evt,this);
+                            //send_now (Event (Event_click (CLICK, x, y)));
+
+                            //_mouse_over_e.state = PRESSED;
+                            //send (SET_E_PROP);
+                            //send (REDRAW);
+                            break;
+                        default:
                         }
-                        break;
-                    default:
+                    }
+                    break;
+                default:
                 }
                 break;
             case CLICK:
                 with (evt.click) {
                     auto _mouse_over_e = gui.select (x,y);
                     if (_mouse_over_e !is null) {
-                        _mouse_over_e.on.go (CLICK, this, _mouse_over_e);
+                        _mouse_over_e.on.go (CLICK, _mouse_over_e, this);
                     }
                 }
                 break;
@@ -200,13 +253,13 @@ O3 : O!(Event) {
 import e_class : E;
 
 void
-send_e_now (E e, Event* evt) {
-    e.go (evt);
+send_e_now (O) (E e, Event* evt, O o) {
+    e.go (evt,o);
 }
 
 void
-send_e_now (E e, Event evt) {
-    e.go (&evt);
+send_e_now (O) (E e, Event evt, O o) {
+    e.go (&evt,o);
 }
 
 struct

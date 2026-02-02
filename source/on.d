@@ -5,13 +5,13 @@ On (Event) {
     Rec[] recs;
 
     void
-    go (O,E) (Event.Type type, O o, E e) {
+    go (O,E) (Event.Type type, E e, O o) {
         auto rec = select (type);
         if (rec !is null) {
             if (rec.new_event.type)
                 o.send (&rec.new_event);
             if (rec.fn !is null)
-                rec.fn (&rec.new_event, rec.data, cast (void*) o, cast (void*) e);
+                rec.fn (&rec.new_event, rec.data, cast (void*) e, cast (void*) o);
         }
     }
 
@@ -61,5 +61,5 @@ On (Event) {
         void*      data;
     }
 
-    alias FN = void function (Event* evt, void* data, void* o, void* e);
+    alias FN = void function (Event* evt, void* data, void* e, void* o);
 }

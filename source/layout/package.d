@@ -17,7 +17,7 @@ Layout (E) {
 
     void
     go_layout (Event* evt) {
-        switch (childs_layout.a) with (A) {
+        switch (childs_layout.a) with (childs_layout.a) {
             case _: 
                 goto default;
                 break;
@@ -35,33 +35,33 @@ Layout (E) {
         }        
     }
 
-    A left_aligned   (A a = A._) { return a | A.left_aligned; }
-    A center_aligned (A a = A._) { return a | A.center_aligned; }
-    A right_aligned  (A a = A._) { return a | A.right_aligned; }
-    A stacked        (A a = A._) { return a | A.stacked; }
-    A to_right       (A a = A._) { return a | A.to_right; }
-    A to_left        (A a = A._) { return a | A.to_left; }
+    //A left_aligned   (A a = A._) { return a | A.left_aligned; }
+    //A center_aligned (A a = A._) { return a | A.center_aligned; }
+    //A right_aligned  (A a = A._) { return a | A.right_aligned; }
+    //A stacked        (A a = A._) { return a | A.stacked; }
+    //A to_right       (A a = A._) { return a | A.to_right; }
+    //A to_left        (A a = A._) { return a | A.to_left; }
 }
 
 struct
 Childs_layout (E) {
-    A a;
+    Type a;
 
     alias FN = void function (E _this);
 
     // childs_layout = left_aligned.stacked.to_right;
     void
-    opAssign (A b) {
+    opAssign (Type b) {
         a = b;
     }
     bool
-    opEquals (A b) {
+    opEquals (Type b) {
         return (a == b);
     }
 }
 
 enum
-A {
+Type {
     _,
     left_aligned   = 0b0000_0001,
     right_aligned  = 0b0000_0010,

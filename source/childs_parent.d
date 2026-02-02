@@ -54,5 +54,42 @@ Childs_parent (E) {
             return result;
         }
     }
+
+    auto
+    childs_recursive () {
+        return childs_recursive_range (this);
+    }
+
+    struct
+    childs_recursive_range {
+        E _this;
+
+        E front;
+        bool empty () { return front is null; }
+        void
+        popFront () {
+            auto e = front;
+            // go down
+            go_down:
+            if (e.cl !is null) {
+                front = e.cl;
+                return;
+            }
+            // go right
+            go_right:
+            if (e.r !is null) {
+                front = e.r;
+                return;
+            }
+            // go up
+            if (e.parent !is null) {
+                front = e.parent;
+                goto go_right;
+            }
+            // end
+            front = null;
+        }
+    }
+
 }
 

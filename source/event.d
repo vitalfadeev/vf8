@@ -4,6 +4,7 @@ struct
 Event {
 union {
     Type             type;
+    Event_base       base;
     Event_sdl        sdl;
     Event_open       open;
     Event_quit       quit;
@@ -32,6 +33,7 @@ union {
         SDL,
         // video
         DRAW,
+        REDRAW,
         // audio
         PLAY,
         // ui
@@ -40,6 +42,11 @@ union {
         LAYOUT,
         CLICK,
     }
+}
+struct
+Event_base {
+    Event.Type type;
+    void* o;
 }
 struct
 Event_sdl {
@@ -66,18 +73,22 @@ Event_draw {
     import importc;
     import layout;
     void
-    draw_rect (Tvg_Canvas canvas, XY xy, XY wh, Color fg) {
-        ubyte bg_r = (fg >>  0) & 0xFF;
-        ubyte bg_g = (fg >>  8) & 0xFF;
-        ubyte bg_b = (fg >> 16) & 0xFF;
-        ubyte bg_a = (fg >> 24) & 0xFF;
+    draw_rect (Tvg_Canvas canvas, XY xy, XY wh, Color bg, Color fg) {
+        ubyte fg_r = (fg >>  0) & 0xFF;
+        ubyte fg_g = (fg >>  8) & 0xFF;
+        ubyte fg_b = (fg >> 16) & 0xFF;
+        ubyte fg_a = (fg >> 24) & 0xFF;
+
+        ubyte bg_r = (bg >>  0) & 0xFF;
+        ubyte bg_g = (bg >>  8) & 0xFF;
+        ubyte bg_b = (bg >> 16) & 0xFF;
+        ubyte bg_a = (bg >> 24) & 0xFF;
 
         Tvg_Paint shape = tvg_shape_new ();
-        //tvg_shape_append_rect (shape, x, y, w, h, 0.0f, 0.0f, true);
         tvg_shape_append_rect (shape, xy.x, xy.y, wh.w, wh.h, 0.0f, 0.0f, true);
-        //tvg_shape_set_fill_color (shape, bg_r, bg_g, bg_b, bg_a);
+        tvg_shape_set_fill_color (shape, bg_r, bg_g, bg_b, bg_a);
         tvg_shape_set_stroke_width (shape, 1);
-        tvg_shape_set_stroke_color (shape, bg_r, bg_g, bg_b, bg_a);
+        tvg_shape_set_stroke_color (shape, fg_r, fg_g, fg_b, fg_a);
 
         //Push the shape into the canvas
         tvg_canvas_push (canvas, shape);

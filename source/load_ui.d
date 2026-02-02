@@ -2,8 +2,11 @@ module load_ui;
 
 import e_class;
 import event;
+import attrs;
 import klass;
 import layout;
+import importc;
+import app : O=O3;
 import std.stdio : writeln;
 
 
@@ -92,297 +95,123 @@ parent (E e) {
     return e.parent;
 }
 
-auto window (E e) { return e.add_klass (new Window); }
-class
-Window : Klass {
-    override
-    void  
-    _set_e_prop (Event* evt, E e) {
-        with (e) {
-            x = 0;
-            y = 0;
-            w = Desktop.w;
-            h = 64;
-        }
-        with (e) {
-           fg = 0xFF00FF00;
-           //     aabbggrr
-        }
+auto window (E e) { 
+    auto k = new Klass (__FUNCTION__);
+    with (k) {
+        x  = 0;
+        y  = 0;
+        w  = Desktop.w;
+        h  = 64;
+        fg = 0xFF00FF00;
+        //     aabbggrr
+        return e.add_klass (k);
     }
 }
-auto panel (E e) { return e.add_klass (new Panel); }
-class Panel  : Klass {
-    override string toString () { return typeof(this).stringof; }    
-
-    override
-    void  
-    _set_e_prop (Event* evt, E e) {        
-        with (e) {
-           childs_layout = A.left_aligned_stacked_to_right;
-        }
+auto panel (E e) { 
+    auto k = new Klass (__FUNCTION__);
+    with (k) {
+        import layout : Layout_Type=Type;
+        childs_layout = Layout_Type.left_aligned_stacked_to_right;
+        return e.add_klass (k);
     }
 }
-auto canvas (E e) { return e.add_klass (new Canvas); }
-class Canvas : Klass {
-    override string toString () { return typeof(this).stringof; }
-}
-auto loc1 (E e) { return e.add_klass (new Loc1); }
-class 
-Loc1 : Klass {
-    override string toString () { return typeof(this).stringof; }
-
-    override
-    void  
-    _set_e_prop (Event* evt, E e) {        
-        with (e) with (Coord) {
-           w = 33.perc;
-           h = parent_h;
-        }
-        with (e) {
-           //childs_layout = left_aligned.stacked.to_right;
-           childs_layout = A.left_aligned_stacked_to_right;
-        }
-        with (e) {
-           fg = 0x88444444;
-        }
+auto canvas (E e) {
+    auto k = new Klass (__FUNCTION__);
+    with (k) {
+        return e.add_klass (k);
     }
 }
-auto button (E e) { return e.add_klass (new Button); }
-class Button : Klass {
-    // childs
-    //   pressed
-    //   released
-    State state;
-
-    enum
-    State {
-        RELEASED,
-        PRESSED,
-    }
-
-    override
-    void
-    go (Event* evt, E e) {
-        switch (state) with (State) {
-            case RELEASED : released.go (evt,e); break;
-            case PRESSED  : pressed .go (evt,e); break;
-            default:
-        }
-        super.go (evt,e);
-    }
-
-    Released released;
-    Pressed  pressed;
-
-    struct
-    Released {
-        string img = "button-released";
-
-        void
-        go (Event* evt, E e) {
-            //
-        }        
-    }
-    struct
-    Pressed {
-        string img = "button-pressed";
-
-        void
-        go (Event* evt, E e) {
-            //
-        }        
-    }
-
-    override string toString () { return typeof(this).stringof; }
-
-    //
-    void draw () {};
-    void on () {};
-
-    override
-    void  
-    _set_e_prop (Event* evt, E e) {
-        with (e) {
-           w = Coord.parent_h;
-        }
-        with (e) {
-           fg = 0xFFFF0000;
-        }
-        with (Event.Type)
-        with (e) {
-           on (CLICK, Event (), &on_click);
-        }
-    }
-
-    static
-    void
-    on_click (Event* evt, void* data, void* o, void* e) {
-        writeln ("on_click");
-        with (cast (Button) e) {
-            toggle_pressed ();
-        }
-    }
-
-    //override
-    //void
-    //go (Event* evt, E e) {
-    //    with (e)
-    //    with (evt.Type)
-    //    switch (evt.type) {
-    //        case CLICK: toggle_pressed (); break;
-    //        default:
-    //    }
-    //    super.go (evt,e);
-    //}
-
-    void
-    toggle_pressed () {
-        is_pressed ? _release () : _press (); 
-    }
-
-    bool
-    is_pressed () {
-        // has ex pressed
-        return true;
-    }
-
-    void
-    _press () {
-        // add ex pressed
-    }
-
-    void 
-    _release () {
-        // rem ex pressed
+auto loc1 (E e) {
+    auto k = new Klass (__FUNCTION__);
+    with (k) {
+        w  = 33.perc;
+        h  = parent_h;
+        import layout : Layout_Type=Type;
+        childs_layout = Layout_Type.left_aligned_stacked_to_right;
+        fg = 0x88444444;
+        //     aabbggrr
+        return e.add_klass (k);
     }
 }
-class Pressed : Klass {
-    override string toString () { return typeof(this).stringof; }
-}
-auto _1 (E e) { return e.add_klass (new __1); }
-class __1 : Klass {
-    override string toString () { return typeof(this).stringof; }
-
-    override 
-    void  
-    _set_e_prop (Event* evt, E e) {
-        with (Event.Type)
-        with (e) {
-            on (CLICK, Event (Event_play (PLAY,1)));
-        }
+auto button (E e) { 
+    auto k = new Klass (__FUNCTION__);
+    with (k) {
+        w  = parent_h;
+        bg = 0xFF00FF00;
+        fg = 0xFFFF0000;
+        //     aabbggrr
+        // on (CLICK, Event (), &on_click);
+        return e.add_klass (k);
     }
 }
-auto _2 (E e) { return e.add_klass (new __2); }
-class __2 : Klass {
-    override string toString () { return typeof(this).stringof; }    
-
-    override 
-    void  
-    _set_e_prop (Event* evt, E e) {
-        with (e) {
-            on_click_send_evt_type = Event.Type.PLAY;
-            on_click_send_evt_arg  = 2; // Arg (int,string)
-        }
-        with (Event.Type)
-        with (e) {
-            on (CLICK, Event (Event_play (PLAY,2)));
-        }
+auto pressed (E e) { 
+    auto k = new Klass (__FUNCTION__);
+    with (k) {
+        bg = 0xFFCCCCCC;
+        //     aabbggrr
+        return e.add_klass (k);
     }
 }
-auto _3 (E e) { return e.add_klass (new __3); }
-class __3 : Klass {
-    override string toString () { return typeof(this).stringof; }    
-
-    override 
-    void  
-    _set_e_prop (Event* evt, E e) {
-        with (e) {
-            on_click_send_evt_type = Event.Type.PLAY;
-            on_click_send_evt_arg  = 3; // Arg (int,string)
-        }
-        with (Event.Type)
-        with (e) {
-            on (CLICK, Event (Event_play (PLAY,3)));
-        }
+auto _1 (E e) {
+    auto k = new Klass (__FUNCTION__);
+    with (k) {
+        // on (CLICK, Event (Event_play (PLAY,1)));
+        return e.add_klass (k);
     }
 }
-auto loc2 (E e) { return e.add_klass (new Loc2); }
-class 
-Loc2 : Klass {
-    override string toString () { return typeof(this).stringof; }
-
-    override
-    void  
-    _set_e_prop (Event* evt, E e) {
-        with (e) {
-            w = 34.perc;
-            h = Coord.parent_h;
-        }
-        with (e) {
-           //childs_layout = center_aligned.stacked.to_right;
-           childs_layout = A.center_aligned_stacked_to_right;
-        }
-        with (e) {
-            fg = 0x88444444;
-        }
+auto _2 (E e) { 
+    auto k = new Klass (__FUNCTION__);
+    with (k) {
+        //on (CLICK, Event (Event_play (PLAY,2)));
+        return e.add_klass (k);
     }
 }
-auto clock (E e) { return e.add_klass (new Clock); }
-class 
-Clock : Klass {
-    override string toString () { return typeof(this).stringof; }
-
-    override
-    void  
-    _set_e_prop (Event* evt, E e) {
-        with (e) {
-            w = 33.perc;
-            h = Coord.parent_h;
-        }
-        with (e) {
-            fg = 0xFFFFFFFF;
-        }
-        with (e) {
-            on_click_send_evt_type = Event.Type.PLAY;
-            on_click_send_evt_arg  = 1; // Arg (int,string)
-        }
+auto _3 (E e) { 
+    auto k = new Klass (__FUNCTION__);
+    with (k) {
+        // on (CLICK, Event (Event_play (PLAY,3)));
+        return e.add_klass (k);
     }
 }
-auto loc3 (E e) { return e.add_klass (new Loc3); }
-class 
-Loc3 : Klass {
-    override string toString () { return typeof(this).stringof; }
-
-    override
-    void  
-    _set_e_prop (Event* evt, E e) {
-        with (e) {
-            w = 33.perc;
-            h = Coord.parent_h;
-        }
-        with (e) {
-            //childs_layout = right_aligned.stacked.to_left;
-            childs_layout = A.right_aligned_stacked_to_left;
-        }
-        with (e) {
-            fg = 0x88444444;
-        }
+auto loc2 (E e) { 
+    auto k = new Klass (__FUNCTION__);
+    with (k) {
+        w = 34.perc;
+        h = parent_h;
+        import layout : Layout_Type=Type;
+        childs_layout = Layout_Type.center_aligned_stacked_to_right;
+        fg = 0x88444444;
+        return e.add_klass (k);
     }
 }
-auto indicator (E e) { return e.add_klass (new Indicator); }
-class Indicator : Klass {
-    override string toString () { return typeof(this).stringof; }
-
-    override
-    void  
-    _set_e_prop (Event* evt, E e,) {
-        with (e) {
-            w = Coord.parent_h;
-            h = Coord.parent_h;
-        }
-        with (e) {
-           fg = 0xFF0000FF;
-        }
+auto clock (E e) { 
+    auto k = new Klass (__FUNCTION__);
+    with (k) {
+        w  = 33.perc;
+        h  = parent_h;
+        fg = 0xFFFFFFFF;
+        //on_click_send_evt_type = Event.Type.PLAY;
+        //on_click_send_evt_arg  = 1; // Arg (int,string)
+        return e.add_klass (k);
     }
 }
-
+auto loc3 (E e) { 
+    auto k = new Klass (__FUNCTION__);
+    with (k) {
+        w  = 33.perc;
+        h  = parent_h;
+        import layout : Layout_Type=Type;
+        childs_layout = Layout_Type.right_aligned_stacked_to_left;
+        fg = 0x88444444;
+        return e.add_klass (k);
+    }
+}
+auto indicator (E e) { 
+    auto k = new Klass (__FUNCTION__);
+    with (k) {
+        w = parent_h;
+        h = parent_h;
+        fg = 0xFF0000FF;
+        return e.add_klass (k);
+    }
+}

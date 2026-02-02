@@ -1,40 +1,30 @@
 module klass;
 
 import e_class;
+import attrs;
 import event;
+import app : O=O3;
 
 
 class
 Klass {
     string name;
-    void* data1;
+    void*  data1;
+    mixin  Attrs;
 
-    void 
-    go (Event* evt, E e) {
-        with (evt.Type)
-        switch (evt.type) {
-            case SET_E_PROP :
-                _set_e_prop (evt,e);
-                break;
-            case LAYOUT :
-                //_layout (evt,e);
-                break;
-            case DRAW :
-                //_draw (evt,e);
-                break;
-            default:
-        }
+    this (string name) {
+        this.name = name;
     }
 
-    void
-    _set_e_prop (Event* evt, E e) {
+    void 
+    go (Event* evt) {
         //
     }
 
     override
     string
     toString () {
-        return typeof(this).stringof;
+        return name;
     }
 
     mixin template
