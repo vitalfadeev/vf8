@@ -3,7 +3,7 @@ module attrs;
 
 mixin template 
 Attrs () {
-    A[Aid] attrs;
+    A[Aid.max+1] attrs;
 
     void x  (A   a) { attrs[Aid.x] = a; }
     void x  (int a) { attrs[Aid.x] = A.Int (a); }
