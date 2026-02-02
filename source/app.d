@@ -7,6 +7,7 @@ import vf.video        : Video;
 import event;
 import importc;
 import std.stdio : writeln;
+import attrs : Calculated;
 
 
 extern(C)
@@ -22,7 +23,7 @@ main () {
     o.send_now (Event.Type.SET_E_PROP);
     o.send_now (Event.Type.LAYOUT);
 
-    import e_class : dump_tree;
+    import e_class : dump_tree,dump_tree2;
     dump_tree (o.gui.e);
 
     o.go ();   // event loop
@@ -142,17 +143,17 @@ O3 : O!(Event) {
 
     void
     mod_ui_go (Event* evt) {
-        if (gui.e !is null)
-        with (evt.Type)
-        switch (evt.type) {
-            case UPDATE:
-            case SET_E_PROP:
-            case LAYOUT:
-            case DRAW:
-                gui.e.go (evt,this);
-                break;
-            default:
-        }
+        //if (gui.e !is null)
+        //with (evt.Type)
+        //switch (evt.type) {
+        //    case UPDATE:
+        //    case SET_E_PROP:
+        //    case LAYOUT:
+        //    case DRAW:
+        //        gui.e.go (evt,this);
+        //        break;
+        //    default:
+        //}
         // keys
         with (evt.Type)
         switch (evt.type) {
@@ -173,7 +174,7 @@ O3 : O!(Event) {
                 foreach (e; gui.e.childs_recursive ()) {
                     with (e) 
                     switch (e.type) with (e.type) {
-                    case BUTTON:
+                    //case BUTTON:
                         //switch (e.state) {
                         //case PRESSED:
                         //    draw_rect (canvas,xy,wh,bg,fg);
@@ -185,10 +186,12 @@ O3 : O!(Event) {
                         //    break;
                         //default:
                         //}
-                        break;
+                        //break;
                     default:
-                        //draw_rect (canvas,xy,wh,bg,fg);
-                        //draw_text (canvas,xy,wh,text);
+                        with (Calculated!E (e)) {
+                            draw_rect (canvas,xy,wh,bg,fg);
+                            draw_text (canvas,xy,wh,text);
+                        }
                     }
                 }
                 break;

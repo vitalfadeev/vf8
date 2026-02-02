@@ -62,8 +62,6 @@ Childs_parent (E) {
 
     struct
     childs_recursive_range {
-        E _this;
-
         E front;
         bool empty () { return front is null; }
         void
@@ -83,7 +81,7 @@ Childs_parent (E) {
             }
             // go up
             if (e.parent !is null) {
-                front = e.parent;
+                e = e.parent;
                 goto go_right;
             }
             // end

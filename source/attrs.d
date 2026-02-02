@@ -20,9 +20,9 @@ Attrs () {
     import layout : Layout_Type=Type;
     void childs_layout (Layout_Type a) { attrs[Aid.l] = A.Layout(a); }
     void fg (A    a) { attrs[Aid.f] = a; }
-    void fg (uint a) { attrs[Aid.f] = A.Int (a); }
+    void fg (uint a) { attrs[Aid.f] = A.UInt (a); }
     void bg (A    a) { attrs[Aid.b] = a; }
-    void bg (uint a) { attrs[Aid.b] = A.Int (a); }
+    void bg (uint a) { attrs[Aid.b] = A.UInt (a); }
 
     A x  () { return attrs[Aid.x]; }
     A y  () { return attrs[Aid.y]; }
@@ -49,6 +49,7 @@ A {
     Type type;
     union {
         Int      _int;
+        UInt     _uint;
         Perc     _perc;
         Left     _left;
         Center   _center;
@@ -63,6 +64,7 @@ A {
         _,
         // Coord
         _int,
+        _uint,
         _perc,
         _left,
         _center,
@@ -77,6 +79,11 @@ A {
     struct
     Int {
         int a;
+    }
+
+    struct
+    UInt {
+        uint a;
     }
 
     struct
@@ -131,6 +138,11 @@ A {
         _int = b;
     }
     void
+    opAssign (UInt b) {
+        type = Type._uint;
+        _uint = b;
+    }
+    void
     opAssign (Perc b) {
         type = Type._perc;
         _perc = b;
@@ -181,3 +193,18 @@ static left     = A.Left ();
 static center   = A.Center ();
 static right    = A.Right ();
 static parent_h = A.Parent_h ();
+
+struct
+Calculated (E) {
+    E _this;
+
+    uint
+    bg () {
+        return _this.bg._uint.a;
+    }
+
+    uint
+    fg () {
+        return _this.fg._uint.a;
+    }
+}

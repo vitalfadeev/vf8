@@ -63,8 +63,8 @@ Event_draw {
 
     template
     tpl () {
-        Color  bg;
-        Color  fg;
+        Color  _bg;
+        Color  _fg;
         string text;
         alias Color = uint;
     }

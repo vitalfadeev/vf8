@@ -1,5 +1,7 @@
 module layout;
 
+import std.stdio : writeln;
+
 public import layout.stacked.to_right_down_left_aligned;
 public import layout.stacked.to_right_down_center_aligned;
 public import layout.stacked.to_left_down_right_aligned;
