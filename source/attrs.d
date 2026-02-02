@@ -12,7 +12,7 @@ Attrs () {
     void w  (A   a) { attrs[Aid.w] = a; }
     void w  (int a) { attrs[Aid.w] = A.Int (a); }
     void w  (A.Perc a) { attrs[Aid.w] = a; }
-    void w  (A.Parent_h a) { attrs[Aid.h] = a; }
+    void w  (A.Parent_h a) { attrs[Aid.w] = a; }
     void h  (A   a) { attrs[Aid.h] = a; }
     void h  (int a) { attrs[Aid.h] = A.Int (a); }
     void h  (A.Parent_h a) { attrs[Aid.h] = a; }
@@ -178,10 +178,6 @@ A {
         _layout = b;
     }
 
-    static left     = Left ();
-    static center   = Center ();
-    static right    = Right ();
-    static parent_h = Parent_h ();
 }
 
 auto
