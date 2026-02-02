@@ -44,8 +44,8 @@ E {
 
     void
     set_e_prop (Klass k) {
-        foreach (a; k.attrs) {
-            this.attrs[a.id] = a.value;
+        foreach (key,value; k.attrs) {
+            this.attrs[key] = value;
         }
     }
 
