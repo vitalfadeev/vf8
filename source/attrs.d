@@ -19,19 +19,21 @@ Attrs () {
     void childs_layout (A   a) { attrs[Aid.l] = a; }
     import layout : Layout_Type=Type;
     void childs_layout (Layout_Type a) { attrs[Aid.l] = A.Layout(a); }
-    void fg (A    a) { attrs[Aid.f] = a; }
-    void fg (uint a) { attrs[Aid.f] = A.UInt (a); }
-    void bg (A    a) { attrs[Aid.b] = a; }
-    void bg (uint a) { attrs[Aid.b] = A.UInt (a); }
-    void type (E.Type a) { attrs[Aid.t] = A.EType (a); }
+    void fg (A    a) { attrs[Aid.fg] = a; }
+    void fg (uint a) { attrs[Aid.fg] = A.UInt (a); }
+    void bg (A    a) { attrs[Aid.bg] = a; }
+    void bg (uint a) { attrs[Aid.bg] = A.UInt (a); }
+    void type (E.Type a) { attrs[Aid.tp] = A.EType (a); }
+    void hotkey (string a) { attrs[Aid.hk] = A.Hotkey (a); }
 
-    A x    () { return attrs[Aid.x]; }
-    A y    () { return attrs[Aid.y]; }
-    A w    () { return attrs[Aid.w]; }
-    A h    () { return attrs[Aid.h]; }
-    A fg   () { return attrs[Aid.f]; }
-    A bg   () { return attrs[Aid.b]; }
-    A type () { return attrs[Aid.t]; }
+    A x      () { return attrs[Aid.x]; }
+    A y      () { return attrs[Aid.y]; }
+    A w      () { return attrs[Aid.w]; }
+    A h      () { return attrs[Aid.h]; }
+    A fg     () { return attrs[Aid.fg]; }
+    A bg     () { return attrs[Aid.bg]; }
+    A type   () { return attrs[Aid.tp]; }
+    A hotkey () { return attrs[Aid.hk]; }
 
     auto
     calculated () {
@@ -48,10 +50,11 @@ Aid {
     y,
     w,
     h,
-    l,  // childs_layout
-    f,  // fg
-    b,  // bg
-    t,  // type  // BUTTON
+    l,   // childs_layout
+    fg,  // fg
+    bg,  // bg
+    tp,  // type  // BUTTON
+    hk,  // type  // BUTTON
 }
 
 struct
@@ -68,6 +71,7 @@ A {
         Parent_h _parent_h;
         Layout   _layout;
         EType    _etype;
+        Hotkey   _hotkey;
     }
 
     enum
@@ -86,6 +90,8 @@ A {
         _layout,
         // E Type
         _etype,
+        // hotkey
+        _hotkey,
     }
 
     //
@@ -146,6 +152,11 @@ A {
         E.Type a;
     }        
 
+    struct
+    Hotkey {
+        string a;
+    }
+
     void
     opAssign (int b) {
         type = Type._int;
@@ -200,6 +211,11 @@ A {
     opAssign (EType b) {
         type = Type._etype;
         _etype = b;
+    }
+    void
+    opAssign (Hotkey b) {
+        type = Type._hotkey;
+        _hotkey = b;
     }
 }
 

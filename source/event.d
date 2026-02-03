@@ -14,9 +14,13 @@ union {
     Event_set_e_prop set_e_prop;
     Event_layout     layout;
     Event_click      click;
+    Event_press      press;
+    Event_release    release;
+    Event_hotkey     hotkey;
 }
-    this (Event_play  evt) { play  = evt; }
-    this (Event_click evt) { click = evt; }
+    this (Event_play   evt) { play   = evt; }
+    this (Event_click  evt) { click  = evt; }
+    this (Event_hotkey evt) { hotkey = evt; }
 
     string
     toString () {
@@ -41,6 +45,9 @@ union {
         SET_E_PROP,
         LAYOUT,
         CLICK,
+        PRESS,
+        RELEASE,
+        HOTKEY,
     }
 }
 struct
@@ -127,6 +134,23 @@ Event_click {
         Event.Type on_click_send_evt_type;  // PLLAY
         int        on_click_send_evt_arg;   // 1
     }
+}
+struct
+Event_press {
+    auto type = Event.Type.PRESS;
+    int  x;
+    int  y;
+}
+struct
+Event_release {
+    auto type = Event.Type.RELEASE;
+    int  x;
+    int  y;
+}
+struct
+Event_hotkey {
+    auto type = Event.Type.HOTKEY;
+    void* e;
 }
 
 struct

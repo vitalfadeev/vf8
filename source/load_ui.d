@@ -71,13 +71,19 @@ load_ui (O) (O o) {
     e .window .panel .canvas  // {o,e}
         .e .loc1
             .e .button ._1  
-                .on (Event.Type.CLICK, &o._on_click_1)
+                .on (Event.Type.PRESS,  &o._on_click_1)
+                .on (Event.Type.HOTKEY, &o._on_click_1)
+                .hotkey ("a")
                 .parent
             .e .button ._2  
-                .on (Event.Type.CLICK, &o._on_click_2)
+                .on (Event.Type.PRESS,  &o._on_click_2)
+                .on (Event.Type.HOTKEY, &o._on_click_2)
+                .hotkey ("s")
                 .parent
             .e .button ._3  
-                .on (Event.Type.CLICK, &o._on_click_3)
+                .on (Event.Type.PRESS,  &o._on_click_3)
+                .on (Event.Type.HOTKEY, &o._on_click_3)
+                .hotkey ("d")
                 .parent.parent
         .e .loc2
             .e .button .clock  .parent.parent
@@ -110,6 +116,12 @@ OE (O) {
     auto
     on (Event_Type,DG) (Event_Type type, DG dg) {
         _e.on (type,dg);
+        return this;
+    }
+
+    auto
+    hotkey (string s) {
+        _e.hotkey = s;
         return this;
     }
 
@@ -160,7 +172,7 @@ load_klasses (O o) {
         w    = parent_h;
         bg   = 0xFF003300;
         fg   = 0xFFFF0000;
-        //     aabbggrr
+        //       aabbggrr
         // on (CLICK, Event (), &on_click);
     }
 

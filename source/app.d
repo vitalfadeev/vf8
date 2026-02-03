@@ -55,6 +55,7 @@ O3 : O!(Event) {
         mod_key_go      (evt);
         mod_video       (evt);
         mod_ui_go       (evt);
+        mod_ui_widget_hotkey (evt,gui.e);
     }
 
     void
@@ -150,20 +151,49 @@ O3 : O!(Event) {
                     }
                 }
                 break;
+            case PRESS:
+                with (evt.release) {
+                    auto _mouse_over_e = gui.select (x,y);
+                    if (_mouse_over_e !is null) {
+                        mod_ui_widget_go (evt,_mouse_over_e);
+                        _mouse_over_e._on.go (evt,_mouse_over_e);
+                    }
+                }
+                break;
+            case RELEASE:
+                with (evt.press) {
+                    auto _mouse_over_e = gui.select (x,y);
+                    if (_mouse_over_e !is null) {
+                        mod_ui_widget_go (evt,_mouse_over_e);
+                        send (Event (Event_click (CLICK, x, y)));
+                        _mouse_over_e._on.go (evt,_mouse_over_e);
+                    }
+                }
+                break;
+            case CLICK:
+                with (evt.click) {
+                    auto _mouse_over_e = gui.select (x,y);
+                    if (_mouse_over_e !is null) {
+                        _mouse_over_e._on.go (evt,_mouse_over_e);
+                    }
+                }
+                break;
+            case HOTKEY:
+                with (evt.hotkey) {
+                    auto _hotkey_e = cast (E) e;
+                    if (_hotkey_e !is null) {
+                        _hotkey_e._on.go (evt,_hotkey_e);
+                    }
+                }
+                break;
             case SDL:
                 with (evt.sdl.sdl_event)
                 switch (type) {
                 case SDL_MOUSEBUTTONDOWN: 
                     with (button)
                     switch (button) {
-                    case SDL_BUTTON_LEFT : 
-                        auto _mouse_over_e = gui.select (x,y);
-                        if (_mouse_over_e !is null) {
-                            writeln ("_mouse_over_e down");
-                            with (Calculated!E (_mouse_over_e))
-                            send (Event (Event_click (CLICK, x, y)));
-                            mod_ui_widget_go (evt,_mouse_over_e);
-                        }
+                    case SDL_BUTTON_LEFT:
+                        send (Event (Event_click (PRESS,x,y)));
                         break;
                     default:
                     }
@@ -172,25 +202,12 @@ O3 : O!(Event) {
                     with (button)
                     switch (button) {
                     case SDL_BUTTON_LEFT : 
-                        auto _mouse_over_e = gui.select (x,y);
-                        if (_mouse_over_e !is null) {
-                            writeln ("_mouse_over_e up");
-                            mod_ui_widget_go (evt,_mouse_over_e);
-                        }
+                        send (Event (Event_click (RELEASE,x,y)));
                         break;
                     default:
                     }
                     break;
                 default:
-                }
-                break;
-            case CLICK:
-                writeln ("CLICK");
-                with (evt.click) {
-                    auto _mouse_over_e = gui.select (x,y);
-                    if (_mouse_over_e !is null) {
-                        _mouse_over_e._on.go (evt, _mouse_over_e);
-                    }
                 }
                 break;
             default:
@@ -202,42 +219,19 @@ O3 : O!(Event) {
         with (e) 
         switch (e.type._etype.a) with (E.Type) {
         case BUTTON:
-            with (evt.Type)
-            switch (evt.type) {
-            case SDL:
-                with (evt.sdl.sdl_event)
-                switch (type) {
-                case SDL_MOUSEBUTTONDOWN: 
-                    with (button)
-                    switch (button) {
-                    case SDL_BUTTON_LEFT: 
-                        // pressed
-                        //this.klasses.pressed;
-                        if (e.has_klass ("pressed") is null) {
-                            e.add_klass (select_klass ("pressed"));
-                            send (SET_E_PROP);
-                            send (REDRAW);
-                        }
-                        break;
-                    default:
-                    }
-                    break;
-                case SDL_MOUSEBUTTONUP: 
-                    with (button)
-                    switch (button) {
-                    case SDL_BUTTON_LEFT: 
-                        // released
-                        if (e.has_klass ("pressed") !is null) {
-                            writeln ("has_klass: ", select_klass ("pressed"));
-                            e.rem_klass (select_klass ("pressed"));
-                            send (SET_E_PROP);
-                            send (REDRAW);
-                        }
-                        break;
-                    default:
-                    }
-                    break;
-                default:
+            switch (evt.type) with (evt.type) {
+            case PRESS:
+                if (e.has_klass ("pressed") is null) {
+                    e.add_klass (select_klass ("pressed"));
+                    send (SET_E_PROP);
+                    send (REDRAW);
+                }
+                break;
+            case RELEASE: 
+                if (e.has_klass ("pressed") !is null) {
+                    e.rem_klass (select_klass ("pressed"));
+                    send (SET_E_PROP);
+                    send (REDRAW);
                 }
                 break;
             default:
@@ -251,6 +245,28 @@ O3 : O!(Event) {
             break;
         default:
         }
+    }
+
+    void
+    mod_ui_widget_hotkey (Event* evt, E e) {
+        auto hotkeys = collect_hotkeys (e);
+
+        with (evt.Type)
+        switch (evt.type) {
+            case SDL:
+                with (event.sdl.sdl_event)
+                if (type == SDL_KEYDOWN) {
+                    foreach (ref hke; hotkeys) {
+                        if (hke.hk.length)
+                        if (key.keysym.sym == hke.hk[0]) {
+                            send (Event (Event_hotkey (HOTKEY,cast(void*)hke.e)));
+                        }
+                    }
+                }
+                break;
+            default:
+        }
+
     }
 
     void
@@ -311,17 +327,29 @@ O3 : O!(Event) {
     }
 }
 
+auto
+collect_hotkeys (E e) {
+    HKE[] hotkeys;
+
+    foreach (_e; e.childs_recursive) {
+        auto hk = _e.hotkey;
+        if (hk.type == hk.Type._hotkey) {            
+            if (hk._hotkey.a) {
+                hotkeys ~= HKE (_e,hk._hotkey.a);
+            }
+        }
+    }
+
+    return hotkeys;
+}
+
+struct
+HKE {
+    E      e;
+    string hk;
+}
+
 import e_class : E;
-
-void
-send_e_now (O) (E e, Event* evt, O o) {
-    e.go (evt,o);
-}
-
-void
-send_e_now (O) (E e, Event evt, O o) {
-    e.go (&evt,o);
-}
 
 struct
 Gui {
@@ -450,3 +478,13 @@ Gui {
 // on e-end
 
 // on char
+
+// key Q -> Play 1
+//          btn 1 state pressed
+// btn 1 -> btn 1 state pressed
+//          Play 1
+//
+// hotkey
+// colect_hotkeys
+//   bind HOTKEY, PLAY 1
+//   bind CLICK,  PLAY 1
