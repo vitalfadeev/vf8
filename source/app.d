@@ -8,6 +8,7 @@ import event;
 import importc;
 import std.stdio : writeln;
 import attrs : Calculated;
+import klass;
 
 
 extern(C)
@@ -211,7 +212,8 @@ O3 : O!(Event) {
                     switch (button) {
                     case SDL_BUTTON_LEFT: 
                         // pressed
-                        // add_klass (pressed);
+                        //this.klasses.pressed;
+                        //e.add_klass (select_klass ("pressed"));
                         break;
                     default:
                     }
@@ -279,6 +281,25 @@ O3 : O!(Event) {
         with (evt.Type)
         send (Event (Event_play (PLAY,3)));
     }
+
+
+    Klass[] klasses;
+
+    Klass
+    new_klass (string name) {
+        auto k = new Klass (name);
+        klasses ~= k;
+        return k;
+    }
+
+    Klass
+    select_klass (string name) {
+        foreach (k; klasses) {
+            if (k.name == name)
+                return k;
+        }
+        return null;
+    }
 }
 
 import e_class : E;
@@ -307,6 +328,7 @@ Gui {
     load_ui (O) (O o) {
         import load_ui;
         this.e = load_ui.load_ui (o);
+        writeln (this.e);
     }
 
     E

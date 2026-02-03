@@ -64,164 +64,155 @@ mai (T) () {
 }
 
 auto
-load_ui (O o) {
-    return
-    e .window .panel .canvas
-    .e .loc1
-     .e .button ._1  
-      .on (Event.Type.CLICK, &o._on_click_1)
-      .parent
-     .e .button ._2  
-      .on (Event.Type.CLICK, &o._on_click_2)
-      .parent
-     .e .button ._3  
-      .on (Event.Type.CLICK, &o._on_click_3)
-      .parent.parent
-    .e .loc2
-     .e .button .clock  .parent.parent
-    .e .loc3
-     .e .indicator ._1  .parent
-     .e .indicator ._2  .parent
-     .e .indicator ._3  .parent.parent
-    ;
+load_ui (O) (O o) {
+    load_klasses (o);
+    dump_klasses (o);
+    auto e = OE!O (o,new E());
+        e .window .panel .canvas  // {o,e}
+        .e .loc1
+         .e .button ._1  
+          .on (Event.Type.CLICK, &o._on_click_1)
+          .parent
+         .e .button ._2  
+          .on (Event.Type.CLICK, &o._on_click_2)
+          .parent
+         .e .button ._3  
+          .on (Event.Type.CLICK, &o._on_click_3)
+          .parent.parent
+        .e .loc2
+         .e .button .clock  .parent.parent
+        .e .loc3
+         .e .indicator ._1  .parent
+         .e .indicator ._2  .parent
+         .e .indicator ._3  .parent.parent
+     ;
+    dump_tree (e._e);
+    return e._e;
 }
 
+struct
+OE (O) {
+    O _o;
+    E _e;
 
-//
-auto 
-e () {
-    return new E ();
+    auto 
+    e () {
+        return OE!O (_o, _e.add_child (new E ()));
+    }
+    auto
+    e (OE _oe) {
+        return OE!O (_o, _oe._e.add_child (new E ()));
+    }
+    auto
+    parent () {
+        return OE (_o,_e.parent);
+    }
+
+    auto
+    on (Event_Type,DG) (Event_Type type, DG dg) {
+        _e.on (type,dg);
+        return this;
+    }
+
+    // window
+    auto
+    opDispatch (string name) () {
+        auto k = _o.select_klass (name);
+        _e.add_klass (k);
+        return this;
+    }
 }
-auto
-e (E _e) {
-    return _e.add_child (new E ());
-}
-auto
-parent (E e) {
-    return e.parent;
-}
+
 
 import std.algorithm; // для splitter
 import std.range;     // для last
 
-auto window (E e) { 
-    auto k = new Klass (__FUNCTION__.splitter('.').back);
-    with (k) {
+void
+load_klasses (O o) {
+    with (o.new_klass ("window")) {
         x  = 0;
         y  = 0;
         w  = Desktop.w;
         h  = 64;
         fg = 0xFF00FF00;
         //     aabbggrr
-        return e.add_klass (k);
     }
-}
-auto panel (E e) { 
-    auto k = new Klass (__FUNCTION__.splitter('.').back);
-    with (k) {
+
+    with (o.new_klass ("panel")) {
         import layout : Layout_Type=Type;
         childs_layout = Layout_Type.left_aligned_stacked_to_right;
-        return e.add_klass (k);
     }
-}
-auto canvas (E e) {
-    auto k = new Klass (__FUNCTION__.splitter('.').back);
-    with (k) {
-        return e.add_klass (k);
+
+    with (o.new_klass ("canvas")) {
+        //
     }
-}
-auto loc1 (E e) {
-    auto k = new Klass (__FUNCTION__.splitter('.').back);
-    with (k) {
+
+    with (o.new_klass ("loc1")) {
         w  = 33.perc;
         h  = parent_h;
         import layout : Layout_Type=Type;
         childs_layout = Layout_Type.left_aligned_stacked_to_right;
         fg = 0x88444444;
         //     aabbggrr
-        return e.add_klass (k);
     }
-}
-auto button (E e) { 
-    auto k = new Klass (__FUNCTION__.splitter('.').back);
-    with (k) {
+
+    with (o.new_klass ("button")) {
         type = E.Type.BUTTON;
-        w  = parent_h;
-        bg = 0xFF003300;
-        fg = 0xFFFF0000;
+        w    = parent_h;
+        bg   = 0xFF003300;
+        fg   = 0xFFFF0000;
         //     aabbggrr
         // on (CLICK, Event (), &on_click);
-        return e.add_klass (k);
     }
-}
-auto pressed (E e) { 
-    auto k = new Klass (__FUNCTION__.splitter('.').back);
-    with (k) {
+
+    with (o.new_klass ("pressed")) {
         bg = 0xFFCCCCCC;
-        //     aabbggrr
-        return e.add_klass (k);
     }
-}
-auto _1 (E e) {
-    auto k = new Klass (__FUNCTION__.splitter('.').back);
-    with (k) {
-        // on (CLICK, Event (Event_play (PLAY,1)));
-        return e.add_klass (k);
+
+    with (o.new_klass ("_1")) {
+        //
     }
-}
-auto _2 (E e) { 
-    auto k = new Klass (__FUNCTION__.splitter('.').back);
-    with (k) {
-        //on (CLICK, Event (Event_play (PLAY,2)));
-        return e.add_klass (k);
+
+    with (o.new_klass ("_2")) {
+        //
     }
-}
-auto _3 (E e) { 
-    auto k = new Klass (__FUNCTION__.splitter('.').back);
-    with (k) {
-        // on (CLICK, Event (Event_play (PLAY,3)));
-        return e.add_klass (k);
+
+    with (o.new_klass ("_3")) {
+        //
     }
-}
-auto loc2 (E e) { 
-    auto k = new Klass (__FUNCTION__.splitter('.').back);
-    with (k) {
+
+    with (o.new_klass ("loc2")) {
         w = 34.perc;
         h = parent_h;
         import layout : Layout_Type=Type;
         childs_layout = Layout_Type.center_aligned_stacked_to_right;
         fg = 0x88444444;
-        return e.add_klass (k);
     }
-}
-auto clock (E e) { 
-    auto k = new Klass (__FUNCTION__.splitter('.').back);
-    with (k) {
+
+    with (o.new_klass ("clock")) {
         w  = 33.perc;
         h  = parent_h;
         fg = 0xFFFFFFFF;
-        //on_click_send_evt_type = Event.Type.PLAY;
-        //on_click_send_evt_arg  = 1; // Arg (int,string)
-        return e.add_klass (k);
     }
-}
-auto loc3 (E e) { 
-    auto k = new Klass (__FUNCTION__.splitter('.').back);
-    with (k) {
+
+    with (o.new_klass ("loc3")) {
         w  = 33.perc;
         h  = parent_h;
         import layout : Layout_Type=Type;
         childs_layout = Layout_Type.right_aligned_stacked_to_left;
         fg = 0x88444444;
-        return e.add_klass (k);
+    }
+
+    with (o.new_klass ("indicator")) {
+        w  = parent_h;
+        h  = parent_h;
+        fg = 0xFF0000FF;
     }
 }
-auto indicator (E e) { 
-    auto k = new Klass (__FUNCTION__.splitter('.').back);
-    with (k) {
-        w = parent_h;
-        h = parent_h;
-        fg = 0xFF0000FF;
-        return e.add_klass (k);
+
+void
+dump_klasses (O) (O o) {
+    foreach (k; o.klasses) {
+        writeln (k);
     }
 }
