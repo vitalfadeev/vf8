@@ -43,6 +43,14 @@ Klass {
             return this;
         }
 
+        void
+        set_e_prop (Klass k) {
+            foreach (key,value; k.attrs) {
+                if (value.type)
+                    this.attrs[key] = value;
+            }
+        }
+
         struct
         Klasses_range (T) {
             T _this;

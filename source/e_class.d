@@ -28,49 +28,17 @@ E_base {
 
 class
 E {
-    mixin    Attrs;
-    mixin    Klass.tpl;
-    mixin    Event_layout.tpl;
-    mixin    Event_draw.tpl;
-    mixin    Event_click.tpl;
-    mixin    Childs_parent!(typeof(this));
-    On!Event _on;
-
-    E
-    on (Event.Type type, On!Event.DG dg) {
-        _on.add (type,dg);
-        return this;
-    }
+    mixin Attrs;
+    mixin Klass.tpl;
+    mixin Event_layout.tpl;
+    mixin Event_draw.tpl;
+    mixin Event_click.tpl;
+    mixin Childs_parent!(typeof(this));
+    mixin On!Event;
 
     void 
     go (Event* evt, O o) {
         //
-    }
-
-    void
-    set_e_prop (Klass k) {
-        foreach (key,value; k.attrs) {
-            if (value.type)
-                this.attrs[key] = value;
-        }
-    }
-
-    //override
-    //void  
-    //_draw (E e, Event* evt) {
-    //    //with (o)
-    //    with (e)
-    //    with (evt.draw) {
-    //        draw_rect (canvas,xy,wh,fg);
-    //        draw_text (canvas,xy,wh,text);
-    //        foreach (_e; childs) _e.go (_e,evt);
-    //    }
-    //}
-
-    void
-    each (Event* evt, O o) {
-        foreach (_e; childs)
-            _e.go (evt,o);
     }
 
     override

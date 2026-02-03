@@ -32,6 +32,13 @@ Attrs () {
     A fg   () { return attrs[Aid.f]; }
     A bg   () { return attrs[Aid.b]; }
     A type () { return attrs[Aid.t]; }
+
+    auto
+    calculated () {
+        alias T = typeof(this);
+        static if (__traits (hasMember, T, "Type"))
+            return Calculated!T (this);
+    }
 }
 
 enum 

@@ -10,7 +10,12 @@ Childs_parent (E) {
 
     auto
     childs () {
-        return Childs_range (this);
+        return Childs_range (this.cl);
+    }
+
+    auto
+    childs_recursive () {
+        return childs_recursive_range (this,this);
     }
 
     auto
@@ -38,34 +43,17 @@ Childs_parent (E) {
 
     struct
     Childs_range {
-        E _this;
-
-        int 
-        opApply (scope int delegate(E) dg) {
-            int result = 0;
-
-            for (auto _e = _this.cl; _e !is null; _e = _e.r) {
-                result = dg (_e);
-
-                if (result)
-                    break;
-            }
-
-            return result;
-        }
-    }
-
-    auto
-    childs_recursive () {
-        return childs_recursive_range (this);
+        E    front;
+        bool empty    () { return front is null; }
+        void popFront () { front = front.r; }
     }
 
     struct
     childs_recursive_range {
-        E front;
-        bool empty () { return front is null; }
-        void
-        popFront () {
+        E    front;
+        E    start;
+        bool empty    () { return front is null; }
+        void popFront () {
             auto e = front;
             // go down
             go_down:
@@ -82,7 +70,8 @@ Childs_parent (E) {
             // go up
             if (e.parent !is null) {
                 e = e.parent;
-                goto go_right;
+                if (e !is start)
+                    goto go_right;
             }
             // end
             front = null;

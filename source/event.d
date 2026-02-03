@@ -167,6 +167,6 @@ Event_layout {
     template
     tpl () {
         mixin Xywh!E;
-        mixin Layout!E;        
+        mixin Layout!E;
     }
 }

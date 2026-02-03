@@ -1,7 +1,19 @@
 module on;
 
-struct
+
+mixin template 
 On (Event) {
+    _On!Event _on;
+
+    auto
+    on (Event.Type type, _On!Event.DG dg) {
+        _on.add (type,dg);
+        return this;
+    }
+}
+
+struct
+_On (Event) {
     Rec[] recs;
 
     void

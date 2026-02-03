@@ -6,6 +6,7 @@ import layout.xy;
 // 0,0 .. w,h
 void
 to_right_down_left_aligned (E) (E _this) {
+    // childs_space, wh, xy, childs_range
     XY cursor;
     XY space = _this.childs_space;
     XY line  = _this.wh;

@@ -29,24 +29,6 @@ main () {
     o.go ();   // event loop
 }
 
-//void
-//binds (O) (O o) {
-//    Universal_event_emitter!Event.FN fn =
-//    (Event* evt, void* data)  {
-//        with (evt.click) {
-//            Event event;
-//            event.type    = Event.Type.PLAY;
-//            event.play.id = 1;
-//            o.send (&event);
-//        }
-//    };
-
-//    universal_event_emitter.on (
-//        Event.Type.CLICK,
-//        &fn,
-//        null);
-//}
-
 class
 O3 : O!(Event) {
     Audio audio;
@@ -143,18 +125,6 @@ O3 : O!(Event) {
 
     void
     mod_ui_go (Event* evt) {
-        //if (gui.e !is null)
-        //with (evt.Type)
-        //switch (evt.type) {
-        //    case UPDATE:
-        //    case SET_E_PROP:
-        //    case LAYOUT:
-        //    case DRAW:
-        //        gui.e.go (evt,this);
-        //        break;
-        //    default:
-        //}
-        // keys
         with (evt.Type)
         switch (evt.type) {
             case SET_E_PROP :
@@ -173,44 +143,41 @@ O3 : O!(Event) {
                 with (evt.draw)
                 foreach (e; gui.e.childs_recursive ()) {
                     with (e) 
-                    switch (e.type._etype.a) with (E.Type) {
-                    //case BUTTON:
-                        //switch (e.state) {
-                        //case PRESSED:
-                        //    draw_rect (canvas,xy,wh,bg,fg);
-                        //    draw_text (canvas,xy,wh,text);
-                        //    break;
-                        //case RELEASED:
-                        //    draw_rect (canvas,xy,wh,bg,fg);
-                        //    draw_text (canvas,xy,wh,text);
-                        //    break;
-                        //default:
-                        //}
-                        //break;
-                    default:
-                        with (Calculated!E (e)) {
-                            draw_rect (canvas,xy,wh,bg,fg);
-                            draw_text (canvas,xy,wh,text);
-                        }
+                    with (Calculated!E (e)) {
+                        draw_rect (canvas,xy,wh,bg,fg);
+                        draw_text (canvas,xy,wh,text);
                     }
                 }
                 break;
             case SDL:
                 with (evt.sdl.sdl_event)
-                if (type == SDL_MOUSEBUTTONDOWN)
-                with (button)
-                switch (button) {
-                case SDL_BUTTON_LEFT : 
-                    auto _mouse_over_e = gui.select (x,y);
-                    if (_mouse_over_e !is null) {
-                        writeln ("_mouse_over_e");
-                        with (Calculated!E (_mouse_over_e))
-                        switch (type) with (E.Type) {
-                        case BUTTON:
+                switch (type) {
+                case SDL_MOUSEBUTTONDOWN: 
+                    with (button)
+                    switch (button) {
+                    case SDL_BUTTON_LEFT : 
+                        auto _mouse_over_e = gui.select (x,y);
+                        if (_mouse_over_e !is null) {
+                            writeln ("_mouse_over_e down");
+                            with (Calculated!E (_mouse_over_e))
                             send (Event (Event_click (CLICK, x, y)));
-                            break;
-                        default:
+                            mod_ui_widget_go (evt,_mouse_over_e);
                         }
+                        break;
+                    default:
+                    }
+                    break;
+                case SDL_MOUSEBUTTONUP: 
+                    with (button)
+                    switch (button) {
+                    case SDL_BUTTON_LEFT : 
+                        auto _mouse_over_e = gui.select (x,y);
+                        if (_mouse_over_e !is null) {
+                            writeln ("_mouse_over_e up");
+                            mod_ui_widget_go (evt,_mouse_over_e);
+                        }
+                        break;
+                    default:
                     }
                     break;
                 default:
@@ -234,6 +201,36 @@ O3 : O!(Event) {
         with (e) 
         switch (e.type._etype.a) with (E.Type) {
         case BUTTON:
+            with (evt.Type)
+            switch (evt.type) {
+            case SDL:
+                with (evt.sdl.sdl_event)
+                switch (type) {
+                case SDL_MOUSEBUTTONDOWN: 
+                    with (button)
+                    switch (button) {
+                    case SDL_BUTTON_LEFT: 
+                        // pressed
+                        // add_klass (pressed);
+                        break;
+                    default:
+                    }
+                    break;
+                case SDL_MOUSEBUTTONUP: 
+                    with (button)
+                    switch (button) {
+                    case SDL_BUTTON_LEFT: 
+                        // released
+                        // rem_klass (pressed);
+                        break;
+                    default:
+                    }
+                    break;
+                default:
+                }
+                break;
+            default:
+            }
             break;
         case CHECK:
             break;
@@ -243,39 +240,6 @@ O3 : O!(Event) {
             break;
         default:
         }
-
-        //with (evt.Type)
-        //switch (evt.type) {
-        //case SET_E_PROP :
-        //    break;
-        //case SDL:
-        //    with (evt.sdl.sdl_event)
-        //    if (type == SDL_MOUSEBUTTONDOWN)
-        //    with (button)
-        //    switch (button) {
-        //    case SDL_BUTTON_LEFT : 
-        //        auto _mouse_over_e = gui.select (x,y);
-        //        if (_mouse_over_e !is null) {
-        //            writeln ("_mouse_over_e");
-        //            switch (_mouse_over_e.type) {
-        //            case E.Type.BUTTON:
-        //                // call button.SDL.SDL_BUTTON_LEFT ()
-        //                //_mouse_over_e.go (evt,this);
-        //                //send_now (Event (Event_click (CLICK, x, y)));
-
-        //                //_mouse_over_e.state = PRESSED;
-        //                //send (SET_E_PROP);
-        //                //send (REDRAW);
-        //                break;
-        //            default:
-        //            }
-        //        }
-        //        break;
-        //    default:
-        //    }
-        //    break;
-        //default:
-        //}
     }
 
     void
