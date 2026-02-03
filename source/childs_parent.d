@@ -69,9 +69,10 @@ Childs_parent (E) {
             }
             // go up
             if (e.parent !is null) {
-                e = e.parent;
-                if (e !is start)
+                if (e !is start) {
+                    e = e.parent;
                     goto go_right;
+                }
             }
             // end
             front = null;

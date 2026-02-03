@@ -39,8 +39,23 @@ Klass {
 
         auto
         add_klass (Klass k) {
-            _klasses ~= k;
+            if (k !is null)
+                _klasses ~= k;
             return this;
+        }
+
+        auto
+        has_klass (string name) {
+            foreach (k; _klasses) {
+                if (k.name == name)
+                    return k;
+            }
+            return null;
+        }
+
+        void
+        rem_klass (Klass k) {
+            _klasses = _klasses.remove_element (k);
         }
 
         void
@@ -72,3 +87,9 @@ Klass {
     }
 }
 
+auto 
+remove_element (R, N) (ref R haystack, N needle) {
+    import std.algorithm : countUntil, remove;
+    auto index = haystack.countUntil (needle);
+    return (index != -1) ? haystack.remove (index) : haystack;
+}

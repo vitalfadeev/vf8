@@ -213,7 +213,11 @@ O3 : O!(Event) {
                     case SDL_BUTTON_LEFT: 
                         // pressed
                         //this.klasses.pressed;
-                        //e.add_klass (select_klass ("pressed"));
+                        if (e.has_klass ("pressed") is null) {
+                            e.add_klass (select_klass ("pressed"));
+                            send (SET_E_PROP);
+                            send (REDRAW);
+                        }
                         break;
                     default:
                     }
@@ -223,7 +227,12 @@ O3 : O!(Event) {
                     switch (button) {
                     case SDL_BUTTON_LEFT: 
                         // released
-                        // rem_klass (pressed);
+                        if (e.has_klass ("pressed") !is null) {
+                            writeln ("has_klass: ", select_klass ("pressed"));
+                            e.rem_klass (select_klass ("pressed"));
+                            send (SET_E_PROP);
+                            send (REDRAW);
+                        }
                         break;
                     default:
                     }

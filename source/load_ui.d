@@ -68,25 +68,24 @@ load_ui (O) (O o) {
     load_klasses (o);
     dump_klasses (o);
     auto e = OE!O (o,new E());
-        e .window .panel .canvas  // {o,e}
+    e .window .panel .canvas  // {o,e}
         .e .loc1
-         .e .button ._1  
-          .on (Event.Type.CLICK, &o._on_click_1)
-          .parent
-         .e .button ._2  
-          .on (Event.Type.CLICK, &o._on_click_2)
-          .parent
-         .e .button ._3  
-          .on (Event.Type.CLICK, &o._on_click_3)
-          .parent.parent
+            .e .button ._1  
+                .on (Event.Type.CLICK, &o._on_click_1)
+                .parent
+            .e .button ._2  
+                .on (Event.Type.CLICK, &o._on_click_2)
+                .parent
+            .e .button ._3  
+                .on (Event.Type.CLICK, &o._on_click_3)
+                .parent.parent
         .e .loc2
-         .e .button .clock  .parent.parent
+            .e .button .clock  .parent.parent
         .e .loc3
-         .e .indicator ._1  .parent
-         .e .indicator ._2  .parent
-         .e .indicator ._3  .parent.parent
+            .e .indicator ._1  .parent
+            .e .indicator ._2  .parent
+            .e .indicator ._3  .parent.parent
      ;
-    dump_tree (e._e);
     return e._e;
 }
 
