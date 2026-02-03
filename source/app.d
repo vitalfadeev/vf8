@@ -152,7 +152,7 @@ O3 : O!(Event) {
                 }
                 break;
             case PRESS:
-                with (evt.release) {
+                with (evt.press) {
                     auto _mouse_over_e = gui.select (x,y);
                     if (_mouse_over_e !is null) {
                         mod_ui_widget_go (evt,_mouse_over_e);
@@ -161,7 +161,7 @@ O3 : O!(Event) {
                 }
                 break;
             case RELEASE:
-                with (evt.press) {
+                with (evt.release) {
                     auto _mouse_over_e = gui.select (x,y);
                     if (_mouse_over_e !is null) {
                         mod_ui_widget_go (evt,_mouse_over_e);
@@ -170,19 +170,29 @@ O3 : O!(Event) {
                     }
                 }
                 break;
+            case HOTKEY_PRESS:
+                with (evt.hotkey) {
+                    auto _hotkey_e = cast (E) e;
+                    if (_hotkey_e !is null) {
+                        mod_ui_widget_go (evt,_hotkey_e);
+                        _hotkey_e._on.go (evt,_hotkey_e);
+                    }
+                }
+                break;
+            case HOTKEY_RELEASE:
+                with (evt.hotkey) {
+                    auto _hotkey_e = cast (E) e;
+                    if (_hotkey_e !is null) {
+                        mod_ui_widget_go (evt,_hotkey_e);
+                        _hotkey_e._on.go (evt,_hotkey_e);
+                    }
+                }
+                break;
             case CLICK:
                 with (evt.click) {
                     auto _mouse_over_e = gui.select (x,y);
                     if (_mouse_over_e !is null) {
                         _mouse_over_e._on.go (evt,_mouse_over_e);
-                    }
-                }
-                break;
-            case HOTKEY:
-                with (evt.hotkey) {
-                    auto _hotkey_e = cast (E) e;
-                    if (_hotkey_e !is null) {
-                        _hotkey_e._on.go (evt,_hotkey_e);
                     }
                 }
                 break;
@@ -234,6 +244,20 @@ O3 : O!(Event) {
                     send (REDRAW);
                 }
                 break;
+            case HOTKEY_PRESS:
+                if (e.has_klass ("pressed") is null) {
+                    e.add_klass (select_klass ("pressed"));
+                    send (SET_E_PROP);
+                    send (REDRAW);
+                }
+                break;
+            case HOTKEY_RELEASE:
+                if (e.has_klass ("pressed") !is null) {
+                    e.rem_klass (select_klass ("pressed"));
+                    send (SET_E_PROP);
+                    send (REDRAW);
+                }
+                break;
             default:
             }
             break;
@@ -259,7 +283,16 @@ O3 : O!(Event) {
                     foreach (ref hke; hotkeys) {
                         if (hke.hk.length)
                         if (key.keysym.sym == hke.hk[0]) {
-                            send (Event (Event_hotkey (HOTKEY,cast(void*)hke.e)));
+                            send (Event (Event_hotkey (HOTKEY_PRESS,cast(void*)hke.e)));
+                        }
+                    }
+                }
+                else
+                if (type == SDL_KEYUP) {
+                    foreach (ref hke; hotkeys) {
+                        if (hke.hk.length)
+                        if (key.keysym.sym == hke.hk[0]) {
+                            send (Event (Event_hotkey (HOTKEY_RELEASE,cast(void*)hke.e)));
                         }
                     }
                 }

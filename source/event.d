@@ -47,7 +47,8 @@ union {
         CLICK,
         PRESS,
         RELEASE,
-        HOTKEY,
+        HOTKEY_PRESS,
+        HOTKEY_RELEASE,
     }
 }
 struct
@@ -149,7 +150,7 @@ Event_release {
 }
 struct
 Event_hotkey {
-    auto type = Event.Type.HOTKEY;
+    auto type = Event.Type.HOTKEY_PRESS;
     void* e;
 }
 

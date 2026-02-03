@@ -71,18 +71,18 @@ load_ui (O) (O o) {
     e .window .panel .canvas  // {o,e}
         .e .loc1
             .e .button ._1  
-                .on (Event.Type.PRESS,  &o._on_click_1)
-                .on (Event.Type.HOTKEY, &o._on_click_1)
+                .on (Event.Type.PRESS,        &o._on_click_1)
+                .on (Event.Type.HOTKEY_PRESS, &o._on_click_1)
                 .hotkey ("a")
                 .parent
             .e .button ._2  
-                .on (Event.Type.PRESS,  &o._on_click_2)
-                .on (Event.Type.HOTKEY, &o._on_click_2)
+                .on (Event.Type.PRESS,        &o._on_click_2)
+                .on (Event.Type.HOTKEY_PRESS, &o._on_click_2)
                 .hotkey ("s")
                 .parent
             .e .button ._3  
-                .on (Event.Type.PRESS,  &o._on_click_3)
-                .on (Event.Type.HOTKEY, &o._on_click_3)
+                .on (Event.Type.PRESS,        &o._on_click_3)
+                .on (Event.Type.HOTKEY_PRESS, &o._on_click_3)
                 .hotkey ("d")
                 .parent.parent
         .e .loc2
