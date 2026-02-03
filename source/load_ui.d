@@ -13,7 +13,7 @@ import std.stdio : writeln;
 void
 mai (T) () {
     O o = new O ();
-    o.e = load_ui ();
+    o.e = load_ui (o);
 
     with (Event.Type) {        
         // SET_E_PROP
@@ -64,13 +64,19 @@ mai (T) () {
 }
 
 auto
-load_ui () {
+load_ui (O o) {
     return
     e .window .panel .canvas
     .e .loc1
-     .e .button ._1  .parent
-     .e .button ._2  .parent
-     .e .button ._3  .parent.parent
+     .e .button ._1  
+      .on (Event.Type.CLICK, &o._on_click_1)
+      .parent
+     .e .button ._2  
+      .on (Event.Type.CLICK, &o._on_click_2)
+      .parent
+     .e .button ._3  
+      .on (Event.Type.CLICK, &o._on_click_3)
+      .parent.parent
     .e .loc2
      .e .button .clock  .parent.parent
     .e .loc3
@@ -95,8 +101,11 @@ parent (E e) {
     return e.parent;
 }
 
+import std.algorithm; // для splitter
+import std.range;     // для last
+
 auto window (E e) { 
-    auto k = new Klass (__FUNCTION__);
+    auto k = new Klass (__FUNCTION__.splitter('.').back);
     with (k) {
         x  = 0;
         y  = 0;
@@ -108,7 +117,7 @@ auto window (E e) {
     }
 }
 auto panel (E e) { 
-    auto k = new Klass (__FUNCTION__);
+    auto k = new Klass (__FUNCTION__.splitter('.').back);
     with (k) {
         import layout : Layout_Type=Type;
         childs_layout = Layout_Type.left_aligned_stacked_to_right;
@@ -116,13 +125,13 @@ auto panel (E e) {
     }
 }
 auto canvas (E e) {
-    auto k = new Klass (__FUNCTION__);
+    auto k = new Klass (__FUNCTION__.splitter('.').back);
     with (k) {
         return e.add_klass (k);
     }
 }
 auto loc1 (E e) {
-    auto k = new Klass (__FUNCTION__);
+    auto k = new Klass (__FUNCTION__.splitter('.').back);
     with (k) {
         w  = 33.perc;
         h  = parent_h;
@@ -134,10 +143,11 @@ auto loc1 (E e) {
     }
 }
 auto button (E e) { 
-    auto k = new Klass (__FUNCTION__);
+    auto k = new Klass (__FUNCTION__.splitter('.').back);
     with (k) {
+        type = E.Type.BUTTON;
         w  = parent_h;
-        bg = 0xFF00FF00;
+        bg = 0xFF003300;
         fg = 0xFFFF0000;
         //     aabbggrr
         // on (CLICK, Event (), &on_click);
@@ -145,7 +155,7 @@ auto button (E e) {
     }
 }
 auto pressed (E e) { 
-    auto k = new Klass (__FUNCTION__);
+    auto k = new Klass (__FUNCTION__.splitter('.').back);
     with (k) {
         bg = 0xFFCCCCCC;
         //     aabbggrr
@@ -153,28 +163,28 @@ auto pressed (E e) {
     }
 }
 auto _1 (E e) {
-    auto k = new Klass (__FUNCTION__);
+    auto k = new Klass (__FUNCTION__.splitter('.').back);
     with (k) {
         // on (CLICK, Event (Event_play (PLAY,1)));
         return e.add_klass (k);
     }
 }
 auto _2 (E e) { 
-    auto k = new Klass (__FUNCTION__);
+    auto k = new Klass (__FUNCTION__.splitter('.').back);
     with (k) {
         //on (CLICK, Event (Event_play (PLAY,2)));
         return e.add_klass (k);
     }
 }
 auto _3 (E e) { 
-    auto k = new Klass (__FUNCTION__);
+    auto k = new Klass (__FUNCTION__.splitter('.').back);
     with (k) {
         // on (CLICK, Event (Event_play (PLAY,3)));
         return e.add_klass (k);
     }
 }
 auto loc2 (E e) { 
-    auto k = new Klass (__FUNCTION__);
+    auto k = new Klass (__FUNCTION__.splitter('.').back);
     with (k) {
         w = 34.perc;
         h = parent_h;
@@ -185,7 +195,7 @@ auto loc2 (E e) {
     }
 }
 auto clock (E e) { 
-    auto k = new Klass (__FUNCTION__);
+    auto k = new Klass (__FUNCTION__.splitter('.').back);
     with (k) {
         w  = 33.perc;
         h  = parent_h;
@@ -196,7 +206,7 @@ auto clock (E e) {
     }
 }
 auto loc3 (E e) { 
-    auto k = new Klass (__FUNCTION__);
+    auto k = new Klass (__FUNCTION__.splitter('.').back);
     with (k) {
         w  = 33.perc;
         h  = parent_h;
@@ -207,7 +217,7 @@ auto loc3 (E e) {
     }
 }
 auto indicator (E e) { 
-    auto k = new Klass (__FUNCTION__);
+    auto k = new Klass (__FUNCTION__.splitter('.').back);
     with (k) {
         w = parent_h;
         h = parent_h;

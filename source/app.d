@@ -60,7 +60,7 @@ O3 : O!(Event) {
         audio.open ();
         video.open ();
         super.open ();
-        gui.open ();
+        gui.open (this);
     }
 
     override
@@ -173,7 +173,7 @@ O3 : O!(Event) {
                 with (evt.draw)
                 foreach (e; gui.e.childs_recursive ()) {
                     with (e) 
-                    switch (e.type) with (e.type) {
+                    switch (e.type._etype.a) with (E.Type) {
                     //case BUTTON:
                         //switch (e.state) {
                         //case PRESSED:
@@ -204,15 +204,10 @@ O3 : O!(Event) {
                     auto _mouse_over_e = gui.select (x,y);
                     if (_mouse_over_e !is null) {
                         writeln ("_mouse_over_e");
-                        switch (_mouse_over_e.type) {
-                        case E.Type.BUTTON:
-                            // call button.SDL.SDL_BUTTON_LEFT ()
-                            //_mouse_over_e.go (evt,this);
-                            //send_now (Event (Event_click (CLICK, x, y)));
-
-                            //_mouse_over_e.state = PRESSED;
-                            //send (SET_E_PROP);
-                            //send (REDRAW);
+                        with (Calculated!E (_mouse_over_e))
+                        switch (type) with (E.Type) {
+                        case BUTTON:
+                            send (Event (Event_click (CLICK, x, y)));
                             break;
                         default:
                         }
@@ -222,15 +217,65 @@ O3 : O!(Event) {
                 }
                 break;
             case CLICK:
+                writeln ("CLICK");
                 with (evt.click) {
                     auto _mouse_over_e = gui.select (x,y);
                     if (_mouse_over_e !is null) {
-                        _mouse_over_e.on.go (CLICK, _mouse_over_e, this);
+                        _mouse_over_e._on.go (evt, _mouse_over_e);
                     }
                 }
                 break;
             default:
         }
+    }
+
+    void
+    mod_ui_widget_go (Event* evt, E e) {
+        with (e) 
+        switch (e.type._etype.a) with (E.Type) {
+        case BUTTON:
+            break;
+        case CHECK:
+            break;
+        case RADIO:
+            break;
+        case TEXT:
+            break;
+        default:
+        }
+
+        //with (evt.Type)
+        //switch (evt.type) {
+        //case SET_E_PROP :
+        //    break;
+        //case SDL:
+        //    with (evt.sdl.sdl_event)
+        //    if (type == SDL_MOUSEBUTTONDOWN)
+        //    with (button)
+        //    switch (button) {
+        //    case SDL_BUTTON_LEFT : 
+        //        auto _mouse_over_e = gui.select (x,y);
+        //        if (_mouse_over_e !is null) {
+        //            writeln ("_mouse_over_e");
+        //            switch (_mouse_over_e.type) {
+        //            case E.Type.BUTTON:
+        //                // call button.SDL.SDL_BUTTON_LEFT ()
+        //                //_mouse_over_e.go (evt,this);
+        //                //send_now (Event (Event_click (CLICK, x, y)));
+
+        //                //_mouse_over_e.state = PRESSED;
+        //                //send (SET_E_PROP);
+        //                //send (REDRAW);
+        //                break;
+        //            default:
+        //            }
+        //        }
+        //        break;
+        //    default:
+        //    }
+        //    break;
+        //default:
+        //}
     }
 
     void
@@ -251,6 +296,25 @@ O3 : O!(Event) {
             default:
         }
     }
+
+    void
+    _on_click_1 (Event* evt) {
+        writeln ("_on_click_1");
+        with (evt.Type)
+        send (Event (Event_play (PLAY,1)));
+    }
+    void
+    _on_click_2 (Event* evt) {
+        writeln ("_on_click_2");
+        with (evt.Type)
+        send (Event (Event_play (PLAY,2)));
+    }
+    void
+    _on_click_3 (Event* evt) {
+        writeln ("_on_click_3");
+        with (evt.Type)
+        send (Event (Event_play (PLAY,3)));
+    }
 }
 
 import e_class : E;
@@ -270,15 +334,15 @@ Gui {
     E e;
 
     void
-    open () {
+    open (O) (O o) {
         tvg_engine_init(4);
-        load_ui ();
+        load_ui (o);
     }
 
     void
-    load_ui () {
+    load_ui (O) (O o) {
         import load_ui;
-        this.e = load_ui.load_ui ();
+        this.e = load_ui.load_ui (o);
     }
 
     E

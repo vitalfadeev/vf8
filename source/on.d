@@ -5,13 +5,11 @@ On (Event) {
     Rec[] recs;
 
     void
-    go (O,E) (Event.Type type, E e, O o) {
-        auto rec = select (type);
+    go (E) (Event* evt, E e) {
+        auto rec = select (evt.type);
         if (rec !is null) {
-            if (rec.new_event.type)
-                o.send (&rec.new_event);
-            if (rec.fn !is null)
-                rec.fn (&rec.new_event, rec.data, cast (void*) e, cast (void*) o);
+            if (rec.dg !is null)
+                rec.dg (evt);
         }
     }
 
@@ -27,39 +25,21 @@ On (Event) {
     }
 
     void
-    opCall (Event.Type event_type, Event* new_event, FN fn=null, void* data=null) {
+    add (Event.Type event_type, DG dg, void* data=null) {
         auto rec = select (event_type);
         if (rec !is null)
-            *rec = Rec (event_type,*new_event,fn,data);
+            *rec  = Rec (event_type,dg,data);
         else
-            recs ~= Rec (event_type,*new_event,fn,data);
-    }
-
-    void
-    opCall (Event.Type event_type, Event new_event, FN fn=null, void* data=null) {
-        auto rec = select (event_type);
-        if (rec !is null)
-            *rec  = Rec (event_type,new_event,fn,data);
-        else
-            recs ~= Rec (event_type,new_event,fn,data);
-    }
-
-    void
-    opCall (Event.Type event_type, FN fn, void* data=null) {
-        auto rec = select (event_type);
-        if (rec !is null)
-            *rec  = Rec (event_type,Event (),fn,data);
-        else
-            recs ~= Rec (event_type,Event (),fn,data);
+            recs ~= Rec (event_type,dg,data);
     }
 
     struct
     Rec {
         Event.Type event_type;
-        Event      new_event;
-        FN         fn;
+        DG         dg;
         void*      data;
     }
 
     alias FN = void function (Event* evt, void* data, void* e, void* o);
+    alias DG = void delegate (Event* evt);
 }

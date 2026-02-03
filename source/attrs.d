@@ -23,13 +23,15 @@ Attrs () {
     void fg (uint a) { attrs[Aid.f] = A.UInt (a); }
     void bg (A    a) { attrs[Aid.b] = a; }
     void bg (uint a) { attrs[Aid.b] = A.UInt (a); }
+    void type (E.Type a) { attrs[Aid.t] = A.EType (a); }
 
-    A x  () { return attrs[Aid.x]; }
-    A y  () { return attrs[Aid.y]; }
-    A w  () { return attrs[Aid.w]; }
-    A h  () { return attrs[Aid.h]; }
-    A fg () { return attrs[Aid.f]; }
-    A bg () { return attrs[Aid.b]; }
+    A x    () { return attrs[Aid.x]; }
+    A y    () { return attrs[Aid.y]; }
+    A w    () { return attrs[Aid.w]; }
+    A h    () { return attrs[Aid.h]; }
+    A fg   () { return attrs[Aid.f]; }
+    A bg   () { return attrs[Aid.b]; }
+    A type () { return attrs[Aid.t]; }
 }
 
 enum 
@@ -40,8 +42,9 @@ Aid {
     w,
     h,
     l,  // childs_layout
-    f,
-    b,
+    f,  // fg
+    b,  // bg
+    t,  // type  // BUTTON
 }
 
 struct
@@ -57,6 +60,7 @@ A {
         Parent_w _parent_w;
         Parent_h _parent_h;
         Layout   _layout;
+        EType    _etype;
     }
 
     enum
@@ -73,6 +77,8 @@ A {
         _parent_w,
         // Layout
         _layout,
+        // E Type
+        _etype,
     }
 
     //
@@ -121,10 +127,16 @@ A {
         int a;
     }        
 
-    import layout : Layout_Type=Type;
     struct
     Layout {
+        import layout : Layout_Type=Type;
         Layout_Type a;
+    }        
+
+    struct
+    EType {
+        import e_class : E;
+        E.Type a;
     }        
 
     void
@@ -177,7 +189,11 @@ A {
         type = Type._layout;
         _layout = b;
     }
-
+    void
+    opAssign (EType b) {
+        type = Type._etype;
+        _etype = b;
+    }
 }
 
 auto
@@ -196,11 +212,25 @@ Calculated (E) {
 
     uint
     bg () {
-        return _this.bg._uint.a;
+        switch (_this.bg.type) with (A.Type) {
+            case _uint: return _this.bg._uint.a;
+            default: return 0xFF000000;
+        }
     }
 
     uint
     fg () {
-        return _this.fg._uint.a;
+        switch (_this.fg.type) with (A.Type) {
+            case _uint: return _this.fg._uint.a;
+            default: return 0xFFFFFFFF;
+        }
+    }
+
+    E.Type
+    type () {
+        switch (_this.type.type) with (A.Type) {
+            case _etype: return _this.type._etype.a;
+            default: return E.Type._;
+        }
     }
 }

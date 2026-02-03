@@ -76,6 +76,11 @@ O (Event) {
     }
 
     void
+    send (Event event) {
+        local_input.put (&event);
+    }
+
+    void
     send (Event.Type type, string ev, string prop, VALUE) (VALUE value) {
         Event event;
         event.type = type;

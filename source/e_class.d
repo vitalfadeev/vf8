@@ -28,14 +28,19 @@ E_base {
 
 class
 E {
-    Type     type;
     mixin    Attrs;
     mixin    Klass.tpl;
     mixin    Event_layout.tpl;
     mixin    Event_draw.tpl;
     mixin    Event_click.tpl;
     mixin    Childs_parent!(typeof(this));
-    On!Event on;
+    On!Event _on;
+
+    E
+    on (Event.Type type, On!Event.DG dg) {
+        _on.add (type,dg);
+        return this;
+    }
 
     void 
     go (Event* evt, O o) {
