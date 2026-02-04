@@ -68,14 +68,16 @@ load_ui (O) (O o) {
     load_klasses (o);
     dump_klasses (o);
     auto e = OE!O (o,new E());
+    with (Event.Type)
     e .window .panel .canvas  // {o,e}
         .e .loc1
             .e .button ._1  
-                .on (Event.Type.PRESS,        &o._on_click_1)
-                .on (Event.Type.HOTKEY_PRESS, &o._on_click_1)
-                .hotkey ("a")
-                //.dynamic_klasses (&o.dg_data_eq_x, "red", "green")
-                //.dynamic_klasses (&o.data.flag_1, "pressed", "")
+                //.on (PRESS,        &o._on_click_1)
+                //.on (HOTKEY_PRESS, &o._on_click_1)
+                .on (BUTTON_LEFT, Event (PLAY_1))
+                .on (PLAY_1, Event (PRESS))
+                .on (PRESS, "pressed")
+                //.hotkey ("a")
                 .parent
             .e .button ._2  
                 .on (Event.Type.PRESS,        &o._on_click_2)
@@ -116,8 +118,18 @@ OE (O) {
     }
 
     auto
-    on (Event_Type,DG) (Event_Type type, DG dg) {
+    on (DG) (Event.Type type, DG dg) {
         _e.on (type,dg);
+        return this;
+    }
+    auto
+    on (Event.Type type, Event new_event) {
+        _e.on (type,new_event);
+        return this;
+    }
+    auto
+    on (Event.Type type, string new_klass) {
+        _e.on (type,new_klass);
         return this;
     }
 
@@ -169,13 +181,14 @@ load_klasses (O o) {
         //     aabbggrr
     }
 
+    with (Event.Type)
     with (o.new_klass ("button")) {
         //type = E.Type.BUTTON;
         w    = parent_h;
         bg   = 0xFF003300;
         fg   = 0xFFFF0000;
         //       aabbggrr
-        // on (CLICK, Event (), &on_click);
+        //on (CLICK, &o.on_click);
     }
 
     with (o.new_klass ("pressed")) {

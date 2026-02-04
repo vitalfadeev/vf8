@@ -25,6 +25,7 @@ union {
     Event_hotkey     hotkey;
     Event_attrs      attrs;
 }
+    this (Type         typ) { type   = typ; }
     this (Event_play   evt) { play   = evt; }
     this (Event_click  evt) { click  = evt; }
     this (Event_hotkey evt) { hotkey = evt; }
@@ -77,27 +78,13 @@ union {
         //                   0x1100
         AUDIODEVICEADDED   = SDL_EventType.SDL_AUDIODEVICEADDED,
         AUDIODEVICEREMOVED = SDL_EventType.SDL_AUDIODEVICEREMOVED,
-        //                   0x8000
-        USEREVENT          = SDL_EventType.SDL_USEREVENT,
+        //                       0x8000
+        USEREVENT              = SDL_EventType.SDL_USEREVENT,
+        // ...
+        //                       0x9000
+        USEREVENT9000          = 0x9000,
+        // ...
         //
-        OPEN,
-        QUIT,
-        // video
-        DRAW,
-        REDRAW,
-        // audio
-        PLAY,
-        PLAY_1,
-        // ui
-        UPDATE,
-        SET_E_PROP,
-        LAYOUT,
-        CLICK,
-        PRESS,
-        RELEASE,
-        HOTKEY_PRESS,
-        HOTKEY_RELEASE,
-        ATTRS,
         // Keys
         //                       0xA000
         USER_KEY_EVENT         = 0xA000,
@@ -355,6 +342,36 @@ union {
         BUTTON_RIGHT           = USER_MOUSE_EVENT | SDL_BUTTON_RIGHT,
         BUTTON_X1              = USER_MOUSE_EVENT | SDL_BUTTON_X1,
         BUTTON_X2              = USER_MOUSE_EVENT | SDL_BUTTON_X2,
+        //
+        USEREVENTC000          = 0xC000,
+        // ...
+        USEREVENTD000          = 0xD000,
+        // ...
+        USEREVENTE000          = 0xE000,
+        // ...
+        //                       0xF000
+        APPREVENT              = 0xF000,
+        //
+        OPEN,
+        QUIT,
+        // video
+        DRAW,
+        REDRAW,
+        // audio
+        PLAY,
+        PLAY_1,
+        PLAY_2,
+        PLAY_3,
+        // ui
+        UPDATE,
+        SET_E_PROP,
+        LAYOUT,
+        CLICK,
+        PRESS,
+        RELEASE,
+        HOTKEY_PRESS,
+        HOTKEY_RELEASE,
+        ATTRS,
         //                       0xFFFF
         SDL_LASTEVENT          = SDL_EventType.SDL_LASTEVENT,
     }

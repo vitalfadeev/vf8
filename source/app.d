@@ -53,7 +53,7 @@ O3 : O!(Event) {
     ego (Event* evt) {
         mod_quit_go     (evt);
         mod_sdl_quit_go (evt);
-        mod_player_go   (evt);
+        mod_audio_go    (evt);
         mod_key_go      (evt);
         mod_video       (evt);
         mod_ui_go       (evt);
@@ -85,13 +85,13 @@ O3 : O!(Event) {
     }
 
     void
-    mod_player_go (Event* evt) {
+    mod_audio_go (Event* evt) {
         with (evt.Type)
         switch (evt.type) {
-            case PLAY:
-                printf ("on PLAY %d\n", evt.play.id);
-                audio.play_wav (evt.play.id);
-                break;
+            case PLAY   : audio.play_wav (evt.play.id); break;
+            case PLAY_1 : audio.play_wav (1); break;
+            case PLAY_2 : audio.play_wav (2); break;
+            case PLAY_3 : audio.play_wav (3); break;
             default:
         }
     }
@@ -298,9 +298,9 @@ O3 : O!(Event) {
                 with (SDL_Scancode)
                 switch (key.keysym.scancode) {
                     case SDL_SCANCODE_ESCAPE : send (Event.Type.QUIT); break;
-                    case SDL_SCANCODE_Q      : send!(Event.Type.PLAY, "play", "id") (1); break;
-                    case SDL_SCANCODE_W      : send!(Event.Type.PLAY, "play", "id") (2); break;
-                    case SDL_SCANCODE_E      : send!(Event.Type.PLAY, "play", "id") (3); break;
+                    case SDL_SCANCODE_Q      : send (Event (Event_play (PLAY_1,1))); break;
+                    case SDL_SCANCODE_W      : send (Event (Event_play (PLAY_2,2))); break;
+                    case SDL_SCANCODE_E      : send (Event (Event_play (PLAY_3,3))); break;
                     default:
                 }
                 break;
@@ -659,46 +659,46 @@ Gui {
 
 mixin template
 Switches () {
-    void
-    _key_sw (Event* evt) {
-        switch (evt.type) with (evt.type) {
-            case KEY_A: send (PLAY_1); break;
-            default:
-        }
-    }
+    //void
+    //_key_sw (Event* evt) {
+    //    switch (evt.type) with (evt.type) {
+    //        case KEY_A: send (PLAY_1); break;
+    //        default:
+    //    }
+    //}
 
-    void
-    _audio_sw (Event* evt) {
-        switch (evt.type) with (evt.type) {
-            case PLAY_1: play ("1.wav"); break;
-            default:
-        }
-    }
+    //void
+    //_audio_sw (Event* evt) {
+    //    switch (evt.type) with (evt.type) {
+    //        case PLAY_1: play ("1.wav"); break;
+    //        default:
+    //    }
+    //}
 
-    void
-    _mouse_sw (Event* evt) {
-        switch (evt.type) with (evt.type) {
-            case BUTTON_LEFT: break;
-            default:
-        }
-    }
+    //void
+    //_mouse_sw (Event* evt) {
+    //    switch (evt.type) with (evt.type) {
+    //        case BUTTON_LEFT: break;
+    //        default:
+    //    }
+    //}
 
-    void
-    _button_sw (Event* evt) {
-        switch (evt.type) with (evt.type) {
-            case BUTTON_LEFT : send (PLAY_1); break;
-            case PLAY_1      : send (PRESS);  break;
-            case PRESS       : add_klass ("press"); break;
-            default:
-        }
-    }
+    //void
+    //_button_sw (Event* evt) {
+    //    switch (evt.type) with (evt.type) {
+    //        case BUTTON_LEFT : send (PLAY_1); break;
+    //        case PLAY_1      : send (PRESS);  break;
+    //        case PRESS       : add_klass ("press"); break;
+    //        default:
+    //    }
+    //}
 
-    void
-    _widget_sw (Event* evt) {
-        switch (evt.type) with (evt.type) {
-            case PLAY_1      : add_klass ("play"); break;
-            case BUTTON_LEFT : send (PLAY_1);      break;
-            default:
-        }
-    }
+    //void
+    //_widget_sw (Event* evt) {
+    //    switch (evt.type) with (evt.type) {
+    //        case PLAY_1      : add_klass ("play"); break;
+    //        case BUTTON_LEFT : send (PLAY_1);      break;
+    //        default:
+    //    }
+    //}
 }
