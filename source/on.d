@@ -26,14 +26,14 @@ struct
 _On (Event) {
     Rec[] recs;
 
-    void
-    go (E) (Event* evt, E e) {
-        auto rec = select (evt.type);
-        if (rec !is null) {
-            if (rec.dg !is null)
-                rec.dg (evt);
-        }
-    }
+    //void
+    //go (E) (Event* evt, E e) {
+    //    auto rec = select (evt.type);
+    //    if (rec !is null) {
+    //        if (rec.dg !is null)
+    //            rec.dg (evt);
+    //    }
+    //}
 
     auto
     select (Event.Type type) {

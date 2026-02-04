@@ -155,7 +155,7 @@ O3 : O!(Event) {
                     auto _mouse_over_e = gui.select (x,y);
                     if (_mouse_over_e !is null) {
                         mod_ui_widget_go (evt,_mouse_over_e);
-                        _mouse_over_e._on.go (evt,_mouse_over_e);
+                        //_mouse_over_e._on.go (evt,_mouse_over_e);
                     }
                 }
                 break;
@@ -165,7 +165,7 @@ O3 : O!(Event) {
                     if (_mouse_over_e !is null) {
                         mod_ui_widget_go (evt,_mouse_over_e);
                         send (Event (Event_click (CLICK, x, y)));
-                        _mouse_over_e._on.go (evt,_mouse_over_e);
+                        //_mouse_over_e._on.go (evt,_mouse_over_e);
                     }
                 }
                 break;
@@ -174,7 +174,7 @@ O3 : O!(Event) {
                     auto _hotkey_e = cast (E) e;
                     if (_hotkey_e !is null) {
                         mod_ui_widget_go (evt,_hotkey_e);
-                        _hotkey_e._on.go (evt,_hotkey_e);
+                        //_hotkey_e._on.go (evt,_hotkey_e);
                     }
                 }
                 break;
@@ -183,7 +183,7 @@ O3 : O!(Event) {
                     auto _hotkey_e = cast (E) e;
                     if (_hotkey_e !is null) {
                         mod_ui_widget_go (evt,_hotkey_e);
-                        _hotkey_e._on.go (evt,_hotkey_e);
+                        //_hotkey_e._on.go (evt,_hotkey_e);
                     }
                 }
                 break;
@@ -191,7 +191,7 @@ O3 : O!(Event) {
                 with (evt.click) {
                     auto _mouse_over_e = gui.select (x,y);
                     if (_mouse_over_e !is null) {
-                        _mouse_over_e._on.go (evt,_mouse_over_e);
+                        //_mouse_over_e._on.go (evt,_mouse_over_e);
                     }
                 }
                 break;
@@ -210,6 +210,31 @@ O3 : O!(Event) {
                 }
                 break;
             default:
+        }
+
+        // on
+        foreach (e; gui.e.childs_recursive) {
+            auto rec = e._on.select (evt.type);
+            if (rec !is null) {
+                // call dg
+                if (rec.dg !is null)
+                    rec.dg (evt);
+                // send event
+                if (rec.new_event.type)
+                    send (rec.new_event);
+                // add klass
+                if (rec.add_klass.length) {
+                    auto kls = select_klass (rec.add_klass);
+                    if (kls !is null)
+                        e.add_klass (kls);
+                }
+                // rem klass
+                if (rec.rem_klass.length) {
+                    auto kls = select_klass (rec.rem_klass);
+                    if (kls !is null)
+                        e.rem_klass (kls);
+                }
+            }
         }
     }
 
