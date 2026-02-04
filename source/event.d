@@ -87,6 +87,7 @@ union {
         REDRAW,
         // audio
         PLAY,
+        PLAY_1,
         // ui
         UPDATE,
         SET_E_PROP,

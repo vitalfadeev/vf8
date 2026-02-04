@@ -36,6 +36,8 @@ O3 : O!(Event) {
     Video video;
     Gui   gui;
 
+    mixin Switches;
+
     override
     void
     open () {
@@ -655,45 +657,48 @@ Gui {
 //  _BTN_DOWN
 //     PLAY_1
 
-void
-_key_sw (Event* evt) {
-    switch (evt.type) with (evt.type) {
-        case KEY_A: send (PLAY_1); break;
-        default:
+mixin template
+Switches () {
+    void
+    _key_sw (Event* evt) {
+        switch (evt.type) with (evt.type) {
+            case KEY_A: send (PLAY_1); break;
+            default:
+        }
     }
-}
 
-void
-_audio_sw (Event* evt) {
-    switch (evt.type) with (evt.type) {
-        case PLAY_1: play ("1.wav"); break;
-        default:
+    void
+    _audio_sw (Event* evt) {
+        switch (evt.type) with (evt.type) {
+            case PLAY_1: play ("1.wav"); break;
+            default:
+        }
     }
-}
 
-void
-_mouse_sw (Event* evt) {
-    switch (evt.type) with (evt.type) {
-        case BTN_DOWN: break;
-        default:
+    void
+    _mouse_sw (Event* evt) {
+        switch (evt.type) with (evt.type) {
+            case BUTTON_LEFT: break;
+            default:
+        }
     }
-}
 
-void
-_button_sw (Event* evt) {
-    switch (evt.type) with (evt.type) {
-        case BTN_DOWN : send (PLAY_1); break;
-        case PLAY_1   : send (PRESS);  break;
-        case PRESS    : add_klass ("press"); break;
-        default:
+    void
+    _button_sw (Event* evt) {
+        switch (evt.type) with (evt.type) {
+            case BUTTON_LEFT : send (PLAY_1); break;
+            case PLAY_1      : send (PRESS);  break;
+            case PRESS       : add_klass ("press"); break;
+            default:
+        }
     }
-}
 
-void
-_widget_sw (Event* evt) {
-    switch (evt.type) with (evt.type) {
-        case PLAY_1   : add_klass ("play"); break;
-        case BTN_DOWN : send (PLAY_1);      break;
-        default:
+    void
+    _widget_sw (Event* evt) {
+        switch (evt.type) with (evt.type) {
+            case PLAY_1      : add_klass ("play"); break;
+            case BUTTON_LEFT : send (PLAY_1);      break;
+            default:
+        }
     }
 }
