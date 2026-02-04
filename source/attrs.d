@@ -23,7 +23,7 @@ Attrs () {
     void fg (uint a) { attrs[Aid.fg] = A.UInt (a); }
     void bg (A    a) { attrs[Aid.bg] = a; }
     void bg (uint a) { attrs[Aid.bg] = A.UInt (a); }
-    void type (E.Type a) { attrs[Aid.tp] = A.EType (a); }
+    //void type (E.Type a) { attrs[Aid.tp] = A.EType (a); }
     void hotkey (string a) { attrs[Aid.hk] = A.Hotkey (a); }
 
     A x      () { return attrs[Aid.x]; }

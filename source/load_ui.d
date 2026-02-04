@@ -74,6 +74,8 @@ load_ui (O) (O o) {
                 .on (Event.Type.PRESS,        &o._on_click_1)
                 .on (Event.Type.HOTKEY_PRESS, &o._on_click_1)
                 .hotkey ("a")
+                //.dynamic_klasses (&o.dg_data_eq_x, "red", "green")
+                //.dynamic_klasses (&o.data.flag_1, "pressed", "")
                 .parent
             .e .button ._2  
                 .on (Event.Type.PRESS,        &o._on_click_2)
@@ -168,7 +170,7 @@ load_klasses (O o) {
     }
 
     with (o.new_klass ("button")) {
-        type = E.Type.BUTTON;
+        //type = E.Type.BUTTON;
         w    = parent_h;
         bg   = 0xFF003300;
         fg   = 0xFFFF0000;

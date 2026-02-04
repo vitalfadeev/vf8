@@ -12,8 +12,7 @@ Input (Event) {
 
     bool 
     read (Event* event) {
-        event.type = Event.Type.SDL;
-        return (SDL_WaitEvent (&event.sdl.sdl_event) == 1);
+        return (SDL_WaitEvent (&event.sdl) == 1);
     }
 
     //void

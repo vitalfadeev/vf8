@@ -93,3 +93,32 @@ remove_element (R, N) (ref R haystack, N needle) {
     auto index = haystack.countUntil (needle);
     return (index != -1) ? haystack.remove (index) : haystack;
 }
+
+
+struct
+Event_attrs {
+    mixin Attrs;
+}
+
+void
+window_ (Event* evt) {
+    with (evt.attrs) {
+        x  = 0;
+        y  = 0;
+        w  = Desktop.w;
+        h  = 64;
+        fg = 0xFF00FF00;
+    }
+}
+
+KLASS window_2 = (Event* evt) {
+    with (evt.attrs) {
+        x  = 0;
+        y  = 0;
+        w  = Desktop.w;
+        h  = 64;
+        fg = 0xFF00FF00;
+    }
+};
+
+alias KLASS = void function (Event* evt);
