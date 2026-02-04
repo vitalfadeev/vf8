@@ -126,6 +126,7 @@ O3 : O!(Event) {
 
     void
     mod_ui_go (Event* evt) {
+        writeln (evt.type);
         with (evt.Type)
         switch (evt.type) {
             case SET_E_PROP :
@@ -212,28 +213,49 @@ O3 : O!(Event) {
             default:
         }
 
+        // remap SDL evenp
+        with (Event.Type)
+        if (evt.type == MOUSEBUTTONDOWN)
+            if (evt.sdl.button.button == SDL_BUTTON_LEFT)
+                evt.type = BUTTON_LEFT;
+
         // on
         foreach (e; gui.e.childs_recursive) {
+            bool redraw = false;
             auto rec = e._on.select (evt.type);
             if (rec !is null) {
                 // call dg
-                if (rec.dg !is null)
+                if (rec.dg !is null) {
                     rec.dg (evt);
+                    redraw = true;
+                }
                 // send event
-                if (rec.new_event.type)
+                if (rec.new_event.type) {
                     send (rec.new_event);
+                    redraw = true;
+                }
                 // add klass
                 if (rec.add_klass.length) {
                     auto kls = select_klass (rec.add_klass);
-                    if (kls !is null)
+                    if (kls !is null) {
                         e.add_klass (kls);
+                        redraw = true;
+                    }
                 }
                 // rem klass
                 if (rec.rem_klass.length) {
                     auto kls = select_klass (rec.rem_klass);
-                    if (kls !is null)
+                    if (kls !is null) {
                         e.rem_klass (kls);
+                        redraw = true;
+                    }
                 }
+            }
+
+            with (Event.Type)
+            if (redraw) {
+                send (SET_E_PROP);
+                send (REDRAW);
             }
         }
     }
