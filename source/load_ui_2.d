@@ -1,4 +1,4 @@
-module load_ui;
+module load_ui_2;
 
 import std.stdio : writeln;
 import vf.e_class;
@@ -69,39 +69,38 @@ load_ui (O) (O o) {
     dump_klasses (o);
     auto e = OE!O (o,new E());
     with (Event.Type)
-    e .window .panel .canvas  // {o,e}
-        .e .loc1
-            .e .button ._1  
-                .on (MOUSEBUTTONDOWN, SDL_BUTTON_LEFT, 0, Event (PLAY_1))
-                .on (PLAY_1, "lamp")
-                //.on (PRESS, )
-                .on (CLICK, Event (OPEN_LAUNCHER) )
-                .on (MOUSEBUTTONUP, SDL_BUTTON_LEFT, 0, "-lamp")
-                .on (PLAY_1_STOP, "-lamp")
-                //.on (RELEASE, "-pressed")
-                .parent
-            .e .button ._2  
-                .on (MOUSEBUTTONDOWN, SDL_BUTTON_LEFT, 0, Event (PLAY_2))
-                .on (PLAY_2, "lamp")
-                //.on (PRESS, "pressed")
-                .on (MOUSEBUTTONUP, SDL_BUTTON_LEFT, 0, "-lamp")
-                .on (PLAY_2_STOP, "-lamp")
-                //.on (RELEASE, "-pressed")
-                .parent
-            .e .button ._3  
-                .on (MOUSEBUTTONDOWN, SDL_BUTTON_LEFT, 0, Event (PLAY_3))
-                .on (PLAY_3, "lamp")
-                //.on (PRESS, "pressed")
-                .on (MOUSEBUTTONUP, SDL_BUTTON_LEFT, 0, "-lamp")
-                .on (PLAY_3_STOP, "-lamp")
-                //.on (RELEASE, "-pressed")
-                .parent.parent
-        .e .loc2
-            .e .button .clock  .parent.parent
-        .e .loc3
-            .e .indicator ._1  .parent
-            .e .indicator ._2  .parent
-            .e .indicator ._3  .parent.parent
+    e .window
+        .e .page
+            .e .icon .data
+                .e .image .parent
+                .e .text  .parent.parent
+            .e .icon .data
+                .e .image .parent
+                .e .text  .parent.parent
+            .e .icon .data
+                .e .image .parent
+                .e .text  .parent.parent
+            .e .icon .data
+                .e .image .parent
+                .e .text  .parent.parent
+            .e .icon .data
+                .e .image .parent
+                .e .text  .parent.parent
+            .e .icon .data
+                .e .image .parent
+                .e .text  .parent.parent
+            .e .icon .data
+                .e .image .parent
+                .e .text  .parent.parent
+            .e .icon .data
+                .e .image .parent
+                .e .text  .parent.parent
+            .e .icon .data
+                .e .image .parent
+                .e .text  .parent.parent
+            .e .icon .data
+                .e .image .parent
+                .e .text  .parent.parent.parent
      ;
     return e._e;
 }
@@ -180,81 +179,46 @@ load_klasses (O o) {
         //     aabbggrr
     }
 
-    with (o.new_klass ("panel")) {
+    with (o.new_klass ("page")) {
         import vf.layout : Layout_Type=Type;
         childs_layout = Layout_Type.left_aligned_stacked_to_right;
     }
 
-    with (o.new_klass ("canvas")) {
+    with (o.new_klass ("icon")) {
         //
     }
 
-    with (o.new_klass ("loc1")) {
-        w  = 33.perc;
-        h  = parent_h;
-        import vf.layout : Layout_Type=Type;
-        childs_layout = Layout_Type.left_aligned_stacked_to_right;
-        fg = 0x88444444;
-        //     aabbggrr
-    }
-
-    with (Event.Type)
-    with (o.new_klass ("button")) {
-        //type = E.Type.BUTTON;
-        w    = parent_h;
-        bg   = 0xFF003300;
-        fg   = 0xFFFF0000;
-        //       aabbggrr
-        //on (CLICK, &o.on_click);
-    }
-
-    with (o.new_klass ("pressed")) {
-        bg = 0xFFAAAAAA;
-    }
-
-    with (o.new_klass ("lamp")) {
-        bg = 0xFFCCCCCC;
-    }
-
-    with (o.new_klass ("_1")) {
+    with (o.new_klass ("image")) {
         //
     }
 
-    with (o.new_klass ("_2")) {
+    with (o.new_klass ("text")) {
         //
     }
 
-    with (o.new_klass ("_3")) {
-        //
+    // mapper
+    with (o.new_klass ("data")) {
+        data_mapper = (Klass k, Event* evt, E e, void* _data) {
+            auto data = cast (Data*) _data;
+            e.childs[0].img  = data.img;
+            e.childs[1].text = data.text;
+        };
     }
+}
 
-    with (o.new_klass ("loc2")) {
-        w = 34.perc;
-        h = parent_h;
-        import vf.layout : Layout_Type=Type;
-        childs_layout = Layout_Type.center_aligned_stacked_to_right;
-        fg = 0x88444444;
-    }
+struct
+Data {
+    string img;
+    string text;
+}
 
-    with (o.new_klass ("clock")) {
-        w  = 33.perc;
-        h  = parent_h;
-        fg = 0xFFFFFFFF;
-    }
-
-    with (o.new_klass ("loc3")) {
-        w  = 33.perc;
-        h  = parent_h;
-        import vf.layout : Layout_Type=Type;
-        childs_layout = Layout_Type.right_aligned_stacked_to_left;
-        fg = 0x88444444;
-    }
-
-    with (o.new_klass ("indicator")) {
-        w  = parent_h;
-        h  = parent_h;
-        fg = 0xFF0000FF;
-    }
+struct
+Data_range (Data) {
+    import std.range;
+    Data[] s;
+    Data*  front () { return &s[0]; };
+    bool   empty () { return s.length == 0; }
+    void   popFront () { s = s[1..$]; }
 }
 
 void

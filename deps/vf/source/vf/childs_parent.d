@@ -1,4 +1,4 @@
-module childs_parent;
+module vf.childs_parent;
 
 mixin template
 Childs_parent (E) {
@@ -46,6 +46,10 @@ Childs_parent (E) {
         E    front;
         bool empty    () { return front is null; }
         void popFront () { front = front.r; }
+
+        import std.range;
+        import std.algorithm;
+        auto opIndex (size_t i) { return Childs_range (front).takeExactly (i).front; }
     }
 
     struct

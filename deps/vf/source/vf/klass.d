@@ -1,9 +1,9 @@
-module klass;
+module vf.klass;
 
-import e_class;
-import attrs;
-import event;
-import app : O=O3;
+import vf.e_class;
+import vf.attrs;
+import vf.event;
+import vf.o : O;
 
 
 class
@@ -20,6 +20,9 @@ Klass {
     go (Event* evt) {
         //
     }
+
+    Data_mapper_fn data_mapper;
+    alias Data_mapper_fn = void function (Klass k, Event* evt, E e, void* data);
 
     override
     string

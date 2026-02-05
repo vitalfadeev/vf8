@@ -1,4 +1,4 @@
-module layout.xy;
+module vf.layout.xy;
 
 struct
 XY {

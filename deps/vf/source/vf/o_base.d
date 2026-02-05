@@ -5,7 +5,7 @@ import vf.local_input : Local_input;
 
 ///
 class
-O (Event) {
+O_base (Event) {
     bool              go_flag = true;
     Input!Event       input;
     Local_input!Event local_input;
@@ -80,14 +80,16 @@ O (Event) {
         local_input.put (&event);
     }
 
-    void
-    send (Event.Type type, string ev, string prop, VALUE) (VALUE value) {
-        Event event;
-        event.type = type;
-        __traits (getMember, __traits (getMember, event, ev), prop) = value;
-        local_input.put (&event);
-    }
+    //void
+    //send (Event.Type type, string ev, string prop, VALUE) (VALUE value) {
+    //    Event event;
+    //    event.type = type;
+    //    __traits (getMember, __traits (getMember, event, ev), prop) = value;
+    //    local_input.put (&event);
+    //}
 }
+
+
 
 // input  line
 // direct line

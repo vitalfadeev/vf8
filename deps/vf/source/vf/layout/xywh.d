@@ -1,6 +1,6 @@
-module layout.xywh;
+module vf.layout.xywh;
 
-import layout.xy;
+import vf.layout.xy;
 import std.stdio : writeln;
 
 alias W = X;

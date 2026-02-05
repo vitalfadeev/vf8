@@ -1,8 +1,12 @@
-module attrs;
+module vf.attrs;
+
+import vf.layout : Layout_Type=Type;
 
 
 mixin template 
 Attrs () {
+    import vf.layout  : Layout_Type=Type;
+
     A[Aid.max+1] attrs;
 
     void x  (A   a) { attrs[Aid.x] = a; }
@@ -17,14 +21,15 @@ Attrs () {
     void h  (int a) { attrs[Aid.h] = A.Int (a); }
     void h  (A.Parent_h a) { attrs[Aid.h] = a; }
     void childs_layout (A   a) { attrs[Aid.l] = a; }
-    import layout : Layout_Type=Type;
     void childs_layout (Layout_Type a) { attrs[Aid.l] = A.Layout(a); }
     void fg (A    a) { attrs[Aid.fg] = a; }
     void fg (uint a) { attrs[Aid.fg] = A.UInt (a); }
     void bg (A    a) { attrs[Aid.bg] = a; }
     void bg (uint a) { attrs[Aid.bg] = A.UInt (a); }
-    //void type (E.Type a) { attrs[Aid.tp] = A.EType (a); }
+    void type (uint  a) { attrs[Aid.tp] = A.EType (a); }
     void hotkey (string a) { attrs[Aid.hk] = A.Hotkey (a); }
+    void img  (string a) { attrs[Aid.img] = A.Image (a); }
+    void text (string a) { attrs[Aid.txt] = A.Text (a); }
 
     A x      () { return attrs[Aid.x]; }
     A y      () { return attrs[Aid.y]; }
@@ -34,6 +39,8 @@ Attrs () {
     A bg     () { return attrs[Aid.bg]; }
     A type   () { return attrs[Aid.tp]; }
     A hotkey () { return attrs[Aid.hk]; }
+    A img    () { return attrs[Aid.img]; }
+    A text   () { return attrs[Aid.txt]; }
 
     auto
     calculated () {
@@ -50,11 +57,13 @@ Aid {
     y,
     w,
     h,
-    l,   // childs_layout
-    fg,  // fg
-    bg,  // bg
-    tp,  // type  // BUTTON
-    hk,  // type  // BUTTON
+    l,    // childs_layout
+    fg,   // fg
+    bg,   // bg
+    tp,   // type  // BUTTON
+    hk,   // type  // BUTTON
+    img,
+    txt,
 }
 
 struct
@@ -72,6 +81,8 @@ A {
         Layout   _layout;
         EType    _etype;
         Hotkey   _hotkey;
+        Image    _image;
+        Text     _text;
     }
 
     enum
@@ -92,6 +103,8 @@ A {
         _etype,
         // hotkey
         _hotkey,
+        _image,
+        _text,
     }
 
     //
@@ -142,18 +155,26 @@ A {
 
     struct
     Layout {
-        import layout : Layout_Type=Type;
         Layout_Type a;
     }        
 
     struct
     EType {
-        import e_class : E;
-        E.Type a;
+        uint  a;
     }        
 
     struct
     Hotkey {
+        string a;
+    }
+
+    struct
+    Image {
+        string a;
+    }
+
+    struct
+    Text {
         string a;
     }
 
@@ -217,6 +238,16 @@ A {
         type = Type._hotkey;
         _hotkey = b;
     }
+    void
+    opAssign (Image b) {
+        type = Type._image;
+        _image = b;
+    }
+    void
+    opAssign (Text b) {
+        type = Type._text;
+        _text = b;
+    }
 }
 
 auto
@@ -249,7 +280,7 @@ Calculated (E) {
         }
     }
 
-    E.Type
+    uint 
     type () {
         switch (_this.type.type) with (A.Type) {
             case _etype: return _this.type._etype.a;

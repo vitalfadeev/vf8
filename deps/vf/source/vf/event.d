@@ -1,9 +1,13 @@
-module event;
+module vf.event;
 
 import importc: 
     SDL_Event,SDL_EventType,SDL_Scancode,
     SDL_BUTTON_LEFT,SDL_BUTTON_MIDDLE,SDL_BUTTON_RIGHT,
     SDL_BUTTON_X1,SDL_BUTTON_X2;
+
+import importc;
+import vf.layout;
+import vf.attrs;
 
 struct
 Event {
@@ -15,6 +19,7 @@ union {
     Event_open       open;
     Event_quit       quit;
     Event_draw       draw;
+    Event_redraw     redraw;
     Event_play       play;
     Event_update     update;
     Event_set_e_prop set_e_prop;
@@ -29,6 +34,7 @@ union {
     this (Event_play   evt) { play   = evt; }
     this (Event_click  evt) { click  = evt; }
     this (Event_hotkey evt) { hotkey = evt; }
+    this (Event_draw   evt) { draw   = evt; }
 
     string
     toString () {
@@ -375,6 +381,8 @@ union {
         HOTKEY_PRESS,
         HOTKEY_RELEASE,
         ATTRS,
+        //
+        OPEN_LAUNCHER,
         //                       0xFFFF
         SDL_LASTEVENT          = SDL_EventType.SDL_LASTEVENT,
     }
@@ -387,20 +395,16 @@ Event_base {
 struct
 Event_draw {
     Event.Type type = Event.Type.DRAW;
-    import importc;
     Tvg_Canvas canvas;
 
     template
     tpl () {
         Color  _bg;
         Color  _fg;
-        string text;
         alias Color = uint;
     }
     alias Color = uint;  // aabbggrr
 
-    import importc;
-    import layout;
     void
     draw_rect (Tvg_Canvas canvas, XY xy, XY wh, Color bg, Color fg) {
         ubyte fg_r = (fg >>  0) & 0xFF;
@@ -446,6 +450,14 @@ Event_draw {
     }
 }
 struct
+Event_redraw {
+    Event.Type type = Event.Type.REDRAW;
+    int x;
+    int y;
+    int w;
+    int h;
+}
+struct
 Event_click {
     auto type = Event.Type.CLICK;
     int  x;
@@ -477,7 +489,6 @@ Event_hotkey {
 struct
 Event_attrs {
     auto type = Event.Type.ATTRS;
-    import attrs;
     mixin Attrs;
 }
 

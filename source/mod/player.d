@@ -2,7 +2,7 @@ module mod.player;
 
 import core.stdc.stdio : printf;
 import vf.types        : GO,REG;
-import vf.o_base       : O;
+import vf.o_base       : O_base;
 import importc;
 
 enum       EVT_UI          = 0x0200;

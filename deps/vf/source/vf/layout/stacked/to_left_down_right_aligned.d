@@ -1,6 +1,6 @@
-module layout.stacked.to_left_down_right_aligned;
+module vf.layout.stacked.to_left_down_right_aligned;
 
-import layout.xy;
+import vf.layout.xy;
 
 
 // 0,0 .. w,h

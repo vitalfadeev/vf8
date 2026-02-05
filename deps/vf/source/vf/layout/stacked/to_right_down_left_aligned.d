@@ -1,16 +1,16 @@
-module layout.stacked.to_right_down_center_aligned;
+module vf.layout.stacked.to_right_down_left_aligned;
 
-import layout.xy;
+import vf.layout.xy;
 
 
 // 0,0 .. w,h
 void
-to_right_down_center_aligned (E) (E _this) {
+to_right_down_left_aligned (E) (E _this) {
+    // childs_space, wh, xy, childs_range
     XY cursor;
     XY space = _this.childs_space;
     XY line  = _this.wh;
     XY limi  = _this.wh;
-    XY total;
 
     // setup
     foreach (_e; _this.childs) {
@@ -21,12 +21,11 @@ to_right_down_center_aligned (E) (E _this) {
         auto cn = line_step_and_check_overflow (cursor,wh,space,line);
         _e.xy  = cn.cur;
         cursor = cn.next;
-        total.w  = total.w + wh.w;
-        total.h  = (cursor.h > total.h) ? cursor.h : total.h;
     }
 
+
     // translate
-    auto dx = _this.xy.x + (_this.wh.w - total.w) / 2;
+    auto dx = _this.xy.x;
     foreach (_e; _this.childs) {
         _e.xy.x += dx;
     }

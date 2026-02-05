@@ -1,12 +1,12 @@
-module layout;
+module vf.layout;
 
 import std.stdio : writeln;
 
-public import layout.stacked.to_right_down_left_aligned;
-public import layout.stacked.to_right_down_center_aligned;
-public import layout.stacked.to_left_down_right_aligned;
-public import layout.xy;
-public import layout.xywh;
+public import vf.layout.stacked.to_right_down_left_aligned;
+public import vf.layout.stacked.to_right_down_center_aligned;
+public import vf.layout.stacked.to_left_down_right_aligned;
+public import vf.layout.xy;
+public import vf.layout.xywh;
 
 
 mixin template

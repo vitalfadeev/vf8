@@ -1,15 +1,15 @@
-module e_class;
+module vf.e_class;
 
 import std.stdio  : writefln;
 import std.stdio  : writeln;
 import std.format : format;
-import attrs;
-import klass;
-import childs_parent;
-import layout;
-import event;
-import on;
-import app : O=O3;
+import vf.attrs;
+import vf.klass;
+import vf.childs_parent;
+import vf.layout;
+import vf.event;
+import vf.on;
+import vf.o : O;
 import std.string : toStringz;
 
 //
@@ -55,7 +55,7 @@ E {
     }
 
     enum 
-    Type {
+    Type : uint {
         _,
         BUTTON,
         CHECK,
