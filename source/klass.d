@@ -39,6 +39,7 @@ Klass {
 
         auto
         add_klass (Klass k) {
+            if (!has_klass (k))
             if (k !is null)
                 _klasses ~= k;
             return this;
@@ -48,6 +49,15 @@ Klass {
         has_klass (string name) {
             foreach (k; _klasses) {
                 if (k.name == name)
+                    return k;
+            }
+            return null;
+        }
+
+        auto
+        has_klass (Klass k) {
+            foreach (_k; _klasses) {
+                if (_k == k)
                     return k;
             }
             return null;

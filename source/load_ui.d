@@ -72,9 +72,10 @@ load_ui (O) (O o) {
     e .window .panel .canvas  // {o,e}
         .e .loc1
             .e .button ._1  
-                .on (BUTTON_LEFT, Event (PLAY_1))
+                .on (MOUSEBUTTONDOWN, SDL_BUTTON_LEFT, 0, Event (PLAY_1))
                 .on (PLAY_1, Event (PRESS))
                 .on (PRESS, "pressed")
+                .on (MOUSEBUTTONUP, SDL_BUTTON_LEFT, 0, "-pressed")
                 .parent
             .e .button ._2  
                 .parent
@@ -119,8 +120,18 @@ OE (O) {
         return this;
     }
     auto
+    on (Event.Type type, uint code, uint modifiers, Event new_event) {
+        _e.on (type,code,modifiers,new_event);
+        return this;
+    }
+    auto
     on (Event.Type type, string new_klass) {
         _e.on (type,new_klass);
+        return this;
+    }
+    auto
+    on (Event.Type type, uint code, uint modifiers, string new_klass) {
+        _e.on (type,code,modifiers,new_klass);
         return this;
     }
 

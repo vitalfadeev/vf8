@@ -213,16 +213,20 @@ O3 : O!(Event) {
             default:
         }
 
-        // remap SDL evenp
-        with (Event.Type)
-        if (evt.type == MOUSEBUTTONDOWN)
-            if (evt.sdl.button.button == SDL_BUTTON_LEFT)
-                evt.type = BUTTON_LEFT;
-
         // on
+        bool redraw = false;
+        uint code;
+        uint modifiers;
+        switch (evt.type) with (evt.type) {
+            case MOUSEBUTTONDOWN : code = evt.sdl.button.button; modifiers = SDL_GetModState (); break;
+            case MOUSEBUTTONUP   : code = evt.sdl.button.button; modifiers = SDL_GetModState (); break;
+            case KEYDOWN         : code = evt.sdl.key.keysym.scancode; modifiers = evt.sdl.key.keysym.mod; break;
+            case KEYUP           : code = evt.sdl.key.keysym.scancode; modifiers = evt.sdl.key.keysym.mod; break;
+            default:
+        }
+        modifiers &= (KMOD_CTRL | KMOD_SHIFT | KMOD_ALT | KMOD_GUI);
         foreach (e; gui.e.childs_recursive) {
-            bool redraw = false;
-            auto rec = e._on.select (evt.type);
+            auto rec = e._on.select (evt.type,code,modifiers);
             if (rec !is null) {
                 // call dg
                 if (rec.dg !is null) {
@@ -235,16 +239,18 @@ O3 : O!(Event) {
                     redraw = true;
                 }
                 // add klass
-                if (rec.add_klass.length) {
-                    auto kls = select_klass (rec.add_klass);
+                if (rec.klass.length)
+                if (rec.klass[0] != '-') {
+                    auto kls = select_klass (rec.klass);
                     if (kls !is null) {
                         e.add_klass (kls);
                         redraw = true;
                     }
                 }
                 // rem klass
-                if (rec.rem_klass.length) {
-                    auto kls = select_klass (rec.rem_klass);
+                if (rec.klass.length)
+                if (rec.klass[0] == '-') {
+                    auto kls = select_klass (rec.klass[1..$]);
                     if (kls !is null) {
                         e.rem_klass (kls);
                         redraw = true;
@@ -709,7 +715,7 @@ Switches () {
     //void
     //_key_sw (Event* evt) {
     //    switch (evt.type) with (evt.type) {
-    //        case KEY_A: send (PLAY_1); break;
+    //        case KEYDOWN: if (KEY_A == evt.key.keysym.scancode) send (PLAY_1); break;
     //        default:
     //    }
     //}

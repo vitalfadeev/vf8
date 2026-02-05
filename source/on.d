@@ -16,8 +16,18 @@ On (Event) {
         return this;
     }
     auto
+    on (Event.Type type, uint code, uint modifiers, Event new_event) {
+        _on.add (type,code,modifiers,new_event);
+        return this;
+    }
+    auto
     on (Event.Type type, string klass_name) {
         _on.add (type,klass_name);
+        return this;
+    }
+    auto
+    on (Event.Type type, uint code, uint modifiers, string klass_name) {
+        _on.add (type,code,modifiers,klass_name);
         return this;
     }
 }
@@ -36,9 +46,9 @@ _On (Event) {
     //}
 
     auto
-    select (Event.Type type) {
+    select (Event.Type type, uint code = 0, uint modifiers = 0) {
         foreach (ref rec; recs) {
-            if (rec.event_type == type) {
+            if (rec.event_type == type && rec.code == code && (rec.modifiers == modifiers)) {
                 return &rec;
             }
         }
@@ -50,37 +60,56 @@ _On (Event) {
     add (Event.Type event_type, DG dg, void* data=null) {
         auto rec = select (event_type);
         if (rec !is null)
-            *rec  = Rec (event_type,dg,data);
+            *rec  = Rec (event_type,0,0,dg,data);
         else
-            recs ~= Rec (event_type,dg,data);
+            recs ~= Rec (event_type,0,0,dg,data);
     }
 
     void
     add (Event.Type event_type, ref Event new_event) {
         auto rec = select (event_type);
         if (rec !is null)
-            *rec  = Rec (event_type,null,null,new_event);
+            *rec  = Rec (event_type,0,0,null,null,new_event);
         else
-            recs ~= Rec (event_type,null,null,new_event);
+            recs ~= Rec (event_type,0,0,null,null,new_event);
+    }
+
+    void
+    add (Event.Type event_type, uint code, uint modifiers, ref Event new_event) {
+        auto rec = select (event_type);
+        if (rec !is null)
+            *rec  = Rec (event_type,code,modifiers,null,null,new_event);
+        else
+            recs ~= Rec (event_type,code,modifiers,null,null,new_event);
     }
 
     void
     add (Event.Type event_type, string klass_name) {
         auto rec = select (event_type);
         if (rec !is null)
-            *rec  = Rec (event_type,null,null,Event(),klass_name);
+            *rec  = Rec (event_type,0,0,null,null,Event(),klass_name);
         else
-            recs ~= Rec (event_type,null,null,Event(),klass_name);
+            recs ~= Rec (event_type,0,0,null,null,Event(),klass_name);
+    }
+
+    void
+    add (Event.Type event_type, uint code, uint modifiers, string klass_name) {
+        auto rec = select (event_type,code,modifiers);
+        if (rec !is null)
+            *rec  = Rec (event_type,code,modifiers,null,null,Event(),klass_name);
+        else
+            recs ~= Rec (event_type,code,modifiers,null,null,Event(),klass_name);
     }
 
     struct
     Rec {
         Event.Type event_type;
+        uint       code;
+        uint       modifiers;
         DG         dg;
         void*      data;
         Event      new_event;
-        string     add_klass;
-        string     rem_klass;
+        string     klass;
     }
 
     alias FN = void function (Event* evt, void* data, void* e, void* o);
