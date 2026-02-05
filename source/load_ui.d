@@ -73,15 +73,27 @@ load_ui (O) (O o) {
         .e .loc1
             .e .button ._1  
                 .on (MOUSEBUTTONDOWN, SDL_BUTTON_LEFT, 0, Event (PLAY_1))
-                .on (PLAY_1, Event (PRESS))
-                .on (PRESS, "pressed")
-                .on (MOUSEBUTTONUP, SDL_BUTTON_LEFT, 0, "-pressed")
-                .on (PLAY_1_STOP, Event (RELEASE))
-                .on (RELEASE, "-pressed")
+                .on (PLAY_1, "lamp")
+                //.on (PRESS, )
+                .on (MOUSEBUTTONUP, SDL_BUTTON_LEFT, 0, "-lamp")
+                .on (PLAY_1_STOP, "-lamp")
+                //.on (RELEASE, "-pressed")
                 .parent
             .e .button ._2  
+                .on (MOUSEBUTTONDOWN, SDL_BUTTON_LEFT, 0, Event (PLAY_2))
+                .on (PLAY_2, "lamp")
+                //.on (PRESS, "pressed")
+                .on (MOUSEBUTTONUP, SDL_BUTTON_LEFT, 0, "-lamp")
+                .on (PLAY_2_STOP, "-lamp")
+                //.on (RELEASE, "-pressed")
                 .parent
             .e .button ._3  
+                .on (MOUSEBUTTONDOWN, SDL_BUTTON_LEFT, 0, Event (PLAY_3))
+                .on (PLAY_3, "lamp")
+                //.on (PRESS, "pressed")
+                .on (MOUSEBUTTONUP, SDL_BUTTON_LEFT, 0, "-lamp")
+                .on (PLAY_3_STOP, "-lamp")
+                //.on (RELEASE, "-pressed")
                 .parent.parent
         .e .loc2
             .e .button .clock  .parent.parent
@@ -196,6 +208,10 @@ load_klasses (O o) {
     }
 
     with (o.new_klass ("pressed")) {
+        bg = 0xFFAAAAAA;
+    }
+
+    with (o.new_klass ("lamp")) {
         bg = 0xFFCCCCCC;
     }
 

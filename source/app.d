@@ -217,15 +217,26 @@ O3 : O!(Event) {
         bool redraw = false;
         uint code;
         uint modifiers;
+        uint x,y;
         switch (evt.type) with (evt.type) {
-            case MOUSEBUTTONDOWN : code = evt.sdl.button.button; modifiers = SDL_GetModState (); break;
-            case MOUSEBUTTONUP   : code = evt.sdl.button.button; modifiers = SDL_GetModState (); break;
+            case MOUSEBUTTONDOWN : code = evt.sdl.button.button; modifiers = SDL_GetModState (); x = evt.sdl.button.x; y = evt.sdl.button.y; break;
+            case MOUSEBUTTONUP   : code = evt.sdl.button.button; modifiers = SDL_GetModState (); x = evt.sdl.button.x; y = evt.sdl.button.y; break;
             case KEYDOWN         : code = evt.sdl.key.keysym.scancode; modifiers = evt.sdl.key.keysym.mod; break;
             case KEYUP           : code = evt.sdl.key.keysym.scancode; modifiers = evt.sdl.key.keysym.mod; break;
             default:
         }
         modifiers &= (KMOD_CTRL | KMOD_SHIFT | KMOD_ALT | KMOD_GUI);
         foreach (e; gui.e.childs_recursive) {
+            // check mouse widget by xy
+            with (evt.type)
+            if (evt.type == MOUSEBUTTONDOWN || evt.type == MOUSEBUTTONUP) {
+                if (gui._select (e,x,y))
+                    {} // allow
+                else
+                    continue;
+            }
+
+            // on
             auto rec = e._on.select (evt.type,code,modifiers);
             if (rec !is null) {
                 // call dg
@@ -362,6 +373,8 @@ O3 : O!(Event) {
                 with (SDL_Scancode)
                 switch (key.keysym.scancode) {
                     case SDL_SCANCODE_Q      : send (Event (Event_play (PLAY_1_STOP,1))); break;
+                    case SDL_SCANCODE_W      : send (Event (Event_play (PLAY_2_STOP,1))); break;
+                    case SDL_SCANCODE_E      : send (Event (Event_play (PLAY_3_STOP,1))); break;
                     default:
                 }
                 break;
