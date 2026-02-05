@@ -357,6 +357,14 @@ O3 : O!(Event) {
                     default:
                 }
                 break;
+            case KEYUP:
+                with (event.sdl)
+                with (SDL_Scancode)
+                switch (key.keysym.scancode) {
+                    case SDL_SCANCODE_Q      : send (Event (Event_play (PLAY_1_STOP,1))); break;
+                    default:
+                }
+                break;
             default:
         }
     }

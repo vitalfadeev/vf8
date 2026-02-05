@@ -362,6 +362,7 @@ union {
         PLAY_1,
         PLAY_2,
         PLAY_3,
+        PLAY_1_STOP,
         // ui
         UPDATE,
         SET_E_PROP,

@@ -76,6 +76,8 @@ load_ui (O) (O o) {
                 .on (PLAY_1, Event (PRESS))
                 .on (PRESS, "pressed")
                 .on (MOUSEBUTTONUP, SDL_BUTTON_LEFT, 0, "-pressed")
+                .on (PLAY_1_STOP, Event (RELEASE))
+                .on (RELEASE, "-pressed")
                 .parent
             .e .button ._2  
                 .parent
