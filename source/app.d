@@ -13,10 +13,17 @@ import importc;
 extern(C)
 void 
 main () {
-    auto o = new O ();
-    o.open ();
-    o.gui.e = load_ui (o);
-    o.go ();   // event loop
+    auto o = O ();
+    with (o)
+    foreach (Event* evt; input ()) {
+        // OPEN
+        // LOAD_UI
+        // ...
+        // QUIT
+
+        send ();
+        send_now ();
+    }
 }
 
 

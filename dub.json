@@ -9,7 +9,6 @@
 		"vf"               : {"path": "./deps/vf"},
 	},
 	"libs" : [
-		"thorvg"
 	],
 	"versions"     : [],
 	"dflags"       : [ "-mixin=mixins.d" ],

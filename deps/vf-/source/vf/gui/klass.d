@@ -1,9 +1,10 @@
 module vf.klass;
 
-import vf.e_class;
+import vf.e;
 import vf.attrs;
 import vf.event;
 import vf.o : O;
+import data_mapper;
 
 
 class
@@ -21,8 +22,7 @@ Klass {
         //
     }
 
-    Data_mapper_fn data_mapper;
-    alias Data_mapper_fn = void function (Klass k, Event* evt, E e, void* data);
+    mixin Data_mapper_tpl;
 
     override
     string

@@ -13,35 +13,16 @@ import vf.o : O;
 import std.string : toStringz;
 
 //
-interface 
-GO {
-    void go (Event* evt);
-}
-
-class
-E_base {
-    void 
-    go (Event* evt) {
-        //
-    }
-}
-
-class
+struct
 E {
     mixin Attrs;
     mixin Klass.tpl;
+    mixin Childs_parent!(typeof(this));
     mixin Event_layout.tpl;
     mixin Event_draw.tpl;
     mixin Event_click.tpl;
-    mixin Childs_parent!(typeof(this));
     mixin On!Event;
 
-    void 
-    go (Event* evt, O o) {
-        //
-    }
-
-    override
     string
     toString () {
         string s;
@@ -53,33 +34,8 @@ E {
         return s;
 
     }
-
-    enum 
-    Type : uint {
-        _,
-        BUTTON,
-        CHECK,
-        RADIO,
-        TEXT,
-        TEXTAREA,
-    }
 }
 
-struct
-Desktop {
-    static
-    int 
-    w () {
-        import vf.video;
-        return WINDOW_DEFAULT_W;
-    }
-    static
-    int 
-    h () {
-        import vf.video;
-        return WINDOW_DEFAULT_H;
-    }
-}
 
 
 void

@@ -288,3 +288,13 @@ Calculated (E) {
         }
     }
 }
+
+    enum 
+    E_Type : uint {
+        _,
+        BUTTON,
+        CHECK,
+        RADIO,
+        TEXT,
+        TEXTAREA,
+    }
