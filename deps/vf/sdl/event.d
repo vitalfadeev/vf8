@@ -73,8 +73,13 @@ Custon_EventType {
     DO_FORCED,
     CLOSE,
     QUIT,
-    // renderer
+    // renderer THORVG
     DRAW,
+    REDRAW,
+    // GUI
+    LOAD_UI,
+    ATTR,
+    LAYOUT,
     //
     SDL_LASTEVENT          = 0xFFFF, //SDL_EventType.SDL_LASTEVENT,
 }

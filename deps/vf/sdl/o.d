@@ -1,6 +1,7 @@
 module vf.sdl.o;
 
 import vf.sdl.input   : Input;
+import vf.sdl.send    : Send;
 import vf.sdl.importc : SDL_Init,SDL_INIT_EVENTS,SDL_INIT_EVERYTHING;
 version (WINDOW) import vf.sdl.window;
 version (AUDIO)  import vf.sdl.audio;
@@ -28,45 +29,6 @@ O (Event) {
         SDL_Init (SDL_INIT_EVERYTHING);
     }
 
-    //
-    void
-    send_now (Event* evt) {
-        assert (go !is null);
-        if (go !is null) 
-            go (&this,evt);
-    }
-
-    void
-    send_now (Event evt) {
-        assert (go !is null);
-        if (go !is null) 
-            go (&this,&evt);
-    }
-
-    void
-    send_now (Event.Type type) {
-        assert (go !is null);
-        Event event;
-        event.type = type;
-        if (go !is null) 
-            go (&this,&event);
-    }
-
-    void
-    send (Event* event) {
-        _input ~= event;
-    }
-
-    void
-    send (Event event) {
-        _input ~= &event;
-    }
-
-    void
-    send (Event.Type type) {
-        Event event;
-        event.type = type;
-        _input ~= &event;
-    }
+    mixin Send!Event;
 }
 

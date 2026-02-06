@@ -330,7 +330,7 @@ examples (T) (T t) {
 alias Color = uint;
 
 void
-draw_rect (Tvg_Canvas canvas, uint x, uint y, uint w, uint h, Color bg, Color fg) {
+draw_rect (Tvg_Canvas canvas, uint x, uint y, uint w, uint h, Color fg, Color bg) {
     ubyte fg_r = (fg >>  0) & 0xFF;
     ubyte fg_g = (fg >>  8) & 0xFF;
     ubyte fg_b = (fg >> 16) & 0xFF;

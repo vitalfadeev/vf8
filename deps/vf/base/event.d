@@ -14,6 +14,7 @@ union {
         DO_1,
         DO_FORCED,
         CLOSE,
+        QUIT,
     }
 
     string

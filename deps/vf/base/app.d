@@ -21,7 +21,9 @@ App () {
             if (send_first) { send_first = false; send (DO_1); }
             if (send_force) { send_force = false; send_now (DO_FORCED); }
 
-            go (evt);
+            go (&o,evt);
+
+            if (evt.type == QUIT) break;
         }
 
         send_now (CLOSE);
@@ -29,7 +31,7 @@ App () {
 }
 
 void
-go (Event* evt) {
+go (void* o, Event* evt) {
     import std.stdio : writefln;
     writefln ("go: %s", evt.type);
 }
