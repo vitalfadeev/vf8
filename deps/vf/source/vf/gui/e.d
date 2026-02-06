@@ -11,14 +11,14 @@ import vf.gui.on;
 struct
 E {
     mixin Childs_parent!E;  // parent,l,r,cl,cr
-    version (FIXED_LAUOUT) int  x,y,w,h;
-    version (FIXED_LAUOUT) uint fg,bg;
-    alias Event_type = uint;
-    mixin On!Event_type;
-
+    version (FIXED_LAUOUT) int   x,y,w,h;
+    version (FIXED_LAUOUT) uint  fg,bg;
+    version (ON)           alias Event_type = uint;
+    version (ON)           mixin On!Event_type;
+    
     version (KLASSES) mixin Klasses_tpl;     // klasses
-    //mixin Attrs;          // x,y,w,h,childs_layout,fg,bg,hotkey,img,text,
-    //mixin Layout_tpl!E;   // xy, childs_space
+    version (LAUOUT)  mixin Attrs;          // x,y,w,h,childs_layout,fg,bg,hotkey,img,text,
+    version (LAUOUT)  mixin Layout_tpl!E;   // xy, childs_space
 
     //mixin Event_draw.tpl;
     //mixin Event_click.tpl;
