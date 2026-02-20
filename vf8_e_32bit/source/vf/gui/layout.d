@@ -1,0 +1,206 @@
+module vf.gui.layout;
+
+version (GUI):
+version (E_32BIT_PAGED):
+import vf.std.xywh     : XY,WH,XYWH;
+
+
+union
+Layout {
+    Type        type;
+    Grid_layout grid;
+    auto range ()       { return grid.range (); }
+    auto select (XY xy) { return grid.select (xy); }
+
+    enum 
+    Type {
+        _,
+        GRID,
+    }
+}
+
+struct
+Grid_layout {
+    Layout.Type type;
+    void*  fn;
+    // total
+    WH     total_wh;
+    // xy
+    ushort cells_on_x;
+    ushort cells_on_y;
+    ushort cells_offset_x;
+    ushort cells_offset_y;
+    ushort cells_space_x;
+    ushort cells_space_y;
+    // wh
+    ushort cells_w;
+    ushort cells_h;
+    ushort first_cell_w;
+    ushort first_cell_h;
+    ushort last_cell_w;
+    ushort last_cell_h;
+
+    Range
+    range () {
+        return Range (&this);  // return XYWH,XYWH,...
+    }
+
+    // center
+    //   dup Range
+    //     calc total_wh      // for left,right,center,both (10,01,00,11)
+    //     calc translate_xy
+    //   dup Range
+    //     translate (xy)
+
+    // Layout args
+    //   3 left, 1 center, 5 right
+    //
+    //   _1st_left_w  = 2x
+    //   _Lst_right_w = 2x
+    //   _center_w    = 2x
+    //
+    // left...  ...center... ... right
+    // 1        2    3   4           5   // 5 loca
+    // vars
+    // loca_1 3  // 3 e
+    // loca_2 2  // 2 e
+    // loca_3 1  // 1 e
+    // loca_4 2  // 2 e
+    // loca_5 3  // 3 e
+    //
+    // e eee ee ee eee - flow  [11]
+    // 3 111 22 44 555 - order [11]
+    //
+    // . . . . .
+    // 3 1 2 4 5 - loca               // 5 Bytes  // 16 bit
+    // 1 3 2 2 3 - n     // 0xFF max  // 5 Bytes  // 
+    Order_rec[5] order;  // 10 Bytes
+
+    struct 
+    Order_rec {
+        Loca loca;
+        N    n;
+    }
+
+    alias Loca = ubyte;
+    alias N    = ubyte;
+
+    auto
+    select (XY xy) {
+        return filter (range,xy);
+    }
+
+    auto
+    filter (R) (R range, XY xy) {
+        return Filter!R (range,xy);
+    }
+
+    struct
+    Filter (R) {
+        R      range;
+        XY     xy;
+        ubyte  i;
+        import std.typecons;
+        alias  Result = Tuple!(ubyte,XYWH);
+        Result front () { return tuple (i,range.front); }
+        bool   empty () { while (!range.empty && !range.front.has (xy)) this.popFront (); return range.empty; }
+        void   popFront () { range.popFront; i++; }
+
+        this (R range, XY xy) {
+            this.range = range;
+            this.xy = xy;
+        }
+    }
+
+    struct
+    Range {
+        Grid_layout* _layout;
+        typeof (_layout.order[]) order;
+        Loca loca;
+        N    n;
+
+        XYWH front;
+        bool empty () { return n == 0; }
+        void popFront () { 
+            import std.range;
+            n--; 
+            if (n == 0) {
+                order.popFront ();
+                if (order.empty) {
+                    n = 0;
+                    return; // END
+                }
+                else {
+                    // next rec
+                    n    = order.front.n;
+                    loca = order.front.loca;
+                    // reset xywh
+                    reset ();
+                }
+            }
+            else {                
+                // update front
+                step ();  
+            }
+        }
+
+        this (Grid_layout* _layout) {
+            import std.range;
+            this._layout = _layout;
+            order = _layout.order[];
+            loca  = order.front.loca;
+            n     = order.front.n;
+            reset ();
+        }
+
+        void 
+        reset () {
+            switch (loca) {
+                case 1:  // left, to right
+                    front.x = _layout.cells_offset_x;
+                    break;
+                case 2:  // center, to left
+                    front.x = _layout.cells_offset_x + _layout.total_wh.w / 2 - _layout.cells_w / 2 - _layout.cells_w;
+                    break;
+                case 3:  // center
+                    front.x = _layout.cells_offset_x + _layout.total_wh.w / 2 - _layout.cells_w / 2;
+                    break;
+                case 4:  // center, to right
+                    front.x = _layout.cells_offset_x + _layout.total_wh.w / 2 + _layout.cells_w / 2;
+                    break;
+                case 5:  // right, to left
+                    front.x = _layout.total_wh.w - _layout.cells_w;
+                    break;
+                default:
+                    front.x = _layout.cells_offset_x;
+            }
+
+            front.y = _layout.cells_offset_y;
+            front.w = _layout.first_cell_w;
+            front.h = _layout.first_cell_h;            
+        }
+
+        void
+        step () {
+            // step
+            switch (loca) {
+                case 1:  // left, to right
+                    front.x += _layout.cells_w + _layout.cells_space_x;
+                    break;
+                case 2:  // center, to left
+                    front.x -= _layout.cells_w + _layout.cells_space_x;
+                    break;
+                case 3:  // center
+                    //front.x += _layout.cells_w + _layout.cells_space_x;
+                    break;
+                case 4:  // center, to right
+                    front.x += _layout.cells_w + _layout.cells_space_x;
+                    break;
+                case 5:  // right, to left
+                    front.x -= _layout.cells_w + _layout.cells_space_x;
+                    break;
+                default:
+            }
+        }
+    }
+}

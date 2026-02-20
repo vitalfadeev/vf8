@@ -1,29 +1,15 @@
 {
 	"name"             : "vf",
-	"authors"          : [
-		"vf"
-	],
+	"authors"          : ["vf"],
 	"description"      : "A minimal D application.",
 	"license"          : "proprietary",
-	"dependencies"     : {
-	},
+	"dependencies"     : {},
 	"versions"         : [],
-	"dflags"           : [ "-mixin=mixins.d" ],
+	"dflags"           : ["-mixin=mixins.d"],
 	"buildOptions"     : ["ignoreDeprecations"],
-
-	"dflags-linux-dmd" : [
-		"-P-I/usr/include/SDL2",
-	],
-	"dflags-linux-ldc" : [
-		"-P-I/usr/include/SDL2",
-	],
-	"importPaths-gdc"  : [
-		"/usr/include/SDL2",
-	],
-	"libs"             : [
-		"sdl2",
-		"thorvg",
-		"SDL2_mixer",
-	],
+	"dflags-linux-dmd" : ["-P-I/usr/include/SDL2"],
+	"dflags-linux-ldc" : ["-P-I/usr/include/SDL2"],
+	"importPaths-gdc"  : ["/usr/include/SDL2"],
+	"libs"             : ["sdl2","thorvg","SDL2_mixer"],
 	"lflags"           : [],
 }
