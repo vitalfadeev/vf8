@@ -15,5 +15,4 @@ Page {
     Tstring256!E es;
     WH           wh;         // ushort x ushort  16368 x 16368
     Layout       layout;  // grid, ...
-    Color[16]    color_palette;
 }

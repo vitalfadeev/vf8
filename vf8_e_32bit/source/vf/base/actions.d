@@ -2,8 +2,7 @@ module vf.base.actions;
 
 
 struct
-Actions (O,Event) {
-    O* o;
+Actions (Event) {
     Action!Event[string] actions;
 
     void
@@ -11,19 +10,28 @@ Actions (O,Event) {
         switch (evt.type) with (Event.Type) {
             case INIT   : _init (evt); break;
             case ACTION : _action (evt); break;
-            default:
+            default     : _default_action (evt);
         }
     }
 
     void
     _init (Event* evt) {
         import actions.quit : Quit;
-        register ("QUIT", new Quit);
+        import actions.quit : SDL_MOUSEBUTTONDOWN;
+        register (Quit.stringof, new Quit);
+        register (SDL_MOUSEBUTTONDOWN.stringof, new SDL_MOUSEBUTTONDOWN);
     }
 
     void
     _action (Event* evt) {
         auto act = evt.action.name in actions;
+        if (act !is null)
+            act._do (evt);
+    }
+
+    void
+    _default_action (Event* evt) {
+        auto act = evt.type_to_string in actions;
         if (act !is null)
             act._do (evt);
     }
@@ -36,17 +44,21 @@ Actions (O,Event) {
 
 // send ("SHOW_QUICK_SETTINGS")  // string
 // send (REDRAW)                 // enum
-void
-send (alias o, Event) (string action_name) {
-    // string save in Event
-    // set type to ACTION
-    //   then send event
-    //   then get Actions
-    //   via Actions.do_switch ()
-    Event evt;
-    evt.type = Event.Type.ACTION;
-    evt.action.name = action_name;
-    o.input ~= &evt;
+
+mixin template
+Send (Event) {
+    void
+    send (O) (O* o, string action_name) {
+        // string save in Event
+        // set type to ACTION
+        //   then send event
+        //   then get Actions
+        //   via Actions.do_switch ()
+        Event evt;
+        evt.type = Event.Type.ACTION;
+        evt.action.name = action_name;
+        o.input ~= &evt;
+    }
 }
 
 class

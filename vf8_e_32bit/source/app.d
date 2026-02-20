@@ -14,8 +14,8 @@ main () {
 	auto o = O ();
 	o.page = Page ();
 	o.page.es.length = 12;
-	static Mod!O mod;
-	mod.o = &o;
+	Mod mod;
+	o.do_switch = &mod.do_switch;
 
 	with (o.page.layout.grid) {
 		import vf.sdl.window : WINDOW_DEFAULT_W, WINDOW_DEFAULT_H;
@@ -40,13 +40,14 @@ main () {
 
 	// INIT
 	with (Event.Type)
-	mod.send_now (INIT);
+	o.send_now (INIT);
 
 	// Event loop
-	foreach (evt; o.input) {
+	with (o)
+	foreach (evt; input) {
 		evt.o = &o;
-		mod.do_switch (evt);
-		if (mod.quit) break;
+		do_switch (evt);
+		if (quit) break;
 	}
 }
 
@@ -59,6 +60,19 @@ O {
     //
     Colors      colors;
 	Fonts 		fonts;
+    bool 		quit;
+    DO_SWITCH   do_switch;
+
+    alias DO_SWITCH = void delegate (Event* evt);
+
+	import vf.base.send;
+	mixin vf.base.send.Send!Event;
+	
+	version (SDL) import vf.sdl.send;
+	version (SDL) mixin vf.sdl.send.Send!Event;
+
+	import vf.base.actions;
+	mixin vf.base.actions.Send!Event;
 }
 
 // SDL_Event sdl_event
@@ -133,13 +147,20 @@ union {
     	Type   type = Type.ACTION;
         string name;
     }
+
+    string
+    type_to_string () {
+    	import vf.sdl.importc_sdl : SDL_USEREVENT;
+    	import std.conv : to;
+    	if (this.type < SDL_USEREVENT)
+    		return (cast (SDL_EventType) this.sdl.type).to!string;    	
+    	else
+    		return this.type.to!string;
+    }
 }
 
 struct
-Mod (I) {
-	O* o;
-	bool quit;
-
+Mod {
 	void
 	do_switch (Event* evt) {
 		log_event (evt);
@@ -159,36 +180,15 @@ Mod (I) {
 	        default     :
 	    }
 
-	    enum
-	    EType {
-	    	_,
-	    	BUTTON,
-	    }
-	    // is GUI xy
-	    // select E
-	    // set evt i
-	    static Mod_type_button!O mod_type_button;
-	    mod_type_button.o = o;
+	    Mod_type_button mod_type_button;
 	    mod_type_button.do_switch (evt);  // set evt.i
-	    with (EType)
-	    if (o.page.es[evt.i].type == BUTTON) {
-		    static Mod_type_on!O mod_type_on;
-		    mod_type_on.o = o;
-		    mod_type_on.do_switch (evt);
-	    }
 
-	    // Cusom type
-	    // ...
-
-	    // app
-		static Mod_app!O mod_app;
-		mod_app.o = o;
-		mod_app.do_switch (evt);  // set evt.i
+	    Mod_type_on mod_type_on;
+	    mod_type_on.do_switch (evt);
 
 		// actions
 		import vf.base.actions : Actions;
-		static Actions!(O,Event) actions;
-		actions.o = o;
+		static Actions!Event actions;
 		actions.do_switch (evt);
 	}
 
@@ -197,26 +197,26 @@ Mod (I) {
 		with (evt.init_) {
 			version (SDL) import vf.sdl.init_sdl : init_sdl;
 			version (SDL) init_sdl ();
-			init_window ();
-			init_gui ();
+			init_window (evt);
+			init_gui (evt);
 		}
 	}
 
 	void
-	init_window () {
-		o.wm.new_window;	    
+	init_window (Event* evt) {
+		evt.o.wm.new_window;
 	}
 
 	void
-	init_gui () {
-		_init_colors ();
-		_init_fonts ();
-		_init_images ();
-		_init_es ();
+	init_gui (Event* evt) {
+		_init_colors (evt);
+		_init_fonts (evt);
+		_init_images (evt);
+		_init_es (evt);
 	}
 
 	void
-	_init_colors () {
+	_init_colors (Event* evt) {
 		Color[8] c;
 		c[0] = 0xFF000000;
 		c[1] = 0xFF444444;
@@ -225,51 +225,52 @@ Mod (I) {
 		c[4] = 0xFF883333;
 		//       aaBBGGRR
 
-		o.colors.base.fg     = c[3];
-		o.colors.base.bg     = c[1];
-		o.colors.disabled.fg = c[1];
-		o.colors.disabled.bg = c[0];
-		o.colors.pressed.fg  = c[3];
-		o.colors.pressed.bg  = c[2];
-		o.colors.selected.fg = c[3];
-		o.colors.selected.bg = c[4];
+		evt.o.colors.base.fg     = c[3];
+		evt.o.colors.base.bg     = c[1];
+		evt.o.colors.disabled.fg = c[1];
+		evt.o.colors.disabled.bg = c[0];
+		evt.o.colors.pressed.fg  = c[3];
+		evt.o.colors.pressed.bg  = c[2];
+		evt.o.colors.selected.fg = c[3];
+		evt.o.colors.selected.bg = c[4];
 	}
 
 	void
-	_init_fonts () {
-		o.fonts._init ();
+	_init_fonts (Event* evt) {
+		evt.o.fonts._init ();
 	}
 
 	void
-	_init_images () {
+	_init_images (Event* evt) {
 	    //
 	}
 
 	void
-	_init_es () {
-	    o.page.es[0].type  = 1; // start 
-	    o.page.es[1].type  = 0;
-	    o.page.es[2].type  = 0;
-	    o.page.es[3].type  = 0;
-	    o.page.es[4].type  = 0;
-	    o.page.es[5].type  = 2; // clock
-	    o.page.es[6].type  = 0;
-	    o.page.es[7].type  = 0;
-	    o.page.es[8].type  = 3; // indicators
-	    o.page.es[9].type  = 4; // indicators
-	    o.page.es[10].type = 5; // indicators
+	_init_es (Event* evt) {
+	    evt.o.page.es[0].type  = 1; // start 
+	    evt.o.page.es[1].type  = 0;
+	    evt.o.page.es[2].type  = 0;
+	    evt.o.page.es[3].type  = 0;
+	    evt.o.page.es[4].type  = 0;
+	    evt.o.page.es[5].type  = 2; // clock
+	    evt.o.page.es[6].type  = 0;
+	    evt.o.page.es[7].type  = 0;
+	    evt.o.page.es[8].type  = 3; // indicators
+	    evt.o.page.es[9].type  = 4; // indicators
+	    evt.o.page.es[10].type = 5; // indicators
 	}
 
 	void
 	_do_draw (Event* evt) {
+		with (evt.o)
 		with (evt.draw) {
 			import std.range     : lockstep;
 			import vf.gui.colors : Color;
 
-			renderer.fonts = &o.fonts;
+			renderer.fonts = &fonts;
 
-		    foreach (e,xywh; lockstep (o.page.es.range, o.page.layout.range)) {
-		    	auto fgbg = get_color (o,*e);
+		    foreach (e,xywh; lockstep (page.es.range, page.layout.range)) {
+		    	auto fgbg = get_color (&colors,*e);
 
 			    with (xywh)
 			    if (w > 0 && h > 0)
@@ -291,11 +292,11 @@ Mod (I) {
 	void
 	get_e_style (E e, Color* fg, Color* bg, uint* font, string* text) {
 		switch (e.type) {
-			case 1  : *font = 0; *text = ""; break;
-			case 2  : *font = 1; *text = ""; break;
-			case 3  : *font = 0; *text = "󰁹"; break;
-			case 4  : *font = 0; *text = ""; break;
-			case 5  : *font = 0; *text = "󰀝"; break;
+			case 1  : *font = 1; *text = ""; break;
+			case 2  : *font = 2; *text = ""; break;
+			case 3  : *font = 1; *text = "󰁹"; break;
+			case 4  : *font = 1; *text = ""; break;
+			case 5  : *font = 1; *text = "󰀝"; break;
 			default :
 		}
 	}
@@ -303,8 +304,9 @@ Mod (I) {
 	version (SDL) 
 	void
 	_do_redraw (Event* evt) {
+		with (evt.o)
 		with (evt.redraw) {
-			auto _window = o.wm.window.window;
+			auto _window = wm.window.window;
     		import vf.sdl.renderer_sdl : Renderer;
 			Renderer renderer;
     		renderer.draw_start (_window);
@@ -335,13 +337,14 @@ Mod (I) {
 	void
 	_do_sdl_quit (Event* evt) {
 		with (evt.sdl.quit) {
-			quit = true;
+			evt.o.quit = true;
 		}
 	}	
 
 	version (SDL)
 	void
 	_do_sdl_window (Event* evt) {
+		with (evt.o)
 		with (evt.sdl.window)
     	switch (event) with (SDL_WindowEventID) {
     		case SDL_WINDOWEVENT_CLOSE:
@@ -364,6 +367,7 @@ Mod (I) {
 		import vf.sdl.importc_sdl;
 		// SDL_KEYDOWN
 		// SDL_KEYUP
+		with (evt.o)
 		with (evt.sdl.key)
     	switch (keysym.scancode) {
 		    case SDL_SCANCODE_ESCAPE : quit = true; break;
@@ -371,18 +375,11 @@ Mod (I) {
 		    default                  :
 		}
 	}
-
-	import vf.base.send;
-	mixin vf.base.send.Send!Event;
-	version (SDL) import vf.sdl.send;
-	version (SDL) mixin vf.sdl.send.Send!Event;
 }
 
 version (SDL)
 struct
-Mod_type_button (O) {
-	O* o;
-
+Mod_type_button {
     void
     do_switch (Event* evt) {
     	switch (evt.sdl.type) with (SDL_EventType) {
@@ -397,22 +394,22 @@ Mod_type_button (O) {
     	{
     		import vf.sdl.importc_sdl;
 
+			with (evt.o)
 			with (Event.Type)
 			with (evt.sdl.button) {
 				auto xy = XY (x,y);
-				foreach (i,xywh; o.page.layout.select (xy)) {
+				foreach (i,xywh; page.layout.select (xy)) {
 			    	switch (button) {
-					    case SDL_BUTTON_LEFT   : o.page.es[i].pressed  = !o.page.es[i].pressed;  break;
-						case SDL_BUTTON_MIDDLE : o.page.es[i].disabled = !o.page.es[i].disabled; break;
-						case SDL_BUTTON_RIGHT  : o.page.es[i].selected = !o.page.es[i].selected; break;
+					    case SDL_BUTTON_LEFT   : page.es[i].pressed  = !page.es[i].pressed;  break;
+						case SDL_BUTTON_MIDDLE : page.es[i].disabled = !page.es[i].disabled; break;
+						case SDL_BUTTON_RIGHT  : page.es[i].selected = !page.es[i].selected; break;
 		    			default                :
 					}
 					evt.i    = i;
 					evt.xywh = xywh;
 					send (REDRAW,xywh);
 
-					import vf.base.actions : send;
-					send!(o,Event) ("QUIT");
+					send (evt.o,"e.action");
 				}
 			}
     	}
@@ -435,20 +432,16 @@ Mod_type_button (O) {
     		}
     	}
     }
-
-	import vf.base.send;
-	mixin vf.base.send.Send!Event;
-	version (SDL) import vf.sdl.send;
-	version (SDL) mixin vf.sdl.send.Send!Event;
 }
 
 version (SDL)
 struct
-Mod_type_on (O) {
-	O* o;
-
+Mod_type_on {
     void
     do_switch (Event* evt) {
+	    with (evt.o)
+	    with (EType)
+	    if (page.es[evt.i].type == BUTTON)
     	switch (evt.sdl.type) with (SDL_EventType) {
     	    case SDL_MOUSEBUTTONDOWN : _do_sdl_button (evt); break;
     	    default                  :
@@ -462,39 +455,33 @@ Mod_type_on (O) {
 
 	void
 	_do_on (Event* evt) {
+		with (evt.o)
 		if (evt.i >= 0)
-		if (evt.i < o.page.es.length)
-		switch (o.page.es[evt.i].type) {
+		if (evt.i < page.es.length)
+		switch (page.es[evt.i].type) {
 			case 1  : break;  // type 1
 			case 2  : break;
 			case 3  : break;
-			case 4  : break;
+			case 4  : /*send ("Quit");*/ break;
 			case 5  : /*send (SHOW_QUICK_SETTINGS);*/ break;
 			default :
 		}
 
 		//
-    	if (evt.i >= 0 && evt.i < o.page.es.length) {
+		with (evt.o)
+    	if (evt.i >= 0 && evt.i < page.es.length) {
 	    	import std.stdio : writefln;
 	    	writefln ("on %d %s", evt.i, cast (SDL_EventType) evt.type);
-	    	writefln ("   %s", o.page.es[evt.i]);
+	    	writefln ("   %s", page.es[evt.i]);
     	}
 	}
+
+	enum
+	EType {
+		_,
+		BUTTON,
+	}
 }
-
-struct
-Mod_app (O) {
-	O* o;
-
-    void
-    do_switch (Event* evt) {
-    	switch (evt.type) with (Event.Type) {
-    	    case SHOW_QUICK_SETTINGS : /*app_SHOW_QUICK_SETTINGS*/ break;
-    	    default                  :
-    	}
-    }
-}
-
 
 struct
 Windows {
@@ -509,12 +496,12 @@ Windows {
 }
 
 auto
-get_color (O* o, E e) {
-	if (e.disabled) { return o.colors.disabled; }
-	if (e.pressed)  { return o.colors.pressed; }
-	if (e.selected) { return o.colors.selected; }
+get_color (Colors* colors, E e) {
+	if (e.disabled) { return colors.disabled; }
+	if (e.pressed)  { return colors.pressed; }
+	if (e.selected) { return colors.selected; }
 
-	return o.colors.base;
+	return colors.base;
 }
 
 struct
@@ -604,21 +591,22 @@ alias I  = ubyte;
 //  batary
 //
 // start
-//   on click ...
 //   w 128
 //   button
+//     on click ...
 //
 // clock
-//   on click ...
 //   button
+//     on click ...
 //
 // clipboard
 //   button
 // locale
 //   button
 // indicators
-//   on click ...   // catch click on any of lan,wifi,sound,batary
 //   button
+//     on click ...   // catch click on any of lan,wifi,sound,batary
+//     on click SHOW_QUICK_SETTINGS
 //
 // grid 256x256
 //

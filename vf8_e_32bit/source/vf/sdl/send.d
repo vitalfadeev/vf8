@@ -9,6 +9,7 @@ Send (Event) {  // if (is (Event==struct) && is(Event.Type == enum))
     send_now (Event.Type type, Renderer* renderer) {
         Event evt;
         evt.type = type;
+        evt.o = &this;
         switch (type) with (Event.Type) {
             case DRAW : evt.draw.renderer = renderer; break;
             default:
@@ -22,11 +23,12 @@ Send (Event) {  // if (is (Event==struct) && is(Event.Type == enum))
     send (Event.Type type, Renderer* renderer) {
         Event evt;
         evt.type = type;
+        evt.o = &this;
         switch (type) with (Event.Type) {
             case DRAW : evt.draw.renderer = renderer; break;
             default:
         }
-        o.input ~= &evt;
+        input ~= &evt;
     }
 
     version (SDL) import vf.std.xywh : XYWH;
@@ -35,10 +37,11 @@ Send (Event) {  // if (is (Event==struct) && is(Event.Type == enum))
     send (Event.Type type, XYWH xywh) {
         Event evt;
         evt.type = type;
+        evt.o = &this;
         switch (type) with (Event.Type) {
             case REDRAW : evt.redraw.xywh = xywh; break;
             default:
         }
-        o.input ~= &evt;
+        input ~= &evt;
     }
 }
