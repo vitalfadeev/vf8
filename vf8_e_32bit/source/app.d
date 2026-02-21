@@ -1,7 +1,7 @@
 import std.stdio;
 
 import vf.gui.page                      : Page;
-import vf.gui.colors                    : Color;
+import vf.gui.colors                    : Color, Colors;
 import vf.gui.e                         : E;
 import vf.std.xywh                      : XY,WH,XYWH;
 import vf.gui.style 					: Style;
@@ -61,6 +61,7 @@ O {
     //
     Colors      colors;
 	Fonts 		fonts;
+	Styles 		styles;
     bool 		quit;
     DO_SWITCH   do_switch;
 
@@ -214,26 +215,16 @@ Mod {
 		_init_fonts (evt);
 		_init_images (evt);
 		_init_es (evt);
+		_init_styles (evt);
 	}
 
 	void
 	_init_colors (Event* evt) {
-		Color[8] c;
-		c[0] = 0xFF000000;
-		c[1] = 0xFF444444;
-		c[2] = 0xFF888888;
-		c[3] = 0xFFCCCCCC;
-		c[4] = 0xFF883333;
-		//       aaBBGGRR
-
-		evt.o.colors.base.fg     = c[3];
-		evt.o.colors.base.bg     = c[1];
-		evt.o.colors.disabled.fg = c[1];
-		evt.o.colors.disabled.bg = c[0];
-		evt.o.colors.pressed.fg  = c[3];
-		evt.o.colors.pressed.bg  = c[2];
-		evt.o.colors.selected.fg = c[3];
-		evt.o.colors.selected.bg = c[4];
+		evt.o.colors.s[0] = 0xFF000000;  // dark
+		evt.o.colors.s[1] = 0xFF444444;  // base
+		evt.o.colors.s[2] = 0xFF888888;  // base-1
+		evt.o.colors.s[3] = 0xFFCCCCCC;  // base-2
+		evt.o.colors.s[4] = 0xFF883333;  
 	}
 
 	void
@@ -262,6 +253,11 @@ Mod {
 	}
 
 	void
+	_init_styles (Event* evt) {
+		evt.o.styles._init ();
+	}
+
+	void
 	_do_draw (Event* evt) {
 		with (evt.o)
 		with (evt.draw) {
@@ -271,77 +267,19 @@ Mod {
 			renderer.fonts = &fonts;
 
 		    foreach (e,xywh; lockstep (page.es.range, page.layout.range)) {
-		    	auto fgbg = get_color (&colors,*e);
+		    	auto style = styles.get_e_style (*e);
 
 			    with (xywh)
+				with (style)
 			    if (w > 0 && h > 0)
-			    	renderer.draw_rect (x,y,w,h,fgbg.fg,fgbg.bg);
+			    	renderer.draw_rect (x,y,w,h,fg,bg);
 
-			    auto style = get_e_style (*e);
 				with (xywh)
 				with (style)
-				with (evt.draw) 
 				if (text.length)
 					renderer.draw_text (font,x,y,w,h,fg,bg,text);
 		    }
 		}
-	}
-
-	Style*
-	get_e_style (E e) {
-		static Style[2^^6][256] styles;  // 256 types * 6 flags
-		// disabled pressed selected focused m_over lamp_on
-		// 16
-		// type * 16  // base, button, check, radio, select, text
-		// 6*16 = 96 styles * 10 = 960 Bytes
-		//
-		// max
-		// 256 types * 6 flags = 1536 * 10 = 15_360 Bytes
-		// 256 types * 2^6 flags = 256*64 = 16384 *10 = 163_840 Bytes
-		//styles[0] = Style (
-		//	WH (64,64),
-		//	1,  // fg
-		//	0,  // bg
-		//	0,  // font
-		//	0,  // text
-		//	0,  // image
-		//	0,  // on
-		//	0,  // on arg
-		//);
-		//styles[1] = Style (
-		//	WH (64,64),
-		//	1,  // fg
-		//	0,  // bg
-		//	0,  // font
-		//	0,  // text
-		//	0,  // image
-		//	0,  // on
-		//	0,  // on arg
-		//);
-		//styles[2] = Style (
-		//	WH (64,64),
-		//	1,  // fg
-		//	0,  // bg
-		//	0,  // font
-		//	0,  // text
-		//	0,  // image
-		//	0,  // on
-		//	0,  // on arg
-		//);
-
-		ubyte flags = 
-			(e.disabled ? 0x01 : 0) |
-			(e.pressed  ? 0x02 : 0) |
-			(e.selected ? 0x04 : 0) |
-			(e.focused  ? 0x08 : 0) |
-			(e.m_over   ? 0x10 : 0) |
-			(e.lamp_on  ? 0x20 : 0);
-		return &styles[e.type][flags];
-		//case 1  : *font = 1; *text = ""; break;
-		//case 2  : *font = 2; *text = ""; break;
-		//case 3  : *font = 1; *text = "󰁹"; break;
-		//case 4  : *font = 1; *text = ""; break;
-		//case 5  : *font = 1; *text = "󰀝"; break;
 	}
 
 	version (SDL) 
@@ -538,29 +476,71 @@ Windows {
     }
 }
 
-auto
-get_color (Colors* colors, E e) {
-	if (e.disabled) { return colors.disabled; }
-	if (e.pressed)  { return colors.pressed; }
-	if (e.selected) { return colors.selected; }
-
-	return colors.base;
-}
 
 struct
-Colors {
-    Fgbg disabled;
-    Fgbg pressed;
-    Fgbg selected;
-    Fgbg base;
+Styles {
+	static Style[2^^6][256] styles;  // 256 types * 6 flags    
 
-    struct
-    Fgbg {
-        Color fg;
-        Color bg;
-    }
+	Style*
+	get_e_style (E e) {
+		ubyte flags = 
+			(e.disabled ? 0x01 : 0) |
+			(e.pressed  ? 0x02 : 0) |
+			(e.selected ? 0x04 : 0) |
+			(e.focused  ? 0x08 : 0) |
+			(e.m_over   ? 0x10 : 0) |
+			(e.lamp_on  ? 0x20 : 0);
+		return &styles[e.type][flags];
+	}
+
+	void
+	_init () {
+	    // disabled pressed selected focused m_over lamp_on
+	    // 16
+	    // type * 16  // base, button, check, radio, select, text
+	    // 6*16 = 96 styles * 10 = 960 Bytes
+	    //
+	    // max
+	    // 256 types * 6 flags = 1536 * 10 = 15_360 Bytes
+	    // 256 types * 2^6 flags = 256*64 = 16384 *10 = 163_840 Bytes
+	    //styles[0] = Style (
+	    //	WH (64,64),
+	    //	1,  // fg
+	    //	0,  // bg
+	    //	0,  // font
+	    //	0,  // text
+	    //	0,  // image
+	    //	0,  // on
+	    //	0,  // on arg
+	    //);
+	    //styles[1] = Style (
+	    //	WH (64,64),
+	    //	1,  // fg
+	    //	0,  // bg
+	    //	0,  // font
+	    //	0,  // text
+	    //	0,  // image
+	    //	0,  // on
+	    //	0,  // on arg
+	    //);
+	    //styles[2] = Style (
+	    //	WH (64,64),
+	    //	1,  // fg
+	    //	0,  // bg
+	    //	0,  // font
+	    //	0,  // text
+	    //	0,  // image
+	    //	0,  // on
+	    //	0,  // on arg
+	    //);
+
+	    //case 1  : *font = 1; *text = ""; break;
+	    //case 2  : *font = 2; *text = ""; break;
+	    //case 3  : *font = 1; *text = "󰁹"; break;
+	    //case 4  : *font = 1; *text = ""; break;
+	    //case 5  : *font = 1; *text = "󰀝"; break;
+	}
 }
-
 
 void
 log_event (Event* evt) {
