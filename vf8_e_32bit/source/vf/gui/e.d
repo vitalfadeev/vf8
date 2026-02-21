@@ -9,11 +9,6 @@ version (E_32BIT_PAGED):
 //  e
 struct 
 E {
-    //ubyte flags1;         // 3  // 32 bit       //
-    //ubyte flags2;         //    //              //
-    //ubyte flags3;         //    //              //
-    //ubyte id;             // 1  //              //
-
     bool disabled:1;  // enabled  / disabled
     bool unvisible:1; // visible  / unvisible
     bool focused:1;   // focused  / 

@@ -254,7 +254,7 @@ Mod {
 
 	void
 	_init_styles (Event* evt) {
-		evt.o.styles._init ();
+		evt.o.styles._init (evt);
 	}
 
 	void
@@ -494,7 +494,27 @@ Styles {
 	}
 
 	void
-	_init () {
+	_init (Event* evt) {
+		foreach (t,ref ss; styles) {
+		    foreach (i,ref s; ss) {
+		        switch (i) {
+		            case 0x00 /* base     */: s.bg = evt.o.colors.s[1]; break;
+		            case 0x02 /* pressed  */: s.bg = evt.o.colors.s[3]; break;
+		            case 0x04 /* selected */: s.bg = evt.o.colors.s[4]; break;
+		            case 0x08 /* focused  */: s.bg = evt.o.colors.s[2]; break;
+		            default:
+		        }
+				switch (t) {
+					case 1  : s.font = 1; s.text = ""; break;
+					case 2  : s.font = 2; s.text = ""; break;
+					case 3  : s.font = 1; s.text = "󰁹"; break;
+					case 4  : s.font = 1; s.text = ""; break;
+					case 5  : s.font = 1; s.text = "󰀝"; break;
+				    default:
+				}
+		    }
+		}
+
 	    // disabled pressed selected focused m_over lamp_on
 	    // 16
 	    // type * 16  // base, button, check, radio, select, text
@@ -533,12 +553,6 @@ Styles {
 	    //	0,  // on
 	    //	0,  // on arg
 	    //);
-
-	    //case 1  : *font = 1; *text = ""; break;
-	    //case 2  : *font = 2; *text = ""; break;
-	    //case 3  : *font = 1; *text = "󰁹"; break;
-	    //case 4  : *font = 1; *text = ""; break;
-	    //case 5  : *font = 1; *text = "󰀝"; break;
 	}
 }
 

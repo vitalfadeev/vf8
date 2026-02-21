@@ -13,7 +13,7 @@ Style {
     Color bg;
     ubyte font = 1;
     //ubyte text;
-    string text = "A";
+    string text = " ";
     ubyte image;
     ubyte event_on;
     ubyte event_on_arg;

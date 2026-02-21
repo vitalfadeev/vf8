@@ -41,7 +41,7 @@ Fontconfig {
 
          // 6. Извлечение пути к файлу
          FcChar8* file;
-         if (FcPatternGetString (match, FC_FILE, 0, &file) == FcResultMatch) {
+         if (FcPatternGetString (match, cast (char*) FC_FILE, 0, &file) == FcResultMatch) {
              // Преобразование из C-строки (FcChar8*) в строку D
              string filePath = fromStringz (cast(char*)file).to!string;
              writeln ("Найден файл шрифта: ", filePath);
