@@ -58,6 +58,9 @@ Renderer {
     void
     draw_text (uint font_id, uint x, uint y, uint w, uint h, Color fg, Color bg, string text) {
         import vf.sdl.draw_char;
+        
+        if (text.length == 0) return;
+
         int size_w,size_h;
         auto surface = 
             _draw_text (fonts.font[font_id],x,y,w,h,fg,bg,text, &size_w,&size_h);

@@ -13,6 +13,7 @@ struct
 Fonts {
 union {
     TTF_Font*[8] font;
+    pragma (msg, "fonts.size: ", font.sizeof);  // 64
 struct {
     TTF_Font*    xxl;
     TTF_Font*    xl;

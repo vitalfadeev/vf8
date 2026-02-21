@@ -14,6 +14,7 @@ version (ACTIONS) import vf.base.actions : Actions;
 void 
 main () {
 	auto o = O ();
+	pragma (msg, "o.size: ", o.sizeof);  // 278_768
 	o.page = Page ();
 	o.page.es.length = 12;
 	Mod mod;
@@ -64,6 +65,7 @@ O {
     Colors      colors;
 	Fonts 		fonts;
 	Styles 		styles;
+	Strings 	strings;
     bool 		quit;
     DO_SWITCH   do_switch;
 
@@ -212,11 +214,12 @@ Mod {
 
 	void
 	init_gui (Event* evt) {
-		_init_colors (evt);
-		_init_fonts  (evt);
-		_init_images (evt);
-		_init_es     (evt);
-		_init_styles (evt);
+		_init_colors  (evt);
+		_init_fonts   (evt);
+		_init_images  (evt);
+		_init_es      (evt);
+		_init_strings (evt);
+		_init_styles  (evt);
 	}
 
 	void
@@ -255,6 +258,11 @@ Mod {
 	}
 
 	void
+	_init_strings (Event* evt) {
+		evt.o.strings._init (evt);
+	}
+
+	void
 	_init_styles (Event* evt) {
 		evt.o.styles._init (evt);
 	}
@@ -278,8 +286,8 @@ Mod {
 
 				with (xywh)
 				with (style)
-				if (text.length)
-					renderer.draw_text (font,x,y,w,h,colors.s[fg],colors.s[bg],text);
+				if (text)
+					renderer.draw_text (font,x,y,w,h,colors.s[fg],colors.s[bg],strings.s[text]);
 		    }
 		}
 	}
@@ -288,12 +296,12 @@ Mod {
 	void
 	_do_redraw (Event* evt) {
 		with (evt.o)
+		with (Event.Type)
 		with (evt.redraw) {
 			auto _window = wm.window.window;
     		import vf.sdl.renderer_sdl : Renderer;
 			Renderer renderer;
     		renderer.draw_start (_window);
-    		with (Event.Type)
     		send_now (DRAW,&renderer);
     		renderer.draw_end (_window);
 		}
@@ -328,6 +336,7 @@ Mod {
 	void
 	_do_sdl_window (Event* evt) {
 		with (evt.o)
+		with (Event.Type)
 		with (evt.sdl.window)
     	switch (event) with (SDL_WindowEventID) {
     		case SDL_WINDOWEVENT_CLOSE:
@@ -336,7 +345,6 @@ Mod {
 	    		import vf.sdl.renderer_sdl : Renderer;
     			Renderer renderer;
 	    		renderer.draw_start (&evt.sdl);
-	    		with (Event.Type)
 	    		send_now (DRAW, &renderer);
 	    		renderer.draw_end (&evt.sdl);
 	    		break;
@@ -373,49 +381,29 @@ Mod_type_button {
 
     void
     _do_sdl_button (Event* evt) {
-    	version (SDL)
-    	{
-    		import vf.sdl.importc_sdl;
+		import vf.sdl.importc_sdl;
 
-			with (evt.o)
-			with (Event.Type)
-			with (evt.sdl.button) {
-				auto xy = XY (x,y);
-				foreach (i,xywh; page.layout.select (xy)) {
-			    	switch (button) {
-					    case SDL_BUTTON_LEFT   : page.es[i].pressed  = !page.es[i].pressed;  break;
-						case SDL_BUTTON_MIDDLE : page.es[i].disabled = !page.es[i].disabled; break;
-						case SDL_BUTTON_RIGHT  : page.es[i].selected = !page.es[i].selected; break;
-		    			default                :
-					}
-					evt.i    = i;
-					evt.xywh = xywh;
-					send (REDRAW,xywh);
-
-					version (ACTIONS) send (evt.o,"e.action");
+		with (evt.o)
+		with (Event.Type)
+		with (evt.sdl.button) {
+			auto xy = XY (x,y);
+			foreach (i,xywh; page.layout.select (xy)) {
+		    	switch (button) {
+				    case SDL_BUTTON_LEFT   : page.es[i].pressed  = !page.es[i].pressed;  break;
+					case SDL_BUTTON_MIDDLE : page.es[i].disabled = !page.es[i].disabled; break;
+					case SDL_BUTTON_RIGHT  : page.es[i].selected = !page.es[i].selected; break;
+	    			default                :
 				}
+				evt.i    = i;
+				evt.xywh = xywh;
+				send (REDRAW,xywh);
+
+				version (ACTIONS) send (evt.o,"e.action");
 			}
-    	}
-    	else
-    	{
-    		import vf.sdl.importc_sdl : SDL_BUTTON_LEFT, SDL_BUTTON_RIGHT;
-    		// SDL_MOUSEBUTTONDOWN
-    		// SDL_MOUSEBUTTONUP
-    		with (evt.sdl.button)
-        	switch (button) {
-    		    case SDL_BUTTON_LEFT  : 
-    		    	Event event2;
-    		    	event2.type = Event.Type.CLICK;
-    		    	event2.click.xy.x = x;
-    		    	event2.click.xy.y = y;
-    		    	send_now (&event2);
-    		    	break;
-    		    case SDL_BUTTON_RIGHT : break;
-    		    default               :
-    		}
-    	}
-    }
+		}
+	}
 }
+
 
 version (SDL)
 struct
@@ -481,8 +469,8 @@ Windows {
 
 struct
 Styles {
-	Style[2^^6][256] styles;  // 256 types * 6 flags
-	pragma (msg, "styles.size: ", styles.sizeof);  // 786_432
+	Style[2^^6][0xFF] styles;  // 256 types * 6 flags
+	pragma (msg, "styles.size: ", styles.sizeof);  // 261_120
 
 	Style*
 	get_e_style (E e) {
@@ -508,11 +496,11 @@ Styles {
 		            default:
 		        }
 				switch (t) {
-					case 1 /* start  */ : s.font = 1; s.text = ""; break;
-					case 2 /* clock  */ : s.font = 2; s.text = ""; break;
-					case 3 /* batary */ : s.font = 1; s.text = "󰁹"; break;
-					case 4 /* volume */ : s.font = 1; s.text = ""; break;
-					case 5 /* avia   */ : s.font = 1; s.text = "󰀝"; break;
+					case 1 /* start  */ : s.font = 1; s.text = 1; break;
+					case 2 /* clock  */ : s.font = 2; s.text = 2; break;
+					case 3 /* batary */ : s.font = 1; s.text = 3; break;
+					case 4 /* volume */ : s.font = 1; s.text = 4; break;
+					case 5 /* avia   */ : s.font = 1; s.text = 5; break;
 				    default:
 				}
 		    }
@@ -527,6 +515,22 @@ Styles {
 	    // 256 types * 6 flags = 1536 * 10 = 15_360 Bytes
 	    // 256 types * 2^6 flags = 256*64 = 16384 *10 = 163_840 Bytes
 	}
+}
+
+struct
+Strings {
+	string[0xFF] s;
+	pragma (msg, "strings.size: ", s.sizeof);  // 4_080
+
+    void
+    _init (Event* evt) {
+        s[0] = " ";
+        s[1] = "";
+        s[2] = "";
+        s[3] = "󰁹";
+        s[4] = "";
+        s[5] = "󰀝";
+    }
 }
 
 void

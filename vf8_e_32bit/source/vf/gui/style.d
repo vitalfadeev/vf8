@@ -10,8 +10,7 @@ Style {
     ubyte fg = 1;
     ubyte bg;
     ubyte font = 1;
-    //ubyte text;
-    string text = " ";
+    ubyte text;
     ubyte image;
     ubyte event_on;
     ubyte event_on_arg;

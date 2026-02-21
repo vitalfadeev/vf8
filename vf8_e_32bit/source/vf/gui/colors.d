@@ -6,6 +6,7 @@ static __gshared Colors colors;
 struct 
 Colors {    
     Color[0xFF] s;
+    pragma (msg, "colors.size: ", s.sizeof);  // 1_020
 
     ubyte
     index_of (Color a) {

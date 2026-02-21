@@ -15,4 +15,5 @@ Page {
     Tstring256!E es;
     WH           wh;         // ushort x ushort  16368 x 16368
     Layout       layout;  // grid, ...
+    pragma (msg, "es.size: ", es.sizeof);  // 1028
 }
