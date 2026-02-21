@@ -61,12 +61,8 @@ Send (Event) {
     }
 }
 
-class
+interface
 Action (Event) {
-    void
-    _do (Event* evt) {
-        //
-    }
+    void _do (Event* evt);
 }
-
 //alias DG (Event) = void delegate (Event* evt);

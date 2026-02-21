@@ -4,6 +4,7 @@ import vf.gui.page                      : Page;
 import vf.gui.colors                    : Color;
 import vf.gui.e                         : E;
 import vf.std.xywh                      : XY,WH,XYWH;
+import vf.gui.style 					: Style;
 version (SDL) import vf.sdl.input       : Input;
 version (SDL) import vf.sdl.importc_sdl : SDL_Event,SDL_EventType, SDL_WindowEventID;
 version (SDL) import vf.sdl.fonts       : Fonts;
@@ -276,12 +277,9 @@ Mod {
 			    if (w > 0 && h > 0)
 			    	renderer.draw_rect (x,y,w,h,fgbg.fg,fgbg.bg);
 
-			    auto   fg = fgbg.fg;
-			    auto   bg = fgbg.bg;
-			    uint   font;
-			    string text;
-			    get_e_style (*e,&fg,&bg,&font,&text);
+			    auto style = get_e_style (*e);
 				with (xywh)
+				with (style)
 				with (evt.draw) 
 				if (text.length)
 					renderer.draw_text (font,x,y,w,h,fg,bg,text);
@@ -289,16 +287,61 @@ Mod {
 		}
 	}
 
-	void
-	get_e_style (E e, Color* fg, Color* bg, uint* font, string* text) {
-		switch (e.type) {
-			case 1  : *font = 1; *text = ""; break;
-			case 2  : *font = 2; *text = ""; break;
-			case 3  : *font = 1; *text = "󰁹"; break;
-			case 4  : *font = 1; *text = ""; break;
-			case 5  : *font = 1; *text = "󰀝"; break;
-			default :
-		}
+	Style*
+	get_e_style (E e) {
+		static Style[2^^6][256] styles;  // 256 types * 6 flags
+		// disabled pressed selected focused m_over lamp_on
+		// 16
+		// type * 16  // base, button, check, radio, select, text
+		// 6*16 = 96 styles * 10 = 960 Bytes
+		//
+		// max
+		// 256 types * 6 flags = 1536 * 10 = 15_360 Bytes
+		// 256 types * 2^6 flags = 256*64 = 16384 *10 = 163_840 Bytes
+		//styles[0] = Style (
+		//	WH (64,64),
+		//	1,  // fg
+		//	0,  // bg
+		//	0,  // font
+		//	0,  // text
+		//	0,  // image
+		//	0,  // on
+		//	0,  // on arg
+		//);
+		//styles[1] = Style (
+		//	WH (64,64),
+		//	1,  // fg
+		//	0,  // bg
+		//	0,  // font
+		//	0,  // text
+		//	0,  // image
+		//	0,  // on
+		//	0,  // on arg
+		//);
+		//styles[2] = Style (
+		//	WH (64,64),
+		//	1,  // fg
+		//	0,  // bg
+		//	0,  // font
+		//	0,  // text
+		//	0,  // image
+		//	0,  // on
+		//	0,  // on arg
+		//);
+
+		ubyte flags = 
+			(e.disabled ? 0x01 : 0) |
+			(e.pressed  ? 0x02 : 0) |
+			(e.selected ? 0x04 : 0) |
+			(e.focused  ? 0x08 : 0) |
+			(e.m_over   ? 0x10 : 0) |
+			(e.lamp_on  ? 0x20 : 0);
+		return &styles[e.type][flags];
+		//case 1  : *font = 1; *text = ""; break;
+		//case 2  : *font = 2; *text = ""; break;
+		//case 3  : *font = 1; *text = "󰁹"; break;
+		//case 4  : *font = 1; *text = ""; break;
+		//case 5  : *font = 1; *text = "󰀝"; break;
 	}
 
 	version (SDL) 
@@ -614,6 +657,28 @@ alias I  = ubyte;
 // 1:1 3:1 5:3
 // 1:1 3:1 5:7
 
+// page 2
+// QUICK_SETTINGS
+// 1   2 2 2
+// 3 -------
+// 3 -------
+// 4--- ---4
+// 4--- ---4
+// 4--- ---4
+//
+// bat    setting lock quit
+// volume
+// bright
+// lan                 wifi
+// power              light
+// style               avia
+//
+// bat
+//   w 128
+//
+//
+
+
 // 🛜 — Wireless (U+1F6DC
 // 📶 — Antenna Bars (U+1F4F6):
 // ᯤ — Tai Tham Consonant Sign Low 
@@ -635,3 +700,18 @@ alias I  = ubyte;
 // 󰤟 󰤢 󰤥 󰤨 󰤭 󰤯 󰤠 󰤡 󰤣 󰤤 󰤦 󰤧 󰤩 󰤪 󰤫 󰤬 󰤮 󱛋 󱛌 󱛍 󱛎 󱛏
 // 
 //        󰕾 󰕿 󰖀 󰝞 󰝟 󰖁 󰝝 󱄠 󱄡
+
+// slider
+//   on change APP_EVENT value  // value = 0..0xFF position
+// button
+//   on click APP_EVENT value   // value = 0..1    pressed
+// checkbox
+//   on click APP_EVENT value   // value = 0..1    checked
+// radio
+//   on click APP_EVENT value   // value = 0..0xFF id
+// select
+//   on click APP_EVENT value   // value = 0..0xFF id
+// text
+//   on change APP_EVENT value  // value = 0..0xFFFF wchar
+//   on key APP_EVENT value     // value = 0..0xFF   scancode
+

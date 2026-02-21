@@ -3,9 +3,9 @@
 	"description"      : "A minimal D application.",
 	"authors"          : ["vf"],
 	"license"          : "proprietary",
-	"versions"         : ["GUI","E_32BIT_PAGED","SDL","INPUT_SDL","SDLTTF"],
+	"versions"         : ["GUI","E_32BIT_PAGED","SDL","INPUT_SDL","SDLTTF","FONTCONFIG"],
 	"dflags-linux-dmd" : ["-P-I/usr/include/SDL2"],
 	"dflags-linux-ldc" : ["-P-I/usr/include/SDL2","-preview=bitfields"],
 	"importPaths-gdc"  : ["/usr/include/SDL2"],
-	"libs"             : ["SDL2","SDL2_ttf"],
+	"libs"             : ["SDL2","SDL2_ttf","fontconfig"],
 }

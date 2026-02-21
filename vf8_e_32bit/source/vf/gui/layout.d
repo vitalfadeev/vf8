@@ -16,13 +16,13 @@ Layout {
     Type {
         _,
         GRID,
+        QUICK_SETTINGS,
     }
 }
 
 struct
 Grid_layout {
     Layout.Type type;
-    void*  fn;
     // total
     WH     total_wh;
     // xy
@@ -39,11 +39,6 @@ Grid_layout {
     ushort first_cell_h;
     ushort last_cell_w;
     ushort last_cell_h;
-
-    Range
-    range () {
-        return Range (&this);  // return XYWH,XYWH,...
-    }
 
     // center
     //   dup Range
@@ -84,6 +79,11 @@ Grid_layout {
 
     alias Loca = ubyte;
     alias N    = ubyte;
+
+    Range
+    range () {
+        return Range (&this);  // return XYWH,XYWH,...
+    }
 
     auto
     select (XY xy) {
@@ -198,6 +198,108 @@ Grid_layout {
                     break;
                 case 5:  // right, to left
                     front.x -= _layout.cells_w + _layout.cells_space_x;
+                    break;
+                default:
+            }
+        }
+    }
+}
+
+// QUICK_SETTINGS
+// 1   2 2 2
+// 3 -------
+// 3 -------
+// 4--- ---4
+// 4--- ---4
+// 4--- ---4
+struct
+QUICK_SETTINGS_layout {
+    Layout.Type type;
+    // total
+    WH     total_wh;
+    Order_rec[4] order;  // 8 Bytes  // [1:1, 2:3, 3:2, 4:6]
+
+    struct 
+    Order_rec {
+        Loca loca;
+        N    n;
+    }
+
+    alias Loca = ubyte;
+    alias N    = ubyte;
+
+    Range
+    range () {
+        return Range (&this);  // return XYWH,XYWH,...
+    }
+
+    struct
+    Range {
+        QUICK_SETTINGS_layout* _layout;
+        typeof (_layout.order[]) order;
+        Loca loca;
+        N    n;
+
+        XYWH front;
+        bool empty () { return n == 0; }
+        void popFront () { 
+            import std.range;
+            n--; 
+            if (n == 0) {
+                order.popFront ();
+                if (order.empty) {
+                    n = 0;
+                    return; // END
+                }
+                else {
+                    // next rec
+                    n    = order.front.n;
+                    loca = order.front.loca;
+                    // reset xywh
+                    reset ();
+                }
+            }
+            else {                
+                // update front
+                step ();  
+            }
+        }
+
+        this (QUICK_SETTINGS_layout* _layout) {
+            import std.range;
+            this._layout = _layout;
+            order = _layout.order[];
+            loca  = order.front.loca;
+            n     = order.front.n;
+            reset ();
+        }
+
+        void 
+        reset () {
+            switch (loca) {
+                case 1:  // left, to right
+                    break;
+                case 2:  // center, to left
+                    break;
+                case 3:  // center
+                    break;
+                case 4:  // center, to right
+                    break;
+                default:
+            }
+        }
+
+        void
+        step () {
+            // step
+            switch (loca) {
+                case 1:  // left, to right
+                    break;
+                case 2:  // right, to left
+                    break;
+                case 3:  // line down
+                    break;
+                case 4:  // left 1/2 w, to right
                     break;
                 default:
             }

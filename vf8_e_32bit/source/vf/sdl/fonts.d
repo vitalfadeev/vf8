@@ -5,6 +5,8 @@ version (SDLTTF):
 import std.string : toStringz;
 import vf.sdl.importc_sdl_ttf;
 import vf.sdl.exceptions;
+import vf.sdl.fontconfig : Fontconfig;
+import std.format : format;
 
 
 struct
@@ -20,13 +22,22 @@ struct {
 
     void
     _init () {
-        font[0] = open_font ("res/NotoSansMNerdFont-Regular.ttf", 64);
-        font[1] = open_font ("res/NotoSansMNerdFont-Regular.ttf", 32);
-        font[2] = open_font ("res/NotoSansMNerdFont-Regular.ttf", 16);
+        font[0] = open_font ("NotoSansMNerd-Regular", 64);
+        font[1] = open_font ("NotoSansMNerd-Regular", 32);
+        font[2] = open_font ("NotoSansMNerd-Regular", 16);
+    }
+
+    version (FONTCONFIG)
+    TTF_Font*
+    open_font (string font_name, int font_size) {
+        Fontconfig fc;
+        fc._init ();
+        auto font_file = fc.select (format!"%s-%d" (font_name,font_size));
+        return _open_font (font_file, font_size);
     }
 
     TTF_Font*
-    open_font (string file_name, int font_size) {
+    _open_font (string file_name, int font_size) {
         auto filez = file_name.toStringz;
         int  ptsize =font_size;
         //TTF_Font* font = TTF_OpenFont (file_name.toStringz, font_size);
@@ -38,3 +49,4 @@ struct {
     }    
 
 }
+

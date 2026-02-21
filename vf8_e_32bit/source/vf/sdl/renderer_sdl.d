@@ -12,6 +12,10 @@ Renderer {
     SDL_Renderer* _renderer;
     Fonts*         fonts;
 
+    ~this() {
+        SDL_DestroyRenderer (_renderer);
+    }
+
     void
     draw_start (SDL_Event* evt) {
         SDL_Window* window = SDL_GetWindowFromID (evt.window.windowID);
@@ -57,14 +61,14 @@ Renderer {
         int size_w,size_h;
         auto surface = 
             _draw_text (fonts.font[font_id],x,y,w,h,fg,bg,text, &size_w,&size_h);
+        scope (exit) SDL_FreeSurface (surface);
 
         SDL_Texture* texture = SDL_CreateTextureFromSurface (_renderer, surface);
         if (texture is null) {
             import vf.sdl.exceptions : SDLException;
             throw new SDLException ("SDL_CreateTextureFromSurface");
         }
-
-        SDL_FreeSurface (surface);
+        scope (exit) SDL_DestroyTexture (texture);
 
         auto centered_x = x;
         auto centered_y = y;

@@ -6,7 +6,6 @@ import vf.base.actions : Action;
 
 class
 Quit : Action!Event {
-    override
     void
     _do (Event* evt) {
         import std.stdio : writeln;
@@ -18,12 +17,34 @@ Quit : Action!Event {
 
 class
 SDL_MOUSEBUTTONDOWN : Action!Event {
-    override
     void
     _do (Event* evt) {
         import std.stdio : writeln;
         writeln (":ACTION SDL_MOUSEBUTTONDOWN");
-        //evt.o.quit = true;
+    }
+}
+
+class
+SHOW_QUICK_SETTINGS : Action!Event {
+    void
+    _do (Event* evt) {
+        import std.stdio : writeln;
+        writeln (":ACTION SHOW_QUICK_SETTINGS");
+        // create window
+        // init page
+        //   init layout QUICK_SETTINGS
+        //     wh
+        //     locations
+        //   init es
+        //   define style
+        //     font
+        //     text
+        //     color
+        //     widget type
+        //     xh
+
+        // create window
+        // load quick_settings.ui
     }
 }
 
