@@ -7,10 +7,8 @@ import vf.gui.colors : Color;
 struct
 Style {
     WH    wh;
-    //ubyte fg;
-    //ubyte bg;
-    Color fg = 0xFFCCCCCC;
-    Color bg;
+    ubyte fg = 1;
+    ubyte bg;
     ubyte font = 1;
     //ubyte text;
     string text = " ";

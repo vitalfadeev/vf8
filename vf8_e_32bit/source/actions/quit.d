@@ -1,5 +1,6 @@
 module actions.quit;
 
+version (ACTIONS):
 import app : Event;
 import vf.base.actions : Action;
 

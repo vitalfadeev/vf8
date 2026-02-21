@@ -8,6 +8,7 @@ import vf.gui.style 					: Style;
 version (SDL) import vf.sdl.input       : Input;
 version (SDL) import vf.sdl.importc_sdl : SDL_Event,SDL_EventType, SDL_WindowEventID;
 version (SDL) import vf.sdl.fonts       : Fonts;
+version (ACTIONS) import vf.base.actions : Actions;
 
 
 void 
@@ -40,8 +41,9 @@ main () {
 	}
 
 	// INIT
+	with (o)
 	with (Event.Type)
-	o.send_now (INIT);
+	send_now (INIT);
 
 	// Event loop
 	with (o)
@@ -73,8 +75,8 @@ O {
 	version (SDL) import vf.sdl.send;
 	version (SDL) mixin vf.sdl.send.Send!Event;
 
-	import vf.base.actions;
-	mixin vf.base.actions.Send!Event;
+	version (ACTIONS) import vf.base.actions;
+	version (ACTIONS) mixin vf.base.actions.Send!Event;
 }
 
 // SDL_Event sdl_event
@@ -182,26 +184,25 @@ Mod {
 	        default     :
 	    }
 
-	    Mod_type_button mod_type_button;
-	    mod_type_button.do_switch (evt);  // set evt.i
-
-	    Mod_type_on mod_type_on;
-	    mod_type_on.do_switch (evt);
-
-		// actions
-		import vf.base.actions : Actions;
-		static Actions!Event actions;
-		actions.do_switch (evt);
+	    Mod_type_button ().do_switch (evt);  // set evt.i
+	    Mod_type_on     ().do_switch (evt);
+		version (ACTIONS) Actions!Event   ().do_switch (evt);
 	}
 
 	void
 	_do_init (Event* evt) {
 		with (evt.init_) {
-			version (SDL) import vf.sdl.init_sdl : init_sdl;
-			version (SDL) init_sdl ();
+			version (SDL) init_sdl (evt);
 			init_window (evt);
 			init_gui (evt);
 		}
+	}
+
+	version (SDL)
+	void
+	init_sdl (Event* evt) {
+		import vf.sdl.init_sdl : init_sdl;
+		init_sdl ();
 	}
 
 	void
@@ -212,9 +213,9 @@ Mod {
 	void
 	init_gui (Event* evt) {
 		_init_colors (evt);
-		_init_fonts (evt);
+		_init_fonts  (evt);
 		_init_images (evt);
-		_init_es (evt);
+		_init_es     (evt);
 		_init_styles (evt);
 	}
 
@@ -225,6 +226,7 @@ Mod {
 		evt.o.colors.s[2] = 0xFF888888;  // base-1
 		evt.o.colors.s[3] = 0xFFCCCCCC;  // base-2
 		evt.o.colors.s[4] = 0xFF883333;  
+		evt.o.colors.s[5] = 0xFFFFFFFF;  
 	}
 
 	void
@@ -272,12 +274,12 @@ Mod {
 			    with (xywh)
 				with (style)
 			    if (w > 0 && h > 0)
-			    	renderer.draw_rect (x,y,w,h,fg,bg);
+			    	renderer.draw_rect (x,y,w,h,colors.s[fg],colors.s[bg]);
 
 				with (xywh)
 				with (style)
 				if (text.length)
-					renderer.draw_text (font,x,y,w,h,fg,bg,text);
+					renderer.draw_text (font,x,y,w,h,colors.s[fg],colors.s[bg],text);
 		    }
 		}
 	}
@@ -390,7 +392,7 @@ Mod_type_button {
 					evt.xywh = xywh;
 					send (REDRAW,xywh);
 
-					send (evt.o,"e.action");
+					version (ACTIONS) send (evt.o,"e.action");
 				}
 			}
     	}
@@ -479,7 +481,8 @@ Windows {
 
 struct
 Styles {
-	static Style[2^^6][256] styles;  // 256 types * 6 flags    
+	Style[2^^6][256] styles;  // 256 types * 6 flags
+	pragma (msg, "styles.size: ", styles.sizeof);  // 786_432
 
 	Style*
 	get_e_style (E e) {
@@ -498,18 +501,18 @@ Styles {
 		foreach (t,ref ss; styles) {
 		    foreach (i,ref s; ss) {
 		        switch (i) {
-		            case 0x00 /* base     */: s.bg = evt.o.colors.s[1]; break;
-		            case 0x02 /* pressed  */: s.bg = evt.o.colors.s[3]; break;
-		            case 0x04 /* selected */: s.bg = evt.o.colors.s[4]; break;
-		            case 0x08 /* focused  */: s.bg = evt.o.colors.s[2]; break;
+		            case 0x00 /* base     */: s.fg = 3; s.bg = 1; break;
+		            case 0x02 /* pressed  */: s.fg = 5; s.bg = 3; break;
+		            case 0x04 /* selected */: s.fg = 3; s.bg = 4; break;
+		            case 0x08 /* focused  */: s.fg = 3; s.bg = 2; break;
 		            default:
 		        }
 				switch (t) {
-					case 1  : s.font = 1; s.text = ""; break;
-					case 2  : s.font = 2; s.text = ""; break;
-					case 3  : s.font = 1; s.text = "󰁹"; break;
-					case 4  : s.font = 1; s.text = ""; break;
-					case 5  : s.font = 1; s.text = "󰀝"; break;
+					case 1 /* start  */ : s.font = 1; s.text = ""; break;
+					case 2 /* clock  */ : s.font = 2; s.text = ""; break;
+					case 3 /* batary */ : s.font = 1; s.text = "󰁹"; break;
+					case 4 /* volume */ : s.font = 1; s.text = ""; break;
+					case 5 /* avia   */ : s.font = 1; s.text = "󰀝"; break;
 				    default:
 				}
 		    }
@@ -523,36 +526,6 @@ Styles {
 	    // max
 	    // 256 types * 6 flags = 1536 * 10 = 15_360 Bytes
 	    // 256 types * 2^6 flags = 256*64 = 16384 *10 = 163_840 Bytes
-	    //styles[0] = Style (
-	    //	WH (64,64),
-	    //	1,  // fg
-	    //	0,  // bg
-	    //	0,  // font
-	    //	0,  // text
-	    //	0,  // image
-	    //	0,  // on
-	    //	0,  // on arg
-	    //);
-	    //styles[1] = Style (
-	    //	WH (64,64),
-	    //	1,  // fg
-	    //	0,  // bg
-	    //	0,  // font
-	    //	0,  // text
-	    //	0,  // image
-	    //	0,  // on
-	    //	0,  // on arg
-	    //);
-	    //styles[2] = Style (
-	    //	WH (64,64),
-	    //	1,  // fg
-	    //	0,  // bg
-	    //	0,  // font
-	    //	0,  // text
-	    //	0,  // image
-	    //	0,  // on
-	    //	0,  // on arg
-	    //);
 	}
 }
 

@@ -1,9 +1,9 @@
 module vf.base.actions;
 
-
+version (ACTIONS):
 struct
 Actions (Event) {
-    Action!Event[string] actions;
+    static Action!Event[string] actions;
 
     void
     do_switch (Event* evt) {
