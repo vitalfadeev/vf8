@@ -2,13 +2,13 @@ module vf.std.tstring256;
 
 
 struct
-Tstring256 (T,size_t N=0xFF)  {
+Tstring256 (T,size_t N=ubyte.max)  {
 struct {
     align (T.sizeof): 
     ubyte  length;
-    ubyte  n = N;
+    ubyte  n = N;  // capacity
 }    
-    T[N] s;  // 0-element is length
+    T[N+1] s;  // 0-element is length
 
     auto ref opIndex (ubyte i)  { return s[i]; }
     ubyte index_of (T* ptr)  { return cast (ubyte) (ptr - s.ptr); }

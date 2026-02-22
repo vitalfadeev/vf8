@@ -5,7 +5,7 @@ static __gshared Colors colors;
 
 struct 
 Colors {    
-    Color[0xFF] s;
+    Color[ubyte.max+1] s;
     pragma (msg, "colors.size: ", s.sizeof);  // 1_020
 
     ubyte

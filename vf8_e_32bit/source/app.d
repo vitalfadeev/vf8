@@ -469,7 +469,7 @@ Windows {
 
 struct
 Styles {
-	Style[2^^6][0xFF] styles;  // 256 types * 6 flags
+	Style[2^^6][ubyte.max+1] styles;  // 256 types * 6 flags
 	pragma (msg, "styles.size: ", styles.sizeof);  // 261_120
 
 	Style*
@@ -519,7 +519,7 @@ Styles {
 
 struct
 Strings {
-	string[0xFF] s;
+	string[ubyte.max+1] s;
 	pragma (msg, "strings.size: ", s.sizeof);  // 4_080
 
     void
@@ -686,3 +686,89 @@ alias I  = ubyte;
 //   on change APP_EVENT value  // value = 0..0xFFFF wchar
 //   on key APP_EVENT value     // value = 0..0xFF   scancode
 
+// Sounds
+//   PLAY? 1
+//     send PLAY! 1
+// E
+//   PLAY! 1
+//     lamp_on
+//   CLICK
+//     pressed
+//     send PLAY? 1
+//   PLAY_END! 1
+//     lamp_off
+
+// PLAY?
+// PLAY!
+
+// Sounds
+//   PLAY_REQUEST
+//     send PLAY_START
+//     send PLAY_END
+//     send PLAY_INFO
+// E
+//   PLAY_START
+//     lamp_on
+//   PLAY_END
+//     lamp_off
+//   CLICK
+//     pressed
+//     send PLAY_REQUEST
+
+// Sounds
+//   PLAY_REQUEST n
+//     send PLAY_START n
+//     send PLAY_END n
+//     send PLAY_INFO n
+// E
+//   PLAY_START n
+//     lamp_on
+//   PLAY_END n
+//     lamp_off
+//   CLICK
+//     pressed
+//     send PLAY_REQUEST n
+//     send CLICK_INFO e.id
+//   CHANGE_REQUEST value
+//     send CHANGE_INFO e.id
+
+// PLAY
+//   PLAY 0  // request
+//   PLAY 1  // start
+//   PLAY 2  // end
+//   PLAY 3  // info
+
+// Event
+//   code
+//   flag  // request.start.end.info
+//
+//  00000011
+//        00 requesr
+//        01 start
+//        10 end
+//        11 info
+//
+// SDL_USEREVENT
+// 0x8000
+// 1000_0000_0000_0000
+// 1000_0000_0000_0011
+// 1000_0000_0000_0100 PLAY request
+// 1000_0000_0000_0101 PLAY start
+// 1000_0000_0000_0110 PLAY end
+// 1000_0000_0000_0111 PLAY info
+//
+// EVENT!("PLAY", ["REQUEST", "START", "END", "INFO"])
+
+enum
+Event2 {
+	PLAY = 0x8000 | (1 << 2),
+	PLAY_REQUEST = PLAY,
+	PLAY_START,
+	PLAY_END,
+	PLAY_INFO,
+	OPEN = 0x8000 | (2 << 2),
+	OPEN_REQUEST = OPEN,
+	OPEN_START,
+	OPEN_END,
+	OPEN_INFO
+}
