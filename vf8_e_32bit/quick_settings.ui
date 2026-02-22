@@ -34,7 +34,7 @@ fg             .       .        .       .      .       .
 bg             .       .        .       .      .       .
 font           .       .        .       .      .       .
 text           .       .        .       .      .       .
-image          .       .        .       .      .       .
+icon           .       .        .       .      .       .
 on             .       .        .       .      .       .
 on arg         .       .        .       .      .       .
 
@@ -45,21 +45,18 @@ fg             .       .        .       .      .       .
 bg             .       .        .       .      .       .
 font           .       .        .       .      .       .
 text           .       .        .       .      .       .
-image          .       .        .       .      .       .
+icon           .       .        .       .      .       .
 on             .       .        .       .      .       .
 on arg         .       .        .       .      .       .
 
-type X  // bat  (based on button)
-        disabled pressed selected focused m_over lamp_on
-wh             .       .        .       .      .       .
-fg             .       .        .       .      .       .
-bg             .       .        .       .      .       .
-font           .       .        .       .      .       .
-text           .       .        .       .      .       .
-image          .       .        .       .      .       .
-on             .       .        .       .      .       .
-on arg         .       .        .       .      .       .
-
+type X  // volume  (based on button)                      reserved1
+        disabled pressed selected focused m_over lamp_on  mute low mid high 
+wh             .       .        .       .      .       .     .   .   .    .
+fg             .       .        .       .      .       .     .   .   .    .
+bg             .       .        .       .      .       .     .   .   .    .
+font           .       .        .       .      .       .     .   .   .    .
+text           .       .        .       .      .       .     .   .   .    .            
+icon           .       .        .       .      .       .     1   2   3    4
 
 
 Fonts

@@ -216,7 +216,7 @@ Mod {
 	init_gui (Event* evt) {
 		_init_colors  (evt);
 		_init_fonts   (evt);
-		_init_images  (evt);
+		_init_icons   (evt);
 		_init_es      (evt);
 		_init_strings (evt);
 		_init_styles  (evt);
@@ -238,7 +238,7 @@ Mod {
 	}
 
 	void
-	_init_images (Event* evt) {
+	_init_icons (Event* evt) {
 	    //
 	}
 
@@ -286,8 +286,26 @@ Mod {
 
 				with (xywh)
 				with (style)
-				if (text)
-					renderer.draw_text (font,x,y,w,h,colors.s[fg],colors.s[bg],strings.s[text]);
+				if (text) {
+					auto text_index = e.reserved1;
+					text_index = 2;
+					import std.utf;
+					import std.range;
+					import std.array;
+					import std.conv;
+					import std.uni;
+					auto str = strings.s[text];
+					string txt;
+
+						txt = str.byGrapheme
+						    .array
+						    .drop (text_index)
+						    .take (1)
+						    .byCodePoint
+						    .text;
+
+					renderer.draw_text (font,x,y,w,h,colors.s[fg],colors.s[bg],txt);
+				}
 		    }
 		}
 	}
@@ -524,12 +542,12 @@ Strings {
 
     void
     _init (Event* evt) {
-        s[0] = " ";
-        s[1] = "";
-        s[2] = "";
-        s[3] = "󰁹";
-        s[4] = "";
-        s[5] = "󰀝";
+        s[0] = "    ";
+        s[1] = "";
+        s[2] = "";
+        s[3] = "󰁹󰁹󰁹󰁹";
+        s[4] = "";  // //        󰕾 󰕿 󰖀 󰝞 󰝟 󰖁 󰝝 󱄠 󱄡
+        s[5] = "󰀝󰀝󰀝󰀝";
     }
 }
 
@@ -541,6 +559,9 @@ log_event (Event* evt) {
 	with (Event.Type)
 	if (evt.sdl.type == SDL_MOUSEMOTION)
 	    {}
+	else
+	if (evt.sdl.type == SDL_MOUSEWHEEL)
+		writefln ("%s %s", cast (SDL_EventType)evt.sdl.type, cast (SDL_MouseWheelDirection) evt.sdl.wheel.direction);
 	else
 	if (evt.sdl.type == SDL_WINDOWEVENT)
 	    writefln ("%s %s", cast (SDL_EventType)evt.sdl.type, cast (SDL_WindowEventID) evt.sdl.window.event);
@@ -589,7 +610,7 @@ alias I  = ubyte;
 
 // windows
 // fonts
-// images
+// icons
 // sounds
 
 // start
@@ -772,3 +793,16 @@ Event2 {
 	OPEN_END,
 	OPEN_INFO
 }
+
+// Button
+//       pressed released
+// icon  .       .
+//
+// Check
+//       pressed released
+// icon  .       .
+//
+// Volume
+//       mute low mid high 
+// icon  .    .   .   .
+

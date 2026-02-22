@@ -11,7 +11,7 @@ Style {
     ubyte bg;
     ubyte font = 1;
     ubyte text;
-    ubyte image;
+    ubyte icon;
     ubyte event_on;
     ubyte event_on_arg;
 }

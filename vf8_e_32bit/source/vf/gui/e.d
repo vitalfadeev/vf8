@@ -21,7 +21,7 @@ E {
     ubyte type;  // button, checkbox, text, textarea, select
                  //   wh, fg, bg, font, text, image, on
     // 16
-    ubyte reserved1; 
+    ubyte reserved1;  // icon index, text index
     // 24
     ubyte reserved2; 
     // 32
