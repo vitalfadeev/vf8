@@ -6,6 +6,9 @@ import vf.gui.colors : Color;
 
 struct
 Style {
+    // for
+    ubyte type; ubyte flags; ubyte flags2;
+    // rules
     WH    wh;
     ubyte fg = 1;
     ubyte bg;

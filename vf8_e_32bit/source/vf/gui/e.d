@@ -9,6 +9,12 @@ version (E_32BIT_PAGED):
 //  e
 struct 
 E {
+    ubyte type;  // button, checkbox, text, textarea, select
+                 //   wh, fg, bg, font, text, image, on
+    // 8
+union {
+    ubyte flags;
+struct {
     bool disabled:1;  // enabled  / disabled
     bool unvisible:1; // visible  / unvisible
     bool focused:1;   // focused  / 
@@ -17,11 +23,10 @@ E {
     bool defined:1;   // defined  / undefined
     bool pressed:1;   // pressed  / released
     bool lamp_on:1;   // lamp_on  / lamp_off
-    // 8
-    ubyte type;  // button, checkbox, text, textarea, select
-                 //   wh, fg, bg, font, text, image, on
+}
+}
     // 16
-    ubyte reserved1;  // icon index, text index
+    ubyte flags2;  // icon index, text index
     // 24
     ubyte reserved2; 
     // 32

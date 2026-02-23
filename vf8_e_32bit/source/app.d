@@ -287,7 +287,7 @@ Mod {
 				with (xywh)
 				with (style)
 				if (text) {
-					auto text_index = e.reserved1;
+					auto text_index = e.flags2;
 					text_index = 2;
 					import std.utf;
 					import std.range;
@@ -487,41 +487,84 @@ Windows {
 
 struct
 Styles {
-	Style[2^^6][ubyte.max+1] styles;  // 256 types * 6 flags
+	// style 
+	//   by type 
+	//   by flags 
+	//   by flags2
+	//
+	// assume sorted
+	Style[] styles;
+	// styles[0]  // bask
 	pragma (msg, "styles.size: ", styles.sizeof);  // 261_120
 
 	Style*
+	get (bool OR_CREATE=false) (ubyte type, ubyte flags, ubyte flags2) {
+	    foreach (ref s; styles) {
+	    	if (s.type  == type)
+	    	if ((s.flags  & flags)  == flags) 
+	    	if ((s.flags2 & flags2) == flags2) 
+	    		return &s;
+	    }
+
+	    static if (OR_CREATE) {
+	    	styles ~= Style (type,flags,flags2);
+	    	return &styles[$-1];
+	    }
+	    else {
+	    	return &styles[0];
+	    }
+	}
+
+	Style*
 	get_e_style (E e) {
-		ubyte flags = 
-			(e.disabled ? 0x01 : 0) |
-			(e.pressed  ? 0x02 : 0) |
-			(e.selected ? 0x04 : 0) |
-			(e.focused  ? 0x08 : 0) |
-			(e.m_over   ? 0x10 : 0) |
-			(e.lamp_on  ? 0x20 : 0);
-		return &styles[e.type][flags];
+		return get (e.type, e.flags, e.flags2);
 	}
 
 	void
 	_init (Event* evt) {
-		foreach (t,ref ss; styles) {
-		    foreach (i,ref s; ss) {
-		        switch (i) {
-		            case 0x00 /* base     */: s.fg = 3; s.bg = 1; break;
-		            case 0x02 /* pressed  */: s.fg = 5; s.bg = 3; break;
-		            case 0x04 /* selected */: s.fg = 3; s.bg = 4; break;
-		            case 0x08 /* focused  */: s.fg = 3; s.bg = 2; break;
-		            default:
-		        }
-				switch (t) {
-					case 1 /* start  */ : s.font = 1; s.text = 1; break;
-					case 2 /* clock  */ : s.font = 2; s.text = 2; break;
-					case 3 /* batary */ : s.font = 1; s.text = 3; break;
-					case 4 /* volume */ : s.font = 1; s.text = 4; break;
-					case 5 /* avia   */ : s.font = 1; s.text = 5; break;
-				    default:
-				}
-		    }
+		foreach (ubyte t; 0..255) {
+			styles ~= Style (t);
+			Style* s = &styles[$-1];
+
+			switch (t) {
+				case 1 /* start  */ : s.font = 1; s.text = 1; break;
+				case 2 /* clock  */ : s.font = 2; s.text = 2; break;
+				case 3 /* batary */ : s.font = 1; s.text = 3; break;
+				case 4 /* volume */ : s.font = 1; s.text = 4; break;
+				case 5 /* avia   */ : s.font = 1; s.text = 5; break;
+			    default:
+
+			    E _e;
+			    // base 
+				styles ~= Style (t);
+				s = &styles[$-1];
+				s.fg = 3; 
+				s.bg = 1;
+			    // pressed
+				styles ~= Style (t);
+				s = &styles[$-1];
+				_e.flags = 0;
+				_e.pressed = true;
+				s.flags = _e.flags;
+				s.fg = 5; 
+				s.bg = 3;
+			    // selected
+				styles ~= Style (t);
+				s = &styles[$-1];
+				_e.flags = 0;
+				_e.selected = true;
+				s.flags = _e.flags;
+				s.fg = 3; 
+				s.bg = 4;
+			    // focused
+				styles ~= Style (t);
+				s = &styles[$-1];
+				_e.flags = 0;
+				_e.focused = true;
+				s.flags = _e.flags;
+				s.fg = 3; 
+				s.bg = 2;
+			}
 		}
 
 	    // disabled pressed selected focused m_over lamp_on
