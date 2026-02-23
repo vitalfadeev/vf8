@@ -1,13 +1,18 @@
 module mod.widget_volume;
 
+import app : Event;
+import vf.sdl.importc_sdl;
+import mod.widget_button;
+
 
 version (X)
 struct
 Widget_volume {  // e.type = WIDGET_VOLUME
+    Widget_button _super;
+
     void
     do_switch (Event* evt) {
         switch (evt.sdl.type) with (SDL_EventType) {
-            case SDL_MOUSEBUTTONDOWN : _do_sdl_button (evt); break;
             case SDL_MOUSEWHEEL      : _do_sdl_mousewheel (evt); break;
             default                  :
         }
@@ -16,6 +21,8 @@ Widget_volume {  // e.type = WIDGET_VOLUME
             case VOLUME_INFO         : _do_volume_info (evt); break;
             default                  :
         }
+
+        _super.do_switch (evt);
     }
 
     void

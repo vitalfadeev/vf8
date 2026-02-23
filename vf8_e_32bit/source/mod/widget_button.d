@@ -5,6 +5,8 @@ import vf.sdl.importc_sdl;
 
 struct
 Widget_button {  // e.type = WIDGET_BUTTON
+    ubyte WIDGET_TYPE;
+
     void
     do_switch (Event* evt) {
         switch (evt.sdl.type) with (SDL_EventType) {
@@ -17,6 +19,11 @@ Widget_button {  // e.type = WIDGET_BUTTON
             case DRAW : _do_draw (evt); break;
             default   :
         }
+
+        //switch (evt.type) with (Event2.Type) {
+        //    case WIDGET_BUTTON_PRESS : break;
+        //    default   :
+        //}
     }
 
     void
@@ -27,7 +34,8 @@ Widget_button {  // e.type = WIDGET_BUTTON
         with (Event.Type)
         with (evt.sdl.button)
         switch (button) {
-            case SDL_BUTTON_LEFT   : e.pressed = true; break;
+            case SDL_BUTTON_LEFT   : e.pressed = true; 
+                /*send (this.WIDGET_TYPE,PRESSED);*/ break;
             case SDL_BUTTON_MIDDLE : break;
             case SDL_BUTTON_RIGHT  : break;
             case SDL_BUTTON_X1     : break;
@@ -70,7 +78,7 @@ Widget_button {  // e.type = WIDGET_BUTTON
         with (evt.xywh)
         with (style)
         if (text) {
-            auto text_index = e.flags2;
+            auto text_index = e.value;
             text_index = 0;
             import std.utf;
             import std.range;
@@ -88,6 +96,25 @@ Widget_button {  // e.type = WIDGET_BUTTON
                 .text;
 
             renderer.draw_text (font,x,y,w,h,colors.s[fg],colors.s[bg],txt);
+        }
+    }
+
+    struct
+    Event2 {
+        Type type;
+
+        // send (WIDGET, BUTTON, PRESSED)
+        // send (WIDGET_BUTTON_PRESSED)
+        // send (WIDGET_BUTTON, PRESSED)
+        // send (WIDGET + type, PRESSED)
+        enum
+        Type {
+            PRESS,    // request
+            PRESSED,
+            PRESS_INFO,
+            RELEASE,  // request
+            RELEASEED,
+            RELEASE_INFO,
         }
     }
 }

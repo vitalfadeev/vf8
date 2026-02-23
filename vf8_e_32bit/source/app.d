@@ -122,6 +122,10 @@ union {
     	ACTION,
     	//
     	SHOW_QUICK_SETTINGS,
+    	//
+    	WIDGET,
+    	// from Widget_button
+    	// from Widget_volume
     }
 
     struct
@@ -160,6 +164,12 @@ union {
     Action {
     	Type   type = Type.ACTION;
         string name;
+    }
+
+    struct
+    Widget {
+    	Type   type = Type.WIDGET;
+        ushort code;
     }
 
     string
@@ -227,6 +237,7 @@ Mod {
 		_init_icons   (evt);
 		_init_es      (evt);
 		_init_strings (evt);
+		_init_widgets (evt);
 		_init_styles  (evt);
 	}
 
@@ -268,6 +279,11 @@ Mod {
 	void
 	_init_strings (Event* evt) {
 		evt.o.strings._init (evt);
+	}
+
+	void
+	_init_widgets (Event* evt) {
+		evt.o.widgets._init (evt);
 	}
 
 	void
@@ -567,8 +583,15 @@ Widgets {
     DO_SWITCH_DG
     get_e_widget (ubyte type) {
     	import mod.widget_button;
-    	static Widget_button widget;
-    	return &widget.do_switch;
+    	return &(cast (Widget_button*) s[type]).do_switch;
+    }
+
+    void
+    _init (Event* evt) {
+    	import mod.widget_button;
+    	foreach (ubyte t; 0..256) {
+    		s[t] = new Widget_button (t);
+    	}
     }
 }
 
