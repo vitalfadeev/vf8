@@ -51,10 +51,10 @@ Widget_volume {  // e.type = WIDGET_VOLUME
         with (Event.Type)
         with (evt.volume)
         switch (volume_type) with (Volume.Type) {
-            case MUTE : e.reserved1 = 0; break;
-            case LOW  : e.reserved1 = 1; break;
-            case MID  : e.reserved1 = 2; break;
-            case HIGH : e.reserved1 = 3; break;
+            case MUTE : e.value = 0; break;
+            case LOW  : e.value = 1; break;
+            case MID  : e.value = 2; break;
+            case HIGH : e.value = 3; break;
             default   :
         }
     }

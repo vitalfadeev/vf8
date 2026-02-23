@@ -26,9 +26,9 @@ struct {
 }
 }
     // 16
-    ubyte flags2;  // icon index, text index
+    ubyte flags2;  // iconset icon index, text char index
     // 24
-    ubyte reserved2; 
+    ubyte value;
     // 32
 
     // flags
@@ -43,4 +43,3 @@ struct {
     //   image
     //   event_on;  // on click event, on slide event
 }
-

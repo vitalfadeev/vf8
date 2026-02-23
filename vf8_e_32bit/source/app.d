@@ -65,6 +65,7 @@ O {
     Colors      colors;
 	Fonts 		fonts;
 	Styles 		styles;
+	Widgets     widgets;
 	Strings 	strings;
     bool 		quit;
     DO_SWITCH   do_switch;
@@ -79,6 +80,13 @@ O {
 
 	version (ACTIONS) import vf.base.actions;
 	version (ACTIONS) mixin vf.base.actions.Send!Event;
+
+	void
+	do_widget_switch (Event* evt) {
+		auto type   = page.es[evt.i].type;
+		auto widget = widgets.get_e_widget (type);
+		widget (evt);		
+	}
 }
 
 // SDL_Event sdl_event
@@ -186,7 +194,7 @@ Mod {
 	        default     :
 	    }
 
-	    Mod_type_button ().do_switch (evt);  // set evt.i
+	    Mod_type_widget ().do_switch (evt);  // set evt.i
 	    Mod_type_on     ().do_switch (evt);
 		version (ACTIONS) Actions!Event   ().do_switch (evt);
 	}
@@ -275,37 +283,14 @@ Mod {
 			import vf.gui.colors : Color;
 
 			renderer.fonts = &fonts;
+			ubyte i;
 
 		    foreach (e,xywh; lockstep (page.es.range, page.layout.range)) {
-		    	auto style = styles.get_e_style (*e);
+		    	evt.i    = i;
+		    	evt.xywh = xywh;
+		    	do_widget_switch (evt);  // DRAW
 
-			    with (xywh)
-				with (style)
-			    if (w > 0 && h > 0)
-			    	renderer.draw_rect (x,y,w,h,colors.s[fg],colors.s[bg]);
-
-				with (xywh)
-				with (style)
-				if (text) {
-					auto text_index = e.flags2;
-					text_index = 2;
-					import std.utf;
-					import std.range;
-					import std.array;
-					import std.conv;
-					import std.uni;
-					auto str = strings.s[text];
-					string txt;
-
-						txt = str.byGrapheme
-						    .array
-						    .drop (text_index)
-						    .take (1)
-						    .byCodePoint
-						    .text;
-
-					renderer.draw_text (font,x,y,w,h,colors.s[fg],colors.s[bg],txt);
-				}
+		    	i++;
 		    }
 		}
 	}
@@ -388,11 +373,12 @@ Mod {
 
 version (SDL)
 struct
-Mod_type_button {
+Mod_type_widget {
     void
     do_switch (Event* evt) {
     	switch (evt.sdl.type) with (SDL_EventType) {
     	    case SDL_MOUSEBUTTONDOWN : _do_sdl_button (evt); break;
+    	    case SDL_MOUSEBUTTONUP   : _do_sdl_button (evt); break;
     	    default                  :
     	}
     }
@@ -406,14 +392,9 @@ Mod_type_button {
 		with (evt.sdl.button) {
 			auto xy = XY (x,y);
 			foreach (i,xywh; page.layout.select (xy)) {
-		    	switch (button) {
-				    case SDL_BUTTON_LEFT   : page.es[i].pressed  = !page.es[i].pressed;  break;
-					case SDL_BUTTON_MIDDLE : page.es[i].disabled = !page.es[i].disabled; break;
-					case SDL_BUTTON_RIGHT  : page.es[i].selected = !page.es[i].selected; break;
-	    			default                :
-				}
 				evt.i    = i;
 				evt.xywh = xywh;
+				do_widget_switch (evt);
 				send (REDRAW,xywh);
 
 				version (ACTIONS) send (evt.o,"e.action");
@@ -498,16 +479,16 @@ Styles {
 	pragma (msg, "styles.size: ", styles.sizeof);  // 261_120
 
 	Style*
-	get (bool OR_CREATE=false) (ubyte type, ubyte flags, ubyte flags2) {
+	get (bool OR_CREATE=false) (ubyte type, ubyte flags) {
 	    foreach (ref s; styles) {
-	    	if (s.type  == type)
-	    	if ((s.flags  & flags)  == flags) 
-	    	if ((s.flags2 & flags2) == flags2) 
+	    	if (s.type == type)
+	    	if (s.flags == flags)
 	    		return &s;
 	    }
+		return &styles[0];
 
 	    static if (OR_CREATE) {
-	    	styles ~= Style (type,flags,flags2);
+	    	styles ~= Style (type,flags);
 	    	return &styles[$-1];
 	    }
 	    else {
@@ -517,54 +498,53 @@ Styles {
 
 	Style*
 	get_e_style (E e) {
-		return get (e.type, e.flags, e.flags2);
+		return get (e.type, e.flags);
 	}
 
 	void
 	_init (Event* evt) {
+		styles ~= Style ();
+		Style* s = &styles[0];
+		Style* s2 = &styles[0];
+		s.fg   = 1;
+		s.font = 1;
+
 		foreach (ubyte t; 0..255) {
 			styles ~= Style (t);
-			Style* s = &styles[$-1];
+			s = &styles[$-1];
 
 			switch (t) {
-				case 1 /* start  */ : s.font = 1; s.text = 1; break;
-				case 2 /* clock  */ : s.font = 2; s.text = 2; break;
-				case 3 /* batary */ : s.font = 1; s.text = 3; break;
-				case 4 /* volume */ : s.font = 1; s.text = 4; break;
-				case 5 /* avia   */ : s.font = 1; s.text = 5; break;
+				case 1 /* start  */ : s.font = 1; s.text = 1; s.fg = 2; break;
+				case 2 /* clock  */ : s.font = 2; s.text = 2; s.fg = 2; break;
+				case 3 /* batary */ : s.font = 1; s.text = 3; s.fg = 2; break;
+				case 4 /* volume */ : s.font = 1; s.text = 4; s.fg = 2; break;
+				case 5 /* avia   */ : s.font = 1; s.text = 5; s.fg = 2; break;
 			    default:
+		   }
 
-			    E _e;
-			    // base 
-				styles ~= Style (t);
-				s = &styles[$-1];
-				s.fg = 3; 
-				s.bg = 1;
-			    // pressed
-				styles ~= Style (t);
-				s = &styles[$-1];
-				_e.flags = 0;
-				_e.pressed = true;
-				s.flags = _e.flags;
-				s.fg = 5; 
-				s.bg = 3;
-			    // selected
-				styles ~= Style (t);
-				s = &styles[$-1];
-				_e.flags = 0;
-				_e.selected = true;
-				s.flags = _e.flags;
-				s.fg = 3; 
-				s.bg = 4;
-			    // focused
-				styles ~= Style (t);
-				s = &styles[$-1];
-				_e.flags = 0;
-				_e.focused = true;
-				s.flags = _e.flags;
-				s.fg = 3; 
-				s.bg = 2;
-			}
+		    // base 
+			styles ~= *s;
+			s2 = &styles[$-1];
+			s2.fg = 3; 
+			s2.bg = 1;
+		    // pressed
+		    styles ~= *s;
+			s2 = &styles[$-1];
+			s2.pressed = true;
+			s2.fg = 5; 
+			s2.bg = 2;
+		    // selected
+		    styles ~= *s;
+			s2 = &styles[$-1];
+			s2.selected = true;
+			s2.fg = 3; 
+			s2.bg = 4;
+		    // focused
+		    styles ~= *s;
+			s2 = &styles[$-1];
+			s2.focused = true;
+			s2.fg = 3; 
+			s2.bg = 2;
 		}
 
 	    // disabled pressed selected focused m_over lamp_on
@@ -576,6 +556,20 @@ Styles {
 	    // 256 types * 6 flags = 1536 * 10 = 15_360 Bytes
 	    // 256 types * 2^6 flags = 256*64 = 16384 *10 = 163_840 Bytes
 	}
+}
+
+struct
+Widgets {
+    void*[ubyte.max+1] s;
+
+    alias DO_SWITCH_DG = void delegate (Event* evt);
+
+    DO_SWITCH_DG
+    get_e_widget (ubyte type) {
+    	import mod.widget_button;
+    	static Widget_button widget;
+    	return &widget.do_switch;
+    }
 }
 
 struct
