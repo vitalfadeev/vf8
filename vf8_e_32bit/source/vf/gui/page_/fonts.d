@@ -44,8 +44,8 @@ struct {
     _open_font (string file_name, int font_size) {
         auto filez = file_name.toStringz;
         int  ptsize =font_size;
-        //TTF_Font* font = TTF_OpenFont (file_name.toStringz, font_size);
-        auto font = TTF_OpenFontDPI (filez, ptsize, 102, 102);
+        TTF_Font* font = TTF_OpenFont (filez, ptsize);
+        //auto font = TTF_OpenFontDPI (filez, ptsize, 102, 102);
         if (font !is null)
             return font;
 
