@@ -20,10 +20,11 @@ Widget_button {  // e.type = WIDGET_BUTTON
             default   :
         }
 
-        //switch (evt.type) with (Event2.Type) {
-        //    case WIDGET_BUTTON_PRESS : break;
-        //    default   :
-        //}
+        switch (evt.type) with (Event.Type) {
+            case PRESS   : _do_press   (evt); break;
+            case RELEASE : _do_release (evt); break;
+            default      :
+        }
     }
 
     void
@@ -34,8 +35,7 @@ Widget_button {  // e.type = WIDGET_BUTTON
         with (Event.Type)
         with (evt.sdl.button)
         switch (button) {
-            case SDL_BUTTON_LEFT   : e.pressed = true; 
-                /*send (this.WIDGET_TYPE,PRESSED);*/ break;
+            case SDL_BUTTON_LEFT   : e.pressed = true; send (PRESSED); break;
             case SDL_BUTTON_MIDDLE : break;
             case SDL_BUTTON_RIGHT  : break;
             case SDL_BUTTON_X1     : break;
@@ -52,12 +52,34 @@ Widget_button {  // e.type = WIDGET_BUTTON
         with (Event.Type)
         with (evt.sdl.button)
         switch (button) {
-            case SDL_BUTTON_LEFT   : e.pressed = false; break;
+            case SDL_BUTTON_LEFT   : e.pressed = false; send (RELEASED); break;
             case SDL_BUTTON_MIDDLE : break;
             case SDL_BUTTON_RIGHT  : break;
             case SDL_BUTTON_X1     : break;
             case SDL_BUTTON_X2     : break;
             default                :
+        }
+    }
+
+    void
+    _do_press (Event* evt) {
+        auto e = &evt.o.page.es[evt.i];
+
+        with (evt.o)
+        with (Event.Type){
+            e.pressed = true; 
+            send (PRESSED);
+        }
+    }
+
+    void
+    _do_release (Event* evt) {
+        auto e = &evt.o.page.es[evt.i];
+
+        with (evt.o)
+        with (Event.Type){
+            e.pressed = false; 
+            send (RELEASED);
         }
     }
 
@@ -100,7 +122,7 @@ Widget_button {  // e.type = WIDGET_BUTTON
     }
 
     struct
-    Event2 {
+    _Event {
         Type type;
 
         // send (WIDGET, BUTTON, PRESSED)
@@ -113,7 +135,7 @@ Widget_button {  // e.type = WIDGET_BUTTON
             PRESSED,
             PRESS_INFO,
             RELEASE,  // request
-            RELEASEED,
+            RELEASED,
             RELEASE_INFO,
         }
     }

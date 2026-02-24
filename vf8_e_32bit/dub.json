@@ -8,4 +8,5 @@
 	"dflags-linux-ldc" : ["-P-I/usr/include/SDL2","-preview=bitfields"],
 	"importPaths-gdc"  : ["/usr/include/SDL2"],
 	"libs"             : ["SDL2","SDL2_ttf","fontconfig"],
+	"dflags"           : [ "-mixin=mixins.d" ],
 }

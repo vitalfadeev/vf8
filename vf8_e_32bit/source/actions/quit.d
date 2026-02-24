@@ -2,11 +2,11 @@ module actions.quit;
 
 version (ACTIONS):
 import app : Event;
-import vf.base.actions : Action;
+import mod.action : Action;
 
 
 class
-Quit : Action!Event {
+Quit : Action {
     void
     _do (Event* evt) {
         import std.stdio : writeln;
@@ -17,7 +17,7 @@ Quit : Action!Event {
 
 
 class
-SDL_MOUSEBUTTONDOWN : Action!Event {
+SDL_MOUSEBUTTONDOWN : Action {
     void
     _do (Event* evt) {
         import std.stdio : writeln;
@@ -26,7 +26,7 @@ SDL_MOUSEBUTTONDOWN : Action!Event {
 }
 
 class
-SHOW_QUICK_SETTINGS : Action!Event {
+SHOW_QUICK_SETTINGS : Action {
     void
     _do (Event* evt) {
         import std.stdio : writeln;

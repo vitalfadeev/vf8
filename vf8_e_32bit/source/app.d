@@ -8,7 +8,6 @@ import vf.gui.style 					: Style;
 version (SDL) import vf.sdl.input       : Input;
 version (SDL) import vf.sdl.importc_sdl : SDL_Event,SDL_EventType, SDL_WindowEventID;
 version (SDL) import vf.sdl.fonts       : Fonts;
-version (ACTIONS) import vf.base.actions : Actions;
 
 
 void 
@@ -67,6 +66,8 @@ O {
 	Styles 		styles;
 	Widgets     widgets;
 	Strings 	strings;
+	version (ACTIONS) import mod.action : Actions;
+	version (ACTIONS) Actions actions;
     bool 		quit;
     DO_SWITCH   do_switch;
 
@@ -78,8 +79,8 @@ O {
 	version (SDL) import vf.sdl.send;
 	version (SDL) mixin vf.sdl.send.Send!Event;
 
-	version (ACTIONS) import vf.base.actions;
-	version (ACTIONS) mixin vf.base.actions.Send!Event;
+	version (ACTIONS) import mod.action;
+	version (ACTIONS) mixin mod.action.Send;
 
 	void
 	do_widget_switch (Event* evt) {
@@ -102,30 +103,37 @@ union {
     Type   type;
     version (SDL) SDL_Event sdl;
     Init   init_;
-    Draw   draw;
-    Redraw redraw;
+    //Draw   draw;
+	//mixin Mod_event!("mod.draw", "Draw._Event.union");
+	import mod.draw : Mod_draw;
+	mixin ("Mod_draw._Event.Draw   draw;");
+	mixin ("Mod_draw._Event.Redraw redraw;");
     Click  click;
-    Action action;
+    import mod.action : Mod_action;
+    mixin ("Mod_action._Event.Action   action;");
 }
 	O*     o;
     ubyte  i;    // e index
     XYWH   xywh; // e xywh
 
+    import vf.std.mixin_enum : Enum;
+
+    mixin Enum!("Type", 0x8000, 
+    	"app",               "Event._Type",
+    	"mod.draw",          "Mod_draw._Event.Type",
+    	//"mod.redraw",        "Redraw._Event.Type",
+    	//"mod.click",         "Click._Event.Type",
+    	//"mod.action",        "Action._Event.Type",
+    	"mod.widget_button", "Widget_button._Event.Type",
+    	//"mod.widget_volume", "Widget_volume._Event.Type",
+    	//"mod.show_quick_settings", "Show_quick_settings._Event.Type",
+		);
+
     enum
-    Type {  // 0xFFFF
-    	_ = 0x8000,
+    _Type {  // 0xFFFF
     	INIT,
-    	DRAW,
-    	REDRAW,
     	CLICK,
-    	//
     	ACTION,
-    	//
-    	SHOW_QUICK_SETTINGS,
-    	//
-    	WIDGET,
-    	// from Widget_button
-    	// from Widget_volume
     }
 
     struct
@@ -139,37 +147,9 @@ union {
     }
 
     struct
-    Draw {
-        Type type = Type.DRAW;
-        version (SDL) import vf.sdl.renderer_sdl : Renderer;
-        version (SDL) import vf.sdl.window       : Window;
-        version (SDL) Window*   window;
-        version (SDL) Renderer* renderer;
-        XYWH xywh;
-    }
-
-    struct
-    Redraw {
-        Type type = Type.REDRAW;
-        XYWH xywh;
-    }
-
-    struct
     Click {
     	Type type = Type.CLICK;
         XY   xy;
-    }
-
-    struct
-    Action {
-    	Type   type = Type.ACTION;
-        string name;
-    }
-
-    struct
-    Widget {
-    	Type   type = Type.WIDGET;
-        ushort code;
     }
 
     string
@@ -199,14 +179,15 @@ Mod {
 
 	    switch (evt.type) with (Event.Type) {
 	        case INIT   : _do_init   (evt); break;
-	        case DRAW   : _do_draw   (evt); break;
-	        case REDRAW : _do_redraw (evt); break;
 	        default     :
 	    }
 
+	    import mod.draw : Mod_draw;
+	    Mod_draw        ().do_switch (evt);
 	    Mod_type_widget ().do_switch (evt);  // set evt.i
 	    Mod_type_on     ().do_switch (evt);
-		version (ACTIONS) Actions!Event   ().do_switch (evt);
+	    version (ACTIONS) import mod.action : Mod_action;
+		version (ACTIONS) Mod_action ().do_switch (evt);
 	}
 
 	void
@@ -239,6 +220,7 @@ Mod {
 		_init_strings (evt);
 		_init_widgets (evt);
 		_init_styles  (evt);
+		version (ACTIONS) _init_actions (evt);
 	}
 
 	void
@@ -291,38 +273,15 @@ Mod {
 		evt.o.styles._init (evt);
 	}
 
+	version (ACTIONS)
 	void
-	_do_draw (Event* evt) {
-		with (evt.o)
-		with (evt.draw) {
-			import std.range     : lockstep;
-			import vf.gui.colors : Color;
-
-			renderer.fonts = &fonts;
-			ubyte i;
-
-		    foreach (e,xywh; lockstep (page.es.range, page.layout.range)) {
-		    	evt.i    = i;
-		    	evt.xywh = xywh;
-		    	do_widget_switch (evt);  // DRAW
-
-		    	i++;
-		    }
-		}
-	}
-
-	version (SDL) 
-	void
-	_do_redraw (Event* evt) {
-		with (evt.o)
-		with (Event.Type)
-		with (evt.redraw) {
-			auto _window = wm.window.window;
-    		import vf.sdl.renderer_sdl : Renderer;
-			Renderer renderer;
-    		renderer.draw_start (_window);
-    		send_now (DRAW,&renderer);
-    		renderer.draw_end (_window);
+	_init_actions (Event* evt) {
+		import actions.quit : Quit;
+		import actions.quit : SDL_MOUSEBUTTONDOWN;
+		with (evt.o) {
+			actions._init (evt);
+			actions.register (Quit.stringof, new Quit);
+			actions.register (SDL_MOUSEBUTTONDOWN.stringof, new SDL_MOUSEBUTTONDOWN);
 		}
 	}
 
@@ -576,21 +535,20 @@ Styles {
 
 struct
 Widgets {
-    void*[ubyte.max+1] s;
+    DO_SWITCH_DG[ubyte.max+1] s;
 
     alias DO_SWITCH_DG = void delegate (Event* evt);
 
     DO_SWITCH_DG
     get_e_widget (ubyte type) {
-    	import mod.widget_button;
-    	return &(cast (Widget_button*) s[type]).do_switch;
+    	return s[type];
     }
 
     void
     _init (Event* evt) {
     	import mod.widget_button;
     	foreach (ubyte t; 0..256) {
-    		s[t] = new Widget_button (t);
+    		s[t] = &(new Widget_button (t)).do_switch;
     	}
     }
 }
