@@ -106,14 +106,14 @@ union {
     //Draw   draw;
 	//mixin Mod_event!("mod.draw", "Draw._Event.union");
 	import mod.draw : Mod_draw;
-	mixin ("Mod_draw._Event.Draw   draw;");
-	mixin ("Mod_draw._Event.Redraw redraw;");
+	mixin ("Mod_draw._Event.Draw   		draw;");
+	mixin ("Mod_draw._Event.Redraw 		redraw;");
     import mod.click : Mod_click;
-    mixin ("Mod_click._Event.Click   click;");
+    mixin ("Mod_click._Event.Click   	click;");
     import mod.action : Mod_action;
-    mixin ("Mod_action._Event.Action   action;");
+    mixin ("Mod_action._Event.Action   	action;");
     import mod.volume : Mod_volume;
-    mixin ("Mod_volume._Event.Volume   volume;");
+    mixin ("Mod_volume._Event.Volume   	volume;");
 }
 	O*     o;
     ubyte  i;    // e index
@@ -165,13 +165,8 @@ Mod {
 	do_switch (Event* evt) {
 		log_event (evt);
 
-		version (SDL)
-		switch (evt.sdl.type) with (SDL_EventType) {
-		    case SDL_QUIT            : _do_sdl_quit   (evt); break;
-		    case SDL_WINDOWEVENT     : _do_sdl_window (evt); break;
-		    case SDL_KEYDOWN         : _do_sdl_keydown (evt); break;
-		    default                  :
-		}
+		version (SDL) import mod.sdl : Mod_sdl;
+		version (SDL) Mod_sdl ().do_switch (evt);
 
 	    switch (evt.type) with (Event.Type) {
 	        case INIT   : _do_init   (evt); break;
@@ -278,66 +273,6 @@ Mod {
 			actions._init (evt);
 			actions.register (Quit.stringof, new Quit);
 			actions.register (SDL_MOUSEBUTTONDOWN.stringof, new SDL_MOUSEBUTTONDOWN);
-		}
-	}
-
-	//void
-	//_do_click (Event* evt) {
-	//	import std.algorithm : filter;
-	//	with (evt.click) {
-	//		ubyte i;
-	//		foreach (xywh; o.page.layout.select (xy)) {
-	//			if (xywh.has (xy)) {
-	//				o.page.es[i].pressed = !o.page.es[i].pressed;
-	//				on (i, evt);
-	//				with (Event.Type)
-	//				send (REDRAW,xywh);
-	//			}
-	//			i++;
-	//		}
-	//	}
-	//}	
-
-	version (SDL)
-	void
-	_do_sdl_quit (Event* evt) {
-		with (evt.sdl.quit) {
-			evt.o.quit = true;
-		}
-	}	
-
-	version (SDL)
-	void
-	_do_sdl_window (Event* evt) {
-		with (evt.o)
-		with (Event.Type)
-		with (evt.sdl.window)
-    	switch (event) with (SDL_WindowEventID) {
-    		case SDL_WINDOWEVENT_CLOSE:
-    			break;
-    		case SDL_WINDOWEVENT_EXPOSED:
-	    		import vf.sdl.renderer_sdl : Renderer;
-    			Renderer renderer;
-	    		renderer.draw_start (&evt.sdl);
-	    		send_now (DRAW, &renderer);
-	    		renderer.draw_end (&evt.sdl);
-	    		break;
-		    default:
-		}
-	}
-
-	version (SDL)
-	void
-	_do_sdl_keydown (Event* evt) {
-		import vf.sdl.importc_sdl;
-		// SDL_KEYDOWN
-		// SDL_KEYUP
-		with (evt.o)
-		with (evt.sdl.key)
-    	switch (keysym.scancode) {
-		    case SDL_SCANCODE_ESCAPE : quit = true; break;
-		    case SDL_SCANCODE_Q      : quit = true; break;
-		    default                  :
 		}
 	}
 }
