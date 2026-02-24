@@ -58,9 +58,10 @@ Wm {
         }
     }
 
-    void
+    Window*
     new_window (int w=WINDOW_DEFAULT_W, int h=WINDOW_DEFAULT_H) {
         s ~= Window (w,h);
+        return &s[$-1];
     }
 
     void

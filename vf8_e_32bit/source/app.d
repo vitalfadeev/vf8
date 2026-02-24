@@ -49,15 +49,6 @@ O {
 	// send
 	version (ACTIONS) import mod.action;
 	version (ACTIONS) mixin mod.action.Send;
-
-	void
-	do_widget_switch (Event* evt) {
-		if (evt.e !is null) {
-			auto type   = evt.e.type;
-			auto widget_do_switch = page.widgets.get_e_widget_do_switch (type);
-			widget_do_switch (evt);		
-		}
-	}
 }
 
 // SDL_Event sdl_event
@@ -137,7 +128,8 @@ Mod {
 		log_event (evt);
 
 		version (SDL) import mod.sdl : Mod_sdl;
-		version (SDL) Mod_sdl ().do_switch (evt);
+		version (SDL) 
+		Mod_sdl     ().do_switch (evt);
 
 	    switch (evt.type) with (Event.Type) {
 	        case INIT   : _do_init   (evt); break;
@@ -149,7 +141,8 @@ Mod {
 	    import mod.widget : Mod_widget;
 	    Mod_widget  ().do_switch (evt);  // set evt.i
 	    version (ACTIONS) import mod.action : Mod_action;
-		version (ACTIONS) Mod_action ().do_switch (evt);
+		version (ACTIONS) 
+		Mod_action  ().do_switch (evt);
 	}
 
 	void
@@ -178,7 +171,6 @@ Mod {
 }
 
 
-
 void
 log_event (Event* evt) {
 	import std.stdio : writefln;
@@ -192,7 +184,7 @@ log_event (Event* evt) {
 		writefln ("%s %s", cast (SDL_EventType)evt.sdl.type, cast (SDL_MouseWheelDirection) evt.sdl.wheel.direction);
 	else
 	if (evt.sdl.type == SDL_WINDOWEVENT)
-	    writefln ("%s %s", cast (SDL_EventType)evt.sdl.type, cast (SDL_WindowEventID) evt.sdl.window.event);
+	    writefln ("%s %d %s ", cast (SDL_EventType)evt.sdl.type, evt.sdl.window.windowID, cast (SDL_WindowEventID) evt.sdl.window.event);
 	else
 	if (evt.sdl.type == SDL_KEYDOWN)
 	    writefln ("%s %s", cast (SDL_EventType)evt.sdl.type, evt.sdl.key.keysym.scancode);
@@ -408,19 +400,19 @@ alias I  = ubyte;
 //
 // EVENT!("PLAY", ["REQUEST", "START", "END", "INFO"])
 
-enum
-Event2 {
-	PLAY = 0x8000 | (1 << 2),
-	PLAY_REQUEST = PLAY,
-	PLAY_START,
-	PLAY_END,
-	PLAY_INFO,
-	OPEN = 0x8000 | (2 << 2),
-	OPEN_REQUEST = OPEN,
-	OPEN_START,
-	OPEN_END,
-	OPEN_INFO
-}
+//enum
+//Event2 {
+//	PLAY = 0x8000 | (1 << 2),
+//	PLAY_REQUEST = PLAY,
+//	PLAY_START,
+//	PLAY_END,
+//	PLAY_INFO,
+//	OPEN = 0x8000 | (2 << 2),
+//	OPEN_REQUEST = OPEN,
+//	OPEN_START,
+//	OPEN_END,
+//	OPEN_INFO
+//}
 
 // Button
 //       pressed released

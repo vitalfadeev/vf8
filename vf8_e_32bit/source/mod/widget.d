@@ -27,14 +27,14 @@ Mod_widget {
         with (Event.Type)
         with (evt.sdl.button) {
             auto xy = XY (x,y);
+            // widgets at xy
             foreach (i,xywh; page.layout.select (xy)) {
                 evt.i    = i;
                 evt.xywh = xywh;
                 evt.e    = &page.es[i];
-                do_widget_switch (evt);
+                page.widgets.do_widget_switch (evt);
+                
                 send (REDRAW, windowID, xywh);
-
-                version (ACTIONS) send ("e.action");
             }
         }
     }

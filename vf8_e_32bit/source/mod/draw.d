@@ -33,11 +33,12 @@ Mod_draw {
             renderer.fonts = &page.fonts;
             ubyte i;
 
+            // all widgets
             foreach (e,xywh; lockstep (page.es.range, page.layout.range)) {
                 evt.i    = i;
                 evt.xywh = xywh;
                 evt.e    = &page.es[i];
-                do_widget_switch (evt);  // DRAW
+                page.widgets.do_widget_switch (evt);  // DRAW
 
                 i++;
             }
