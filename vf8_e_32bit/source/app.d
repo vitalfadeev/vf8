@@ -84,9 +84,11 @@ O {
 
 	void
 	do_widget_switch (Event* evt) {
-		auto type   = page.es[evt.i].type;
-		auto widget = widgets.get_e_widget (type);
-		widget (evt);		
+		if (evt.e !is null) {
+			auto type   = evt.e.type;
+			auto widget_do_switch = widgets.get_e_widget_do_switch (type);
+			widget_do_switch (evt);		
+		}
 	}
 }
 
@@ -101,7 +103,8 @@ struct
 Event {
 union {
     Type   type;
-    version (SDL) SDL_Event sdl;
+    version (SDL) import mod.sdl : Mod_sdl;
+    version (SDL) mixin ("Mod_sdl._Event.SDL_Event   		sdl;");
     Init   init_;
     //Draw   draw;
 	//mixin Mod_event!("mod.draw", "Draw._Event.union");
@@ -129,6 +132,7 @@ union {
 
     mixin Enum!("Type", 0x8000, 
     	"app",               "Event._Type",
+    	"mod.sdl",           "Mod_sdl._Event.Type",
     	"mod.draw",          "Mod_draw._Event.Type",
     	"mod.click",         "Mod_click._Event.Type",
     	"mod.action",        "Mod_action._Event.Type",
@@ -174,9 +178,9 @@ Mod {
 	    }
 
 	    import mod.draw : Mod_draw;
-	    Mod_draw        ().do_switch (evt);
-	    Mod_type_widget ().do_switch (evt);  // set evt.i
-	    Mod_type_on     ().do_switch (evt);
+	    Mod_draw    ().do_switch (evt);
+	    import mod.widget : Mod_widget;
+	    Mod_widget  ().do_switch (evt);  // set evt.i
 	    version (ACTIONS) import mod.action : Mod_action;
 		version (ACTIONS) Mod_action ().do_switch (evt);
 	}
@@ -184,17 +188,9 @@ Mod {
 	void
 	_do_init (Event* evt) {
 		with (evt.init_) {
-			version (SDL) init_sdl (evt);
 			init_window (evt);
 			init_gui (evt);
 		}
-	}
-
-	version (SDL)
-	void
-	init_sdl (Event* evt) {
-		import vf.sdl.init_sdl : init_sdl;
-		init_sdl ();
 	}
 
 	void
@@ -277,88 +273,6 @@ Mod {
 	}
 }
 
-version (SDL)
-struct
-Mod_type_widget {
-    void
-    do_switch (Event* evt) {
-    	switch (evt.sdl.type) with (SDL_EventType) {
-    	    case SDL_MOUSEBUTTONDOWN : _do_sdl_button (evt); break;
-    	    case SDL_MOUSEBUTTONUP   : _do_sdl_button (evt); break;
-    	    default                  :
-    	}
-    }
-
-    void
-    _do_sdl_button (Event* evt) {
-		import vf.sdl.importc_sdl;
-
-		with (evt.o)
-		with (Event.Type)
-		with (evt.sdl.button) {
-			auto xy = XY (x,y);
-			foreach (i,xywh; page.layout.select (xy)) {
-				evt.i    = i;
-				evt.xywh = xywh;
-				evt.e    = &page.es[i];
-				do_widget_switch (evt);
-				send (REDRAW,xywh);
-
-				version (ACTIONS) send (evt.o,"e.action");
-			}
-		}
-	}
-}
-
-
-version (SDL)
-struct
-Mod_type_on {
-    void
-    do_switch (Event* evt) {
-	    with (evt.o)
-	    with (EType)
-	    if (page.es[evt.i].type == BUTTON)
-    	switch (evt.sdl.type) with (SDL_EventType) {
-    	    case SDL_MOUSEBUTTONDOWN : _do_sdl_button (evt); break;
-    	    default                  :
-    	}
-    }
-
-    void
-    _do_sdl_button (Event* evt) {
-		_do_on (evt);
-    }
-
-	void
-	_do_on (Event* evt) {
-		with (evt.o)
-		if (evt.i >= 0)
-		if (evt.i < page.es.length)
-		switch (page.es[evt.i].type) {
-			case 1  : break;  // type 1
-			case 2  : break;
-			case 3  : break;
-			case 4  : /*send ("Quit");*/ break;
-			case 5  : /*send (SHOW_QUICK_SETTINGS);*/ break;
-			default :
-		}
-
-		//
-		with (evt.o)
-    	if (evt.i >= 0 && evt.i < page.es.length) {
-	    	import std.stdio : writefln;
-	    	writefln ("on %d %s", evt.i, cast (SDL_EventType) evt.type);
-	    	writefln ("   %s", page.es[evt.i]);
-    	}
-	}
-
-	enum
-	EType {
-		_,
-		BUTTON,
-	}
-}
 
 struct
 Windows {
@@ -472,7 +386,7 @@ Widgets {
     alias DO_SWITCH_DG = void delegate (Event* evt);
 
     DO_SWITCH_DG
-    get_e_widget (ubyte type) {
+    get_e_widget_do_switch (ubyte type) {
     	return s[type];
     }
 

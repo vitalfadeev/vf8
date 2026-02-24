@@ -25,7 +25,8 @@ Mod_sdl {
 
     void
     _init (Event* evt) {
-        //
+        import vf.sdl.init_sdl : init_sdl;
+        init_sdl ();
     }
 
     void
@@ -76,9 +77,11 @@ Mod_sdl {
             //
         }
 
+        alias SDL_Event = .SDL_Event;
+
         enum
         Type {
-            __,
+            SDL_,
             // SDL_EventType...
         }
     }

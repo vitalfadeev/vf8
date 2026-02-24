@@ -36,6 +36,7 @@ Mod_draw {
             foreach (e,xywh; lockstep (page.es.range, page.layout.range)) {
                 evt.i    = i;
                 evt.xywh = xywh;
+                evt.e    = &page.es[i];
                 do_widget_switch (evt);  // DRAW
 
                 i++;
