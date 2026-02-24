@@ -108,33 +108,35 @@ union {
 	import mod.draw : Mod_draw;
 	mixin ("Mod_draw._Event.Draw   draw;");
 	mixin ("Mod_draw._Event.Redraw redraw;");
-    Click  click;
+    import mod.click : Mod_click;
+    mixin ("Mod_click._Event.Click   click;");
     import mod.action : Mod_action;
     mixin ("Mod_action._Event.Action   action;");
+    import mod.volume : Mod_volume;
+    mixin ("Mod_volume._Event.Volume   volume;");
 }
 	O*     o;
     ubyte  i;    // e index
     XYWH   xywh; // e xywh
+    E*     e;    // e
 
     import vf.std.mixin_enum : Enum;
-
-    mixin Enum!("Type", 0x8000, 
-    	"app",               "Event._Type",
-    	"mod.draw",          "Mod_draw._Event.Type",
-    	//"mod.redraw",        "Redraw._Event.Type",
-    	//"mod.click",         "Click._Event.Type",
-    	//"mod.action",        "Action._Event.Type",
-    	"mod.widget_button", "Widget_button._Event.Type",
-    	//"mod.widget_volume", "Widget_volume._Event.Type",
-    	//"mod.show_quick_settings", "Show_quick_settings._Event.Type",
-		);
 
     enum
     _Type {  // 0xFFFF
     	INIT,
-    	CLICK,
-    	ACTION,
     }
+
+    mixin Enum!("Type", 0x8000, 
+    	"app",               "Event._Type",
+    	"mod.draw",          "Mod_draw._Event.Type",
+    	"mod.click",         "Mod_click._Event.Type",
+    	"mod.action",        "Mod_action._Event.Type",
+    	"mod.widget_button", "Widget_button._Event.Type",
+    	"mod.volume",        "Mod_volume._Event.Type",
+    	//"mod.widget_volume", "Widget_volume._Event.Type",
+    	//"mod.show_quick_settings", "Show_quick_settings._Event.Type",
+		);
 
     struct
     Base {
@@ -144,12 +146,6 @@ union {
     struct
     Init {
         Type type = Type.INIT;
-    }
-
-    struct
-    Click {
-    	Type type = Type.CLICK;
-        XY   xy;
     }
 
     string
@@ -369,6 +365,7 @@ Mod_type_widget {
 			foreach (i,xywh; page.layout.select (xy)) {
 				evt.i    = i;
 				evt.xywh = xywh;
+				evt.e    = &page.es[i];
 				do_widget_switch (evt);
 				send (REDRAW,xywh);
 
@@ -548,8 +545,10 @@ Widgets {
     _init (Event* evt) {
     	import mod.widget_button;
     	foreach (ubyte t; 0..256) {
-    		s[t] = &(new Widget_button (t)).do_switch;
+    		s[t] = &(new Widget_button ()).do_switch;
     	}
+    	import mod.widget_volume;
+    	s[4] = &(new Widget_volume ()).do_switch;
     }
 }
 

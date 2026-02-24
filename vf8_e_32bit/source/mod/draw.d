@@ -11,10 +11,16 @@ Mod_draw {
     void
     do_switch (Event* evt) {
         switch (evt.type) with (Event.Type) {
+            case INIT   : _init      (evt); break;
             case DRAW   : _do_draw   (evt); break;
             case REDRAW : _do_redraw (evt); break;
             default     :
         }
+    }
+
+    void
+    _init (Event* evt) {
+        //
     }
 
     void
@@ -71,12 +77,12 @@ Mod_draw {
 
         struct
         Draw {
-            Type type = Type.DRAW;
+            Type  type = Type.DRAW;
             version (SDL) import vf.sdl.renderer_sdl : Renderer;
             version (SDL) import vf.sdl.window       : Window;
             version (SDL) Window*   window;
-            Renderer* renderer;
-            XYWH xywh;
+            Renderer*   renderer;
+            XYWH        xywh;
         }
 
         struct

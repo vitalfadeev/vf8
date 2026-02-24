@@ -3,9 +3,9 @@ module mod.widget_volume;
 import app : Event;
 import vf.sdl.importc_sdl;
 import mod.widget_button;
+import mod.volume;
 
 
-version (X)
 struct
 Widget_volume {  // e.type = WIDGET_VOLUME
     Widget_button _super;
@@ -57,11 +57,11 @@ Widget_volume {  // e.type = WIDGET_VOLUME
         with (evt.o)
         with (Event.Type)
         with (evt.volume)
-        switch (volume_type) with (Volume.Type) {
-            case MUTE : e.value = 0; break;
-            case LOW  : e.value = 1; break;
-            case MID  : e.value = 2; break;
-            case HIGH : e.value = 3; break;
+        switch (volume_type) with (Mod_volume.Volume_type) {
+            case MUTE : evt.e.value = 0; break;
+            case LOW  : evt.e.value = 1; break;
+            case MID  : evt.e.value = 2; break;
+            case HIGH : evt.e.value = 3; break;
             default   :
         }
     }

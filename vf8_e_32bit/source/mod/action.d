@@ -1,9 +1,6 @@
 module mod.action;
 
 import app : Event;
-import vf.std.xywh;
-import vf.sdl.importc_sdl;
-import vf.sdl.renderer_sdl;
 
 
 struct

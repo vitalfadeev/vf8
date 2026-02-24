@@ -5,8 +5,6 @@ import vf.sdl.importc_sdl;
 
 struct
 Widget_button {  // e.type = WIDGET_BUTTON
-    ubyte WIDGET_TYPE;
-
     void
     do_switch (Event* evt) {
         switch (evt.sdl.type) with (SDL_EventType) {

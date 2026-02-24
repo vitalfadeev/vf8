@@ -1,23 +1,23 @@
 module mod.volume;
 
+import app : Event;
 
-version (X)
 struct
-Volume {
+Mod_volume {
     void
     do_switch (Event* evt) {
         switch (evt.type) with (Event.Type) {
-            case VOLUME_MUTE     : _do_volume_mute (evt); break;
-            case VOLUME          : _do_volume      (evt); break;
-            case VOLUME_UP       : _do_volume_up   (evt); break;
-            case VOLUME_DN       : _do_volume_dn   (evt); break;
-            case VOLUME_GET_INFO : _do_volume_info (evt); break;
+            case VOLUME_MUTE     : _do_volume_mute     (evt); break;
+            case VOLUME          : _do_volume          (evt); break;
+            case VOLUME_UP       : _do_volume_up       (evt); break;
+            case VOLUME_DN       : _do_volume_dn       (evt); break;
+            case VOLUME_GET_INFO : _do_volume_get_info (evt); break;
             default              :
         }
     }
 
     enum
-    Type {
+    Volume_type {
         MUTE,
         LOW,
         MID,
@@ -29,7 +29,7 @@ Volume {
         with (evt.o)
         with (Event.Type) {
             ubyte volume = 0;
-            send (VOLUME_INFO, 0);
+            //send (VOLUME_INFO, 0);
         }
     }
 
@@ -38,7 +38,7 @@ Volume {
         with (evt.o)
         with (Event.Type) {
             ubyte volume;   
-            send (VOLUME_INFO, volume);
+            //send (VOLUME_INFO, volume);
         }
     }
 
@@ -47,7 +47,7 @@ Volume {
         with (evt.o)
         with (Event.Type) {
             ubyte volume;  // +5%
-            send (VOLUME_INFO, volume);
+            //send (VOLUME_INFO, volume);
         }
     }
 
@@ -56,7 +56,7 @@ Volume {
         with (evt.o)
         with (Event.Type) {
             ubyte volume;  // -5%
-            send (VOLUME_INFO, volume);
+            //send (VOLUME_INFO, volume);
         }
     }
 
@@ -65,13 +65,13 @@ Volume {
         with (evt.o)
         with (Event.Type) {
             ubyte volume;   
-            send (VOLUME_INFO, volume);
+            //send (VOLUME_INFO, volume);
         }
     }
 
-    Type
+    Volume_type
     _volume_type (ubyte volume) {
-        with (Type) {
+        with (Volume_type) {
             if (volume == 0)               return MUTE;
             if (volume < volume.max/3)     return LOW;
             if (volume < (volume.max/3)*2) return MID;
@@ -80,10 +80,12 @@ Volume {
     }
 
     struct
-    Event {
-        Type        type;
-        ubyte       volume;
-        Volume.Type volume_type;
+    _Event {
+        Type type;
+
+        union {
+            Volume volume;
+        }
 
         enum 
         Type {
@@ -93,6 +95,13 @@ Volume {
             VOLUME_DN,
             VOLUME_INFO,
             VOLUME_GET_INFO,
+        }
+
+        struct
+        Volume {
+            Type        type = Type.VOLUME;
+            ubyte       volume;
+            Volume_type volume_type;
         }
     }
 }
