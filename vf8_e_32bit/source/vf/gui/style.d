@@ -1,7 +1,7 @@
 module vf.gui.style;
 
 import vf.std.xywh   : WH;
-import vf.gui.colors : Color;
+import vf.gui.color  : Color;
 
 
 struct

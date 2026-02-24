@@ -2,8 +2,8 @@ module vf.sdl.renderer_sdl;
 
 version (SDL):
 import std.conv : to;
-import vf.gui.colors : Color; 
-import vf.sdl.fonts;
+import vf.gui.color  : Color; 
+import vf.gui.page_.fonts;
 import vf.sdl.importc_sdl;
 
 

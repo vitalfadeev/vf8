@@ -28,9 +28,9 @@ Mod_draw {
         with (evt.o)
         with (evt.draw) {
             import std.range     : lockstep;
-            import vf.gui.colors : Color;
+            import vf.gui.color  : Color;
 
-            renderer.fonts = &fonts;
+            renderer.fonts = &page.fonts;
             ubyte i;
 
             foreach (e,xywh; lockstep (page.es.range, page.layout.range)) {

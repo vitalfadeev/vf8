@@ -1,13 +1,12 @@
 import std.stdio;
 
 import vf.gui.page                      : Page;
-import vf.gui.colors                    : Color, Colors;
+import vf.gui.color                     : Color;
 import vf.gui.e                         : E;
 import vf.std.xywh                      : XY,WH,XYWH;
 import vf.gui.style 					: Style;
 version (SDL) import vf.sdl.input       : Input;
 version (SDL) import vf.sdl.importc_sdl : SDL_Event,SDL_EventType, SDL_WindowEventID;
-version (SDL) import vf.sdl.fonts       : Fonts;
 
 
 void 
@@ -59,26 +58,19 @@ struct
 O {
     Input!Event input;
     Windows     wm;
-    Page        page;
-    //
-    Colors      colors;
-	Fonts 		fonts;
-	Styles 		styles;
-	Widgets     widgets;
-	Strings 	strings;
-	version (ACTIONS) import mod.action : Actions;
-	version (ACTIONS) Actions actions;
     bool 		quit;
     DO_SWITCH   do_switch;
+    Page        page;  // base page
 
     alias DO_SWITCH = void delegate (Event* evt);
 
+    // send
 	import vf.base.send;
 	mixin vf.base.send.Send!Event;
-	
+	// send
 	version (SDL) import vf.sdl.send;
 	version (SDL) mixin vf.sdl.send.Send!Event;
-
+	// send
 	version (ACTIONS) import mod.action;
 	version (ACTIONS) mixin mod.action.Send;
 
@@ -86,7 +78,7 @@ O {
 	do_widget_switch (Event* evt) {
 		if (evt.e !is null) {
 			auto type   = evt.e.type;
-			auto widget_do_switch = widgets.get_e_widget_do_switch (type);
+			auto widget_do_switch = page.widgets.get_e_widget_do_switch (type);
 			widget_do_switch (evt);		
 		}
 	}
@@ -106,8 +98,6 @@ union {
     version (SDL) import mod.sdl : Mod_sdl;
     version (SDL) mixin ("Mod_sdl._Event.SDL_Event   		sdl;");
     Init   init_;
-    //Draw   draw;
-	//mixin Mod_event!("mod.draw", "Draw._Event.union");
 	import mod.draw : Mod_draw;
 	mixin ("Mod_draw._Event.Draw   		draw;");
 	mixin ("Mod_draw._Event.Redraw 		redraw;");
@@ -123,6 +113,7 @@ union {
     XYWH   xywh; // e xywh
     E*     e;    // e
 
+    // Type
     import vf.std.mixin_enum : Enum;
 
     enum
@@ -200,76 +191,12 @@ Mod {
 
 	void
 	init_gui (Event* evt) {
-		_init_colors  (evt);
-		_init_fonts   (evt);
-		_init_icons   (evt);
-		_init_es      (evt);
-		_init_strings (evt);
-		_init_widgets (evt);
-		_init_styles  (evt);
-		version (ACTIONS) _init_actions (evt);
+		_init_page    (evt);
 	}
 
 	void
-	_init_colors (Event* evt) {
-		evt.o.colors.s[0] = 0xFF000000;  // dark
-		evt.o.colors.s[1] = 0xFF444444;  // base
-		evt.o.colors.s[2] = 0xFF888888;  // base-1
-		evt.o.colors.s[3] = 0xFFCCCCCC;  // base-2
-		evt.o.colors.s[4] = 0xFF883333;  
-		evt.o.colors.s[5] = 0xFFFFFFFF;  
-	}
-
-	void
-	_init_fonts (Event* evt) {
-		evt.o.fonts._init ();
-	}
-
-	void
-	_init_icons (Event* evt) {
-	    //
-	}
-
-	void
-	_init_es (Event* evt) {
-	    evt.o.page.es[0].type  = 1; // start 
-	    evt.o.page.es[1].type  = 0;
-	    evt.o.page.es[2].type  = 0;
-	    evt.o.page.es[3].type  = 0;
-	    evt.o.page.es[4].type  = 0;
-	    evt.o.page.es[5].type  = 2; // clock
-	    evt.o.page.es[6].type  = 0;
-	    evt.o.page.es[7].type  = 0;
-	    evt.o.page.es[8].type  = 3; // indicators
-	    evt.o.page.es[9].type  = 4; // indicators
-	    evt.o.page.es[10].type = 5; // indicators
-	}
-
-	void
-	_init_strings (Event* evt) {
-		evt.o.strings._init (evt);
-	}
-
-	void
-	_init_widgets (Event* evt) {
-		evt.o.widgets._init (evt);
-	}
-
-	void
-	_init_styles (Event* evt) {
-		evt.o.styles._init (evt);
-	}
-
-	version (ACTIONS)
-	void
-	_init_actions (Event* evt) {
-		import actions.quit : Quit;
-		import actions.quit : SDL_MOUSEBUTTONDOWN;
-		with (evt.o) {
-			actions._init (evt);
-			actions.register (Quit.stringof, new Quit);
-			actions.register (SDL_MOUSEBUTTONDOWN.stringof, new SDL_MOUSEBUTTONDOWN);
-		}
+	_init_page (Event* evt) {
+	    evt.o.page._init ();
 	}
 }
 
@@ -283,137 +210,6 @@ Windows {
     void
     new_window () {
     	window.window = window.new_window ();
-    }
-}
-
-
-struct
-Styles {
-	// style 
-	//   by type 
-	//   by flags 
-	//   by flags2
-	//
-	// assume sorted
-	Style[] styles;
-	// styles[0]  // bask
-	pragma (msg, "styles.size: ", styles.sizeof);  // 261_120
-
-	Style*
-	get (bool OR_CREATE=false) (ubyte type, ubyte flags) {
-	    foreach (ref s; styles) {
-	    	if (s.type == type)
-	    	if (s.flags == flags)
-	    		return &s;
-	    }
-		return &styles[0];
-
-	    static if (OR_CREATE) {
-	    	styles ~= Style (type,flags);
-	    	return &styles[$-1];
-	    }
-	    else {
-	    	return &styles[0];
-	    }
-	}
-
-	Style*
-	get_e_style (E e) {
-		return get (e.type, e.flags);
-	}
-
-	void
-	_init (Event* evt) {
-		styles ~= Style ();
-		Style* s = &styles[0];
-		Style* s2 = &styles[0];
-		s.fg   = 1;
-		s.font = 1;
-
-		foreach (ubyte t; 0..255) {
-			styles ~= Style (t);
-			s = &styles[$-1];
-
-			switch (t) {
-				case 1 /* start  */ : s.font = 1; s.text = 1; s.fg = 2; break;
-				case 2 /* clock  */ : s.font = 2; s.text = 2; s.fg = 2; break;
-				case 3 /* batary */ : s.font = 1; s.text = 3; s.fg = 2; break;
-				case 4 /* volume */ : s.font = 1; s.text = 4; s.fg = 2; break;
-				case 5 /* avia   */ : s.font = 1; s.text = 5; s.fg = 2; break;
-			    default:
-		   }
-
-		    // base 
-			styles ~= *s;
-			s2 = &styles[$-1];
-			s2.fg = 3; 
-			s2.bg = 1;
-		    // pressed
-		    styles ~= *s;
-			s2 = &styles[$-1];
-			s2.pressed = true;
-			s2.fg = 5; 
-			s2.bg = 2;
-		    // selected
-		    styles ~= *s;
-			s2 = &styles[$-1];
-			s2.selected = true;
-			s2.fg = 3; 
-			s2.bg = 4;
-		    // focused
-		    styles ~= *s;
-			s2 = &styles[$-1];
-			s2.focused = true;
-			s2.fg = 3; 
-			s2.bg = 2;
-		}
-
-	    // disabled pressed selected focused m_over lamp_on
-	    // 16
-	    // type * 16  // base, button, check, radio, select, text
-	    // 6*16 = 96 styles * 10 = 960 Bytes
-	    //
-	    // max
-	    // 256 types * 6 flags = 1536 * 10 = 15_360 Bytes
-	    // 256 types * 2^6 flags = 256*64 = 16384 *10 = 163_840 Bytes
-	}
-}
-
-struct
-Widgets {
-    DO_SWITCH_DG[ubyte.max+1] s;
-
-    alias DO_SWITCH_DG = void delegate (Event* evt);
-
-    DO_SWITCH_DG
-    get_e_widget_do_switch (ubyte type) {
-    	return s[type];
-    }
-
-    void
-    _init (Event* evt) {
-    	import mod.widget_button;
-    	foreach (ubyte t; 0..256) {
-    		s[t] = &(new Widget_button ()).do_switch;
-    	}
-    	import mod.widget_volume;
-    	s[4] = &(new Widget_volume ()).do_switch;
-    }
-}
-
-struct
-Strings {
-	string[ubyte.max+1] s;
-	pragma (msg, "strings.size: ", s.sizeof);  // 4_080
-
-    void
-    _init (Event* evt) {
-        s[0] = "    ";
-        s[1] = "";
-        s[2] = "";
-        s[3] = "󰁹󰁹󰁹󰁹";
-        s[4] = "";  // //        󰕾 󰕿 󰖀 󰝞 󰝟 󰖁 󰝝 󱄠 󱄡
-        s[5] = "󰀝󰀝󰀝󰀝";
     }
 }
 

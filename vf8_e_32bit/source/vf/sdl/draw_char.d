@@ -3,7 +3,7 @@ module vf.sdl.draw_char;
 version (SDL):
 import vf.sdl.importc_sdl_ttf;
 import vf.sdl.exceptions;
-import vf.gui.colors : Color;
+import vf.gui.color : Color;
 import std.string : toStringz;
 
 struct 

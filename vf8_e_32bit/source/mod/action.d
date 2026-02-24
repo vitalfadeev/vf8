@@ -21,14 +21,14 @@ Mod_action {
 
     void
     _action (Event* evt) {
-        auto act = evt.action.name in evt.o.actions.s;
+        auto act = evt.action.name in evt.o.page.actions.s;
         if (act !is null)
             act._do (evt);
     }
 
     void
     _default_action (Event* evt) {
-        auto act = evt.type_to_string in evt.o.actions.s;
+        auto act = evt.type_to_string in evt.o.page.actions.s;
         if (act !is null)
             act._do (evt);
     }
@@ -70,22 +70,3 @@ Send () {
     }
 }
 
-struct
-Actions {
-    static Action[string] s;
-
-    void
-    _init (Event* evt) {
-        //
-    }
-
-    void
-    register (string name, Action act) {
-        s[name] = act;
-    }
-}
-
-interface
-Action {
-    void _do (Event* evt);
-}

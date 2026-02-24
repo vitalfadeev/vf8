@@ -2,7 +2,7 @@ module actions.quit;
 
 version (ACTIONS):
 import app : Event;
-import mod.action : Action;
+import vf.gui.page_.actions : Action;
 
 
 class

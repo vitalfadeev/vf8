@@ -84,14 +84,14 @@ Widget_button {  // e.type = WIDGET_BUTTON
     void
     _do_draw (Event* evt) {
         auto e = &evt.o.page.es[evt.i];
-        auto style = evt.o.styles.get_e_style (*e);
+        auto style = evt.o.page.styles.get_e_style (*e);
 
         with (evt.o)
         with (evt.draw)
         with (evt.xywh)
         with (style)
         if (w > 0 && h > 0)
-            renderer.draw_rect (x,y,w,h,colors.s[fg],colors.s[bg]);
+            renderer.draw_rect (x,y,w,h,page.colors.s[fg],page.colors.s[bg]);
 
         with (evt.o)
         with (evt.draw)
@@ -105,7 +105,7 @@ Widget_button {  // e.type = WIDGET_BUTTON
             import std.array;
             import std.conv;
             import std.uni;
-            auto str = strings.s[text];
+            auto str = page.strings.s[text];
             string txt;
 
             txt = str.byGrapheme
@@ -115,7 +115,7 @@ Widget_button {  // e.type = WIDGET_BUTTON
                 .byCodePoint
                 .text;
 
-            renderer.draw_text (font,x,y,w,h,colors.s[fg],colors.s[bg],txt);
+            renderer.draw_text (font,x,y,w,h,page.colors.s[fg],page.colors.s[bg],txt);
         }
     }
 
