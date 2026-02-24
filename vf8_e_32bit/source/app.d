@@ -8,7 +8,6 @@ import vf.gui.style 					: Style;
 version (SDL) import vf.sdl.input       : Input;
 version (SDL) import vf.sdl.importc_sdl : SDL_Event,SDL_EventType, SDL_WindowEventID;
 version (SDL) import vf.sdl.importc_sdl : SDL_GetWindowFromID, SDL_DestroyWindow;
-version (SDL) import vf.sdl.wm          : Wm;
 
 
 void 
@@ -35,7 +34,6 @@ main () {
 struct
 O {
     Input!Event input;
-    Wm          wm;
     bool 		quit;
     DO_SWITCH   do_switch;
     Page        page;  // base page
@@ -146,7 +144,6 @@ Mod {
 	        default     :
 	    }
 
-	    evt.o.wm.do_switch (evt);
 	    import mod.draw : Mod_draw;
 	    Mod_draw    ().do_switch (evt);
 	    import mod.widget : Mod_widget;
@@ -165,7 +162,8 @@ Mod {
 
 	void
 	init_window (Event* evt) {
-		evt.o.wm.new_window ();
+		import vf.sdl.wm : Wm;
+		Wm ().new_window ();
 	}
 
 	void

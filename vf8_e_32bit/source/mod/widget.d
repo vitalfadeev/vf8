@@ -32,7 +32,7 @@ Mod_widget {
                 evt.xywh = xywh;
                 evt.e    = &page.es[i];
                 do_widget_switch (evt);
-                send (REDRAW,xywh);
+                send (REDRAW, windowID, xywh);
 
                 version (ACTIONS) send ("e.action");
             }

@@ -4,7 +4,7 @@ version (SDL):
 import app : Event;
 import vf.std.xywh;
 import vf.sdl.importc_sdl;
-import vf.sdl.renderer_sdl;
+import vf.sdl.wm : Wm;
 
 
 struct
@@ -20,6 +20,7 @@ Mod_sdl {
             case SDL_KEYDOWN     : _do_sdl_keydown (evt); break;
             default              :
         }
+        Wm ().do_switch (evt);
     }
 
     void
@@ -37,14 +38,13 @@ Mod_sdl {
 
     void
     _do_sdl_keydown (Event* evt) {
-        import vf.sdl.importc_sdl;
         // SDL_KEYDOWN
         // SDL_KEYUP
         with (evt.o)
         with (evt.sdl.key)
         switch (keysym.scancode) {
-            case SDL_SCANCODE_ESCAPE : quit = true; break;
-            case SDL_SCANCODE_Q      : quit = true; break;
+            //case SDL_SCANCODE_ESCAPE : quit = true; break;
+            //case SDL_SCANCODE_Q      : quit = true; break;
             default                  :
         }
     }

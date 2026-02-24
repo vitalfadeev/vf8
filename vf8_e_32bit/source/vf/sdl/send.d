@@ -6,12 +6,19 @@ Send (Event) {  // if (is (Event==struct) && is(Event.Type == enum))
     version (SDL) import vf.sdl.renderer_sdl : Renderer;
     version (SDL) 
     void
-    send_now (Event.Type type, Renderer* renderer) {
+    send_now (Event.Type type, uint windowID, Renderer* renderer) {
         Event evt;
         evt.type = type;
         evt.o = &this;
         switch (type) with (Event.Type) {
-            case DRAW : evt.draw.renderer = renderer; break;
+            case DRAW : 
+                evt.draw.windowID = windowID; 
+                evt.draw.renderer = renderer; 
+                break;
+            case REDRAW : 
+                evt.redraw.windowID = windowID; 
+                evt.redraw.renderer = renderer; 
+                break;
             default:
         }
         do_switch (&evt);
@@ -20,12 +27,19 @@ Send (Event) {  // if (is (Event==struct) && is(Event.Type == enum))
     version (SDL) import vf.sdl.renderer_sdl : Renderer;
     version (SDL) 
     void
-    send (Event.Type type, Renderer* renderer) {
+    send (Event.Type type, uint windowID, Renderer* renderer) {
         Event evt;
         evt.type = type;
         evt.o = &this;
         switch (type) with (Event.Type) {
-            case DRAW : evt.draw.renderer = renderer; break;
+            case DRAW : 
+                evt.draw.windowID = windowID; 
+                evt.draw.renderer = renderer; 
+                break;
+            case REDRAW : 
+                evt.redraw.windowID = windowID; 
+                evt.redraw.renderer = renderer; 
+                break;
             default:
         }
         input ~= &evt;
@@ -34,12 +48,15 @@ Send (Event) {  // if (is (Event==struct) && is(Event.Type == enum))
     version (SDL) import vf.std.xywh : XYWH;
     version (SDL) 
     void
-    send (Event.Type type, XYWH xywh) {
+    send (Event.Type type, uint windowID, XYWH xywh) {
         Event evt;
         evt.type = type;
         evt.o = &this;
         switch (type) with (Event.Type) {
-            case REDRAW : evt.redraw.xywh = xywh; break;
+            case REDRAW : 
+                evt.redraw.windowID = windowID; 
+                evt.redraw.xywh     = xywh; 
+                break;
             default:
         }
         input ~= &evt;

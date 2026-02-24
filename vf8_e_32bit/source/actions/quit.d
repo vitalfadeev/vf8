@@ -47,7 +47,8 @@ SHOW_QUICK_SETTINGS : Action {
         // create window
         // load quick_settings.ui
         with (evt.o) {
-            wm.new_window (320,240);
+            import vf.sdl.wm : Wm;
+            Wm () .new_window (320,240);
         }
     }
 }

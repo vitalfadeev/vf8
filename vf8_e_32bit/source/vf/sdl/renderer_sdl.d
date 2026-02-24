@@ -17,8 +17,8 @@ Renderer {
     }
 
     void
-    draw_start (SDL_Event* evt) {
-        SDL_Window* window = SDL_GetWindowFromID (evt.window.windowID);
+    draw_start (uint windowID) {
+        SDL_Window* window = SDL_GetWindowFromID (windowID);
         draw_start (window);
     }
     void
@@ -29,8 +29,8 @@ Renderer {
     }
 
     void
-    draw_end (SDL_Event* evt) {
-        SDL_Window* window = SDL_GetWindowFromID (evt.window.windowID);
+    draw_end (uint windowID) {
+        SDL_Window* window = SDL_GetWindowFromID (windowID);
         draw_end (window);
     }
     void

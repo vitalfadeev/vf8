@@ -4,7 +4,7 @@ import app : Event;
 import vf.std.xywh;
 import vf.sdl.importc_sdl;
 import vf.sdl.renderer_sdl;
-
+import vf.sdl.wm : Wm;
 
 struct
 Mod_draw {
@@ -50,12 +50,7 @@ Mod_draw {
         with (evt.o)
         with (Event.Type)
         with (evt.redraw) {
-            auto _window = wm.s[0].window;
-            import vf.sdl.renderer_sdl : Renderer;
-            Renderer renderer;
-            renderer.draw_start (_window);
-            send_now (DRAW,&renderer);
-            renderer.draw_end (_window);
+            Wm (). _send_draw (evt,windowID);
         }
     }
 
@@ -80,8 +75,8 @@ Mod_draw {
         Draw {
             Type  type = Type.DRAW;
             version (SDL) import vf.sdl.renderer_sdl : Renderer;
-            version (SDL) import vf.sdl.window       : Window;
-            version (SDL) Window*   window;
+            version (SDL) 
+            uint        windowID;
             Renderer*   renderer;
             XYWH        xywh;
         }
@@ -89,7 +84,11 @@ Mod_draw {
         struct
         Redraw {
             Type type = Type.REDRAW;
-            XYWH xywh;
+            version (SDL) import vf.sdl.renderer_sdl : Renderer;
+            version (SDL) 
+            uint        windowID;
+            Renderer*   renderer;
+            XYWH        xywh;
         }
     }
 }
