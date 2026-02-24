@@ -7,37 +7,15 @@ import vf.std.xywh                      : XY,WH,XYWH;
 import vf.gui.style 					: Style;
 version (SDL) import vf.sdl.input       : Input;
 version (SDL) import vf.sdl.importc_sdl : SDL_Event,SDL_EventType, SDL_WindowEventID;
+version (SDL) import vf.sdl.importc_sdl : SDL_GetWindowFromID, SDL_DestroyWindow;
+version (SDL) import vf.sdl.wm          : Wm;
 
 
 void 
 main () {
 	auto o = O ();
-	pragma (msg, "o.size: ", o.sizeof);  // 278_768
 	o.page = Page ();
-	o.page.es.length = 12;
-	Mod mod;
-	o.do_switch = &mod.do_switch;
-
-	with (o.page.layout.grid) {
-		import vf.sdl.window : WINDOW_DEFAULT_W, WINDOW_DEFAULT_H;
-		total_wh.w     = WINDOW_DEFAULT_W;
-		total_wh.h     = 64;
-		cells_offset_x =  0;
-		cells_space_x  =  0;
-		cells_w        = 64;
-		cells_h        = 64;
-		first_cell_w   = 64;
-		first_cell_h   = 64;
-		order[0] = Order_rec (1,3);
-		order[1] = Order_rec (2,2);
-		order[2] = Order_rec (3,1);
-		order[3] = Order_rec (4,2);
-		order[4] = Order_rec (5,3);
-	}
-	foreach (xywh; o.page.layout.range) {
-		import std.stdio : writeln;
-		writeln (xywh);
-	}
+	o.do_switch = &Mod().do_switch;
 
 	// INIT
 	with (o)
@@ -57,7 +35,7 @@ main () {
 struct
 O {
     Input!Event input;
-    Windows     wm;
+    Wm          wm;
     bool 		quit;
     DO_SWITCH   do_switch;
     Page        page;  // base page
@@ -168,6 +146,7 @@ Mod {
 	        default     :
 	    }
 
+	    evt.o.wm.do_switch (evt);
 	    import mod.draw : Mod_draw;
 	    Mod_draw    ().do_switch (evt);
 	    import mod.widget : Mod_widget;
@@ -186,12 +165,12 @@ Mod {
 
 	void
 	init_window (Event* evt) {
-		evt.o.wm.new_window;
+		evt.o.wm.new_window ();
 	}
 
 	void
 	init_gui (Event* evt) {
-		_init_page    (evt);
+		_init_page (evt);
 	}
 
 	void
@@ -201,17 +180,6 @@ Mod {
 }
 
 
-struct
-Windows {
-	import vf.sdl.window : Window;
-
-	Window window;
-
-    void
-    new_window () {
-    	window.window = window.new_window ();
-    }
-}
 
 void
 log_event (Event* evt) {

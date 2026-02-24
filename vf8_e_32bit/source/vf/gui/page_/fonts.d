@@ -12,8 +12,8 @@ import std.format : format;
 struct
 Fonts {
 union {
-    TTF_Font*[8] font;
-    pragma (msg, "fonts.size: ", font.sizeof);  // 64
+    TTF_Font*[8] s;
+    pragma (msg, "fonts.size: ", s.sizeof);  // 64
 struct {
     TTF_Font*    xxl;
     TTF_Font*    xl;
@@ -23,12 +23,7 @@ struct {
 
     void
     _init () {
-        //font[0] = open_font ("NotoSansMNerd-Regular", 64);
-        //font[1] = open_font ("NotoSansMNerd-Regular", 32);
-        //font[2] = open_font ("NotoSansMNerd-Regular", 16);
-        font[0] = _open_font ("res/NotoMonoNerdFont-Regular.ttf", 64);
-        font[1] = _open_font ("res/NotoMonoNerdFont-Regular.ttf", 32);
-        font[2] = _open_font ("res/NotoMonoNerdFont-Regular.ttf", 16);
+        //
     }
 
     version (FONTCONFIG)

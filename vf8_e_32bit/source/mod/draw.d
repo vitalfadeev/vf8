@@ -50,7 +50,7 @@ Mod_draw {
         with (evt.o)
         with (Event.Type)
         with (evt.redraw) {
-            auto _window = wm.window.window;
+            auto _window = wm.s[0].window;
             import vf.sdl.renderer_sdl : Renderer;
             Renderer renderer;
             renderer.draw_start (_window);

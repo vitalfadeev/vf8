@@ -19,15 +19,14 @@ struct
 Window {
     SDL_Window* window;
 
-    SDL_Window* 
-    new_window () {
+    this (int w, int h) {
         // Window
-        SDL_Window* window = 
+        window = 
             SDL_CreateWindow (
                 __FILE_FULL_PATH__, // "SDL2 Window",
                 SDL_WINDOWPOS_CENTERED_DISPLAY (0),
                 SDL_WINDOWPOS_CENTERED_DISPLAY (0),
-                WINDOW_DEFAULT_W, WINDOW_DEFAULT_H,
+                w, h,
                 SDL_WINDOW_RESIZABLE
                 // | SDL_WINDOW_VULKAN
                 // | SDL_WINDOW_ALLOW_HIGHDPI
@@ -38,8 +37,5 @@ Window {
 
         // Update
         SDL_UpdateWindowSurface (window);
-
-        return window;
     }
 }
-

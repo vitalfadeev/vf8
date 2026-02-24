@@ -34,7 +34,7 @@ Mod_widget {
                 do_widget_switch (evt);
                 send (REDRAW,xywh);
 
-                version (ACTIONS) send (evt.o,"e.action");
+                version (ACTIONS) send ("e.action");
             }
         }
     }

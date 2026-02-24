@@ -13,6 +13,7 @@ Widget_volume {  // e.type = WIDGET_VOLUME
     void
     do_switch (Event* evt) {
         switch (evt.sdl.type) with (SDL_EventType) {
+            case SDL_MOUSEBUTTONDOWN : _do_sdl_button_dn  (evt); break;
             case SDL_MOUSEWHEEL      : _do_sdl_mousewheel (evt); break;
             default                  :
         }
@@ -26,12 +27,12 @@ Widget_volume {  // e.type = WIDGET_VOLUME
     }
 
     void
-    _do_sdl_button (Event* evt) {
+    _do_sdl_button_dn (Event* evt) {
         with (evt.o)
         with (Event.Type)
         with (evt.sdl.button)
         switch (button) {
-            case SDL_BUTTON_LEFT   : break;
+            case SDL_BUTTON_LEFT   : send ("SHOW_QUICK_SETTINGS"); break;
             case SDL_BUTTON_MIDDLE : send (VOLUME_MUTE); break;
             case SDL_BUTTON_RIGHT  : break;
             case SDL_BUTTON_X1     : break;

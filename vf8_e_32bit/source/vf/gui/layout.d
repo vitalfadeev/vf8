@@ -7,8 +7,11 @@ import vf.std.xywh     : XY,WH,XYWH;
 
 union
 Layout {
-    Type        type;
-    Grid_layout grid;
+union {
+    Type                    type;
+    Grid_layout             grid;
+    Quick_settings_layout   quick_settings;
+}
     auto range ()       { return grid.range (); }
     auto select (XY xy) { return grid.select (xy); }
 
@@ -39,7 +42,8 @@ Grid_layout {
     ushort first_cell_h;
     ushort last_cell_w;
     ushort last_cell_h;
-
+    //
+    Order_rec[5] order;  // 10 Bytes
     // center
     //   dup Range
     //     calc total_wh      // for left,right,center,both (10,01,00,11)
@@ -69,7 +73,6 @@ Grid_layout {
     // . . . . .
     // 3 1 2 4 5 - loca               // 5 Bytes  // 16 bit
     // 1 3 2 2 3 - n     // 0xFF max  // 5 Bytes  // 
-    Order_rec[5] order;  // 10 Bytes
 
     struct 
     Order_rec {
@@ -213,10 +216,51 @@ Grid_layout {
 // 4--- ---4
 // 4--- ---4
 struct
-QUICK_SETTINGS_layout {
+Quick_settings_layout {
     Layout.Type type;
     // total
     WH     total_wh;
+    // xy
+    ushort cells1_on_x;
+    ushort cells1_on_y;
+    ushort cells1_offset_x;
+    ushort cells1_offset_y;
+    ushort cells1_space_x;
+    ushort cells1_space_y;
+    //
+    ushort cells2_on_x;
+    ushort cells2_on_y;
+    ushort cells2_offset_x;
+    ushort cells2_offset_y;
+    ushort cells2_space_x;
+    ushort cells2_space_y;
+    //
+    ushort cells3_on_x;
+    ushort cells3_on_y;
+    ushort cells3_offset_x;
+    ushort cells3_offset_y;
+    ushort cells3_space_x;
+    ushort cells3_space_y;
+    //
+    ushort cells4_on_x;
+    ushort cells4_on_y;
+    ushort cells4_offset_x;
+    ushort cells4_offset_y;
+    ushort cells4_space_x;
+    ushort cells4_space_y;
+    // wh
+    ushort cells1_w;
+    ushort cells1_h;
+    //
+    ushort cells2_w;
+    ushort cells2_h;
+    //
+    ushort cells3_w;
+    ushort cells3_h;
+    //
+    ushort cells4_w;
+    ushort cells4_h;
+    //
     Order_rec[4] order;  // 8 Bytes  // [1:1, 2:3, 3:2, 4:6]
 
     struct 
@@ -235,10 +279,11 @@ QUICK_SETTINGS_layout {
 
     struct
     Range {
-        QUICK_SETTINGS_layout* _layout;
+        Quick_settings_layout* _layout;
         typeof (_layout.order[]) order;
         Loca loca;
         N    n;
+        N    i;
 
         XYWH front;
         bool empty () { return n == 0; }
@@ -265,12 +310,13 @@ QUICK_SETTINGS_layout {
             }
         }
 
-        this (QUICK_SETTINGS_layout* _layout) {
+        this (Quick_settings_layout* _layout) {
             import std.range;
             this._layout = _layout;
             order = _layout.order[];
             loca  = order.front.loca;
             n     = order.front.n;
+            i     = 0;
             reset ();
         }
 
@@ -278,15 +324,32 @@ QUICK_SETTINGS_layout {
         reset () {
             switch (loca) {
                 case 1:  // left, to right
+                    front.x = _layout.cells1_offset_x;
+                    front.y = _layout.cells1_offset_y;
+                    front.w = _layout.cells1_w;
+                    front.h = _layout.cells1_h;
                     break;
-                case 2:  // center, to left
+                case 2:  // right, to left
+                    front.x = _layout.total_wh.w - _layout.cells2_w;
+                    front.y = _layout.cells2_offset_y;
+                    front.w = _layout.cells2_w;
+                    front.h = _layout.cells2_h;
                     break;
-                case 3:  // center
+                case 3:  // line down 
+                    front.x = _layout.cells3_offset_x;
+                    front.y = _layout.cells3_offset_y;
+                    front.w = _layout.cells3_w;
+                    front.h = _layout.cells3_h;
                     break;
-                case 4:  // center, to right
+                case 4:  // left 1/2 w, to right
+                    front.x = _layout.cells4_offset_x;
+                    front.y = _layout.cells4_offset_y;
+                    front.w = _layout.cells4_w;
+                    front.h = _layout.cells4_h;            
                     break;
                 default:
             }
+            i = 0;
         }
 
         void
@@ -294,15 +357,28 @@ QUICK_SETTINGS_layout {
             // step
             switch (loca) {
                 case 1:  // left, to right
+                    front.x += _layout.cells1_w + _layout.cells1_space_x;
                     break;
                 case 2:  // right, to left
+                    front.x -= _layout.cells2_w + _layout.cells2_space_x;
                     break;
                 case 3:  // line down
+                    front.y += _layout.cells3_h + _layout.cells3_space_y;
                     break;
                 case 4:  // left 1/2 w, to right
+                    // 1
+                    if (i % 2 == 0) {                        
+                        front.x += _layout.cells4_w + _layout.cells4_space_x;
+                    }
+                    // 2
+                    else { 
+                        front.x  = _layout.cells4_w;
+                        front.y += _layout.cells4_h + _layout.cells4_space_y;
+                    }
                     break;
                 default:
             }
+            i++;
         }
     }
 }

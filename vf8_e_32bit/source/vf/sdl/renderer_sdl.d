@@ -63,7 +63,7 @@ Renderer {
 
         int size_w,size_h;
         auto surface = 
-            _draw_text (fonts.font[font_id],x,y,w,h,fg,bg,text, &size_w,&size_h);
+            _draw_text (fonts.s[font_id],x,y,w,h,fg,bg,text, &size_w,&size_h);
         scope (exit) SDL_FreeSurface (surface);
 
         SDL_Texture* texture = SDL_CreateTextureFromSurface (_renderer, surface);

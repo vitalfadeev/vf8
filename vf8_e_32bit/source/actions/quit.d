@@ -46,6 +46,9 @@ SHOW_QUICK_SETTINGS : Action {
 
         // create window
         // load quick_settings.ui
+        with (evt.o) {
+            wm.new_window (320,240);
+        }
     }
 }
 

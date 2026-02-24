@@ -16,11 +16,6 @@ Widgets {
 
     void
     _init () {
-        import mod.widget_button;
-        foreach (ubyte t; 0..256) {
-            s[t] = &(new Widget_button ()).do_switch;
-        }
-        import mod.widget_volume;
-        s[4] = &(new Widget_volume ()).do_switch;
+        //
     }
 }

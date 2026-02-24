@@ -57,7 +57,7 @@ Mod_action {
 mixin template
 Send () {
     void
-    send (O) (O* o, string action_name) {
+    send (string action_name) {
         // string save in Event
         // set type to ACTION
         //   then send event
@@ -66,7 +66,7 @@ Send () {
         Event evt;
         evt.type = Event.Type.ACTION;
         evt.action.name = action_name;
-        o.input ~= &evt;
+        input ~= &evt;
     }
 }
 
