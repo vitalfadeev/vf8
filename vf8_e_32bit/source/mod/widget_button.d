@@ -1,6 +1,6 @@
 module mod.widget_button;
 
-import app : Event;
+import app : Event,EType;
 import vf.sdl.importc_sdl;
 
 struct
@@ -121,7 +121,7 @@ Widget_button {  // e.type = WIDGET_BUTTON
 
     struct
     _Event {
-        Type type;
+        EType type;
 
         // send (WIDGET, BUTTON, PRESSED)
         // send (WIDGET_BUTTON_PRESSED)

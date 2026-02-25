@@ -6,7 +6,7 @@ Enum (string name, ushort start_value, Pairs...) {
     import vf.std.mixin_enum : mods_enum_members;
     import std.format : format;
 
-    mixin ("enum "~name~"{"~
+    mixin ("enum "~name~" :ushort {"~
         format!"_ = %d,\n" (start_value)~
         mods_enum_members!(Pairs).result~
         "}");

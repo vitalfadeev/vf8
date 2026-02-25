@@ -3,14 +3,12 @@ module vf.sdl.init_sdl;
 import core.stdc.stdio    : printf;
 import core.stdc.stdlib   : abort;
 import vf.sdl.exceptions  : SDLException;
-import vf.sdl.importc_sdl :
-    SDL_Init,SDL_INIT_VIDEO,SDL_INIT_EVERYTHING,
-    SDL_GetError;
+import vf.sdl.importc_sdl;
 
 void 
 init_sdl () {
-    // SDL_Init (SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_EVENTS);
-    if (SDL_Init (SDL_INIT_EVERYTHING) < 0) {
+    // SDL_Init (SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_EVERYTHING);
+    if (SDL_Init (SDL_INIT_VIDEO | SDL_INIT_EVENTS) < 0) {
         printf ("Failed to initialize SDL video: %s\n", SDL_GetError ());
         abort ();
     }

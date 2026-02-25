@@ -1,35 +1,59 @@
 module vf.base.send;
 
 
+
 mixin template 
 Send (Event) {  // if (is (Event==struct) && is(Event.Type == enum))
     void
-    send_now (Event.Type type) {
+    send_now (const Event.Type type){
         Event evt;
         evt.type = type;
-        evt.o = &this;
+        evt.o    = &this;
         if (do_switch !is null) do_switch (&evt);
     }
+    import vf.sdl.renderer_sdl : Renderer;
     void
-    send_now (Event* evt) {
-        if (do_switch !is null) do_switch (evt);
-    }
-    void
-    send_now (Event evt) {
-        evt.o = &this;
+    send_now (const Event.Type type, uint windowID, Renderer* renderer) {
+        Event evt;
+        switch (type) with (Event.Type) {
+            case DRAW   : evt.draw   = typeof(evt.draw)   (type,windowID,renderer); break;
+            default     : assert (0);
+        }
+        evt.type = type;
+        evt.o    = &this;
         if (do_switch !is null) do_switch (&evt);
     }
 
     void
-    send (Event.Type type) {
+    send (const Event.Type type) {
         Event evt;
         evt.type = type;
-        evt.o = &this;
+        evt.o    = &this;
         input ~= &evt;
-    }   
+    }
+    import vf.sdl.renderer_sdl : Renderer;
     void
-    send (Event* evt) {
-        evt.o = &this;
-        input ~= evt;
-    }   
+    send (const Event.Type type, uint windowID, Renderer* renderer, XYWH xywh) {
+        Event evt;
+        switch (type) with (Event.Type) {
+            case DRAW   : evt.draw   = typeof(evt.draw)   (type,windowID,renderer,xywh); break;
+            case REDRAW : evt.redraw = typeof(evt.redraw) (type,windowID,renderer,xywh); break;
+            default     : assert (0);
+        }
+        evt.type = type;
+        evt.o    = &this;
+        input ~= &evt;
+    }
+    void
+    send (const Event.Type type, string saction) {
+        Event evt;
+        switch (type) with (Event.Type) {
+            case ACTION : evt.action = typeof(evt.action) (type,saction); break;
+            default     : assert (0);
+        }
+        evt.type = type;
+        evt.o    = &this;
+        input ~= &evt;
+    }
 }
+

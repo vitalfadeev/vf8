@@ -34,7 +34,7 @@ Mod_widget {
                 evt.e    = &page.es[i];
                 page.widgets.do_widget_switch (evt);
                 
-                send (REDRAW, windowID, xywh);
+                send (REDRAW, windowID, null, xywh);
             }
         }
     }

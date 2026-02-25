@@ -51,8 +51,6 @@ Mod_sdl {
 
     struct
     _Event {
-        Type type;
-
         union {
             //
         }

@@ -9,6 +9,7 @@ import vf.gui.layout   : Layout;
 import vf.std.xywh     : XY,WH,XYWH;
 import vf.gui.e        : E;
 import vf.gui.style    : Style;
+import vf.sdl.window   : Window;
 
 import vf.gui.page_.colors  : Colors;
 import vf.gui.page_.fonts   : Fonts;
@@ -30,6 +31,7 @@ Page {
     Strings      strings;
     Actions      actions;
     Styles       styles;
+    Window*      window;
 
     //void
     //do_switch (Event* evt) {

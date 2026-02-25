@@ -49,8 +49,9 @@ SHOW_QUICK_SETTINGS : Action {
         with (evt.o) {
             import vf.sdl.wm : Wm;
             auto window = Wm () .new_window (320,240);
+            // SDL_SetWindowModalFor (SDL_Window * modal_window, SDL_Window * parent_window);
             // window + page
-            
+                        
         }
     }
 }

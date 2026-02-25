@@ -1,6 +1,6 @@
 module mod.volume;
 
-import app : Event;
+import app : Event,EType;
 
 struct
 Mod_volume {
@@ -81,8 +81,6 @@ Mod_volume {
 
     struct
     _Event {
-        Type type;
-
         union {
             Volume volume;
         }
@@ -99,7 +97,7 @@ Mod_volume {
 
         struct
         Volume {
-            Type        type = Type.VOLUME;
+            EType       type;
             ubyte       volume;
             Volume_type volume_type;
         }

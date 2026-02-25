@@ -1,6 +1,6 @@
 module mod.action;
 
-import app : Event;
+import app : Event,EType;
 
 
 struct
@@ -35,8 +35,6 @@ Mod_action {
 
     struct
     _Event {
-        Type type;
-
         union {
             Action action;
         }
@@ -48,25 +46,8 @@ Mod_action {
 
         struct
         Action {
-            Type   type = Type.ACTION;
+            EType  type;
             string name;
         }
     }
 }
-
-mixin template
-Send () {
-    void
-    send (string action_name) {
-        // string save in Event
-        // set type to ACTION
-        //   then send event
-        //   then get Actions
-        //   via Actions.do_switch ()
-        Event evt;
-        evt.type = Event.Type.ACTION;
-        evt.action.name = action_name;
-        input ~= &evt;
-    }
-}
-

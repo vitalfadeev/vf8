@@ -1,6 +1,6 @@
 module mod.draw;
 
-import app : Event;
+import app : Event,EType;
 import vf.std.xywh;
 import vf.sdl.importc_sdl;
 import vf.sdl.renderer_sdl;
@@ -57,8 +57,6 @@ Mod_draw {
 
     struct
     _Event {
-        Type type;
-
         union {
             Draw   draw;
             Redraw redraw;
@@ -74,7 +72,7 @@ Mod_draw {
 
         struct
         Draw {
-            Type  type = Type.DRAW;
+            EType       type;
             version (SDL) import vf.sdl.renderer_sdl : Renderer;
             version (SDL) 
             uint        windowID;
@@ -84,7 +82,7 @@ Mod_draw {
 
         struct
         Redraw {
-            Type type = Type.REDRAW;
+            EType       type;
             version (SDL) import vf.sdl.renderer_sdl : Renderer;
             version (SDL) 
             uint        windowID;

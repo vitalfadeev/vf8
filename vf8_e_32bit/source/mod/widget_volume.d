@@ -32,7 +32,7 @@ Widget_volume {  // e.type = WIDGET_VOLUME
         with (Event.Type)
         with (evt.sdl.button)
         switch (button) {
-            case SDL_BUTTON_LEFT   : send ("SHOW_QUICK_SETTINGS"); break;
+            case SDL_BUTTON_LEFT   : send (ACTION,"SHOW_QUICK_SETTINGS"); break;
             case SDL_BUTTON_MIDDLE : send (VOLUME_MUTE); break;
             case SDL_BUTTON_RIGHT  : break;
             case SDL_BUTTON_X1     : break;

@@ -1,6 +1,6 @@
 module mod.click;
 
-import app : Event;
+import app : Event,EType;
 import vf.std.xywh : XY;
 
 
@@ -27,8 +27,6 @@ Mod_click {
 
     struct
     _Event {
-        Type type;
-
         union {
             Click click;
         }
@@ -40,8 +38,8 @@ Mod_click {
 
         struct
         Click {
-            Type type = Type.CLICK;
-            XY   xy;
+            EType type;
+            XY    xy;
         }
     }
 }

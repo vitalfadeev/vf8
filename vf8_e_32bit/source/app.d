@@ -37,18 +37,13 @@ O {
     bool 		quit;
     DO_SWITCH   do_switch;
     Page        page;  // base page
+    Page[]      pages;
 
     alias DO_SWITCH = void delegate (Event* evt);
 
     // send
 	import vf.base.send;
 	mixin vf.base.send.Send!Event;
-	// send
-	version (SDL) import vf.sdl.send;
-	version (SDL) mixin vf.sdl.send.Send!Event;
-	// send
-	version (ACTIONS) import mod.action;
-	version (ACTIONS) mixin mod.action.Send;
 }
 
 // SDL_Event sdl_event
@@ -58,22 +53,45 @@ O {
 //     type > 0x8000
 // cast (Event) sdl_event
 
+template
+Evtmix (RECS...) {
+	enum Mod = RECS[0];
+	enum Kls = RECS[1];
+	enum Evt = RECS[2];
+	enum Var = RECS[3];
+
+	import std.format : format;
+
+	static if (RECS.length == 0) 
+		enum Evtmix = "";
+	static if (RECS.length == 4) 
+		enum Evtmix =  
+			format!"import %s : %s;\n" (Mod,Kls) ~
+			format!"%s._Event.%s %s;\n" (Kls,Evt,Var);
+	static if (RECS.length > 4) 
+		enum Evtmix =  
+			format!"import %s : %s;\n" (Mod,Kls) ~
+			format!"%s._Event.%s %s;\n" (Kls,Evt,Var) ~ 
+			Evtmix!(RECS[4..$]);
+	static if (RECS.length < 4) 
+		static assert (0, "expect RECS.length >= 4");
+}
+
+alias EType = ushort;
+
 struct
 Event {
 union {
     Type   type;
-    version (SDL) import mod.sdl : Mod_sdl;
-    version (SDL) mixin ("Mod_sdl._Event.SDL_Event   		sdl;");
-    Init   init_;
-	import mod.draw : Mod_draw;
-	mixin ("Mod_draw._Event.Draw   		draw;");
-	mixin ("Mod_draw._Event.Redraw 		redraw;");
-    import mod.click : Mod_click;
-    mixin ("Mod_click._Event.Click   	click;");
-    import mod.action : Mod_action;
-    mixin ("Mod_action._Event.Action   	action;");
-    import mod.volume : Mod_volume;
-    mixin ("Mod_volume._Event.Volume   	volume;");
+    Init   _init;
+    mixin (Evtmix!(
+    	"mod.sdl",    "Mod_sdl",    "SDL_Event", "sdl",
+    	"mod.draw",   "Mod_draw",   "Draw",      "draw",
+    	"mod.draw",   "Mod_draw",   "Redraw",    "redraw",
+    	"mod.click",  "Mod_click",  "Click",     "click",
+    	"mod.action", "Mod_action", "Action",    "action",
+    	"mod.volume", "Mod_volume", "Volume",    "volume",
+	));
 }
 	O*     o;
     ubyte  i;    // e index
@@ -83,8 +101,8 @@ union {
     // Type
     import vf.std.mixin_enum : Enum;
 
-    enum
-    _Type {  // 0xFFFF
+    enum 
+    _Type :EType {  // 0xFFFF
     	INIT,
     }
 
@@ -147,7 +165,7 @@ Mod {
 
 	void
 	_do_init (Event* evt) {
-		with (evt.init_) {
+		with (evt._init) {
 			init_window (evt);
 			init_gui (evt);
 		}

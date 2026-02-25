@@ -39,9 +39,12 @@ Sound {
     }
 
     struct
-    Event {
-        Type  type;
-        ubyte value;
+    _Event {
+        struct
+        Sound {
+            EType  type;
+            ubyte  value;
+        }
 
         enum 
         Type {
