@@ -1,5 +1,6 @@
 module mod.widget_volume;
 
+version (X):
 import app : Event;
 import vf.sdl.importc_sdl;
 import mod.widget.button;
@@ -59,10 +60,10 @@ Widget_volume {  // e.type = WIDGET_VOLUME
         with (Event.Type)
         with (evt.volume)
         switch (volume_type) with (Mod_volume.Volume_type) {
-            case MUTE : evt.widget.base.value = 0; break;
-            case LOW  : evt.widget.base.value = 1; break;
-            case MID  : evt.widget.base.value = 2; break;
-            case HIGH : evt.widget.base.value = 3; break;
+            case MUTE : value = 0; break;
+            case LOW  : value = 1; break;
+            case MID  : value = 2; break;
+            case HIGH : value = 3; break;
             default   :
         }
     }

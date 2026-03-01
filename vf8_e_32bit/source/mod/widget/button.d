@@ -2,13 +2,17 @@ module mod.widget.button;
 
 version (SDL):
 import app : Event,EType;
-import mod.widget : Widget,_Widget,Do_switch;
+import mod.widget : Widget,Do_switch,Create;
 import vf.sdl.importc_sdl;
+import std.stdio : writeln;
 
 
 struct
 Button {
-    mixin _Widget!(Widget.Type.BUTTON);
+    Widget _super;
+    alias _super this;
+    mixin Do_switch;
+    mixin Create;
 
     void
     SDL_MOUSEBUTTONDOWN (Event* evt) {
@@ -60,8 +64,9 @@ Button {
 
     void
     DRAW (Event* evt) {
-        auto style = evt.o.page.styles.get_style (cast (Widget*) &this);
-        //auto style = evt.o.page.styles.get (type,flags);
+        //auto style = evt.o.page.styles.get_style (cast (Widget*) &this);
+        auto style = evt.o.page.styles.get (name,flags);
+        writeln ("DRAW: ", this.name);
 
         with (evt.o)
         with (evt.draw)
@@ -98,12 +103,6 @@ Button {
 
     struct
     _Event {
-        EType type;
-
-        // send (WIDGET, BUTTON, PRESSED)
-        // send (WIDGET_BUTTON_PRESSED)
-        // send (WIDGET_BUTTON, PRESSED)
-        // send (WIDGET + type, PRESSED)
         enum
         Type {
             PRESS,    // request

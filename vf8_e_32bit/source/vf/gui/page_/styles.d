@@ -17,9 +17,9 @@ Styles {
     pragma (msg, "styles.size: ", s.sizeof);  // 261_120
 
     Style*
-    get (bool OR_CREATE=false) (Widget.Type type, Widget.Flags flags) {
+    get (bool OR_CREATE=false) (string name, Widget.Flags flags) {
         foreach (ref _s; s) {
-            if (_s.type == type)
+            if (_s.name  == name)
             if (_s.flags == flags) {
                 return &_s;
             }
@@ -37,7 +37,7 @@ Styles {
 
     Style*
     get_style (Widget* widget) {
-        return get (widget.type, widget.base.flags);
+        return get (widget.name, widget.flags);
     }
 
     void

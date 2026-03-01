@@ -34,7 +34,7 @@ Mod_draw {
             ubyte i;
 
             // all widgets
-            foreach (widget,xywh; lockstep (page.widgets.s.range, page.layout.range)) {
+            foreach (widget,xywh; lockstep (page.widgets.s, page.layout.range)) {
                 evt.i      = i;
                 evt.xywh   = xywh;
                 evt.widget = widget;

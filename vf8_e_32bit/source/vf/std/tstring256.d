@@ -4,7 +4,7 @@ module vf.std.tstring256;
 struct
 Tstring256 (T,size_t N=ubyte.max)  {
 struct {
-    align (T.sizeof): 
+//    align (T.sizeof): 
     ubyte  length;
     ubyte  n = N;  // capacity
 }    

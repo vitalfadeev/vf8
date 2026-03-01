@@ -8,7 +8,7 @@ import mod.widget    : Widget;
 struct
 Style {
     // for
-    Widget.Type  type;
+    string       name;
     Widget.Flags flags;
     
     // rules

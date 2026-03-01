@@ -24,7 +24,9 @@ main () {
 	// Event loop
 	with (o)
 	foreach (evt; input) {
-		evt.o = &o;
+		evt.o      = &o;
+		evt.i      = 0;
+		evt.widget = null;
 		do_switch (evt);
 		if (quit) break;
 	}

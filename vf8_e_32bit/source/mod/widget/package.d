@@ -5,6 +5,7 @@ import app : Event;
 import vf.std.xywh;
 import vf.sdl.importc_sdl;
 import mod.widget.button;
+//import mod.widget.volume;
 import mod.volume;
 
 
@@ -29,7 +30,7 @@ Mod_widget {
             auto xy = XY (x,y);
             // widgets at xy
             foreach (i,xywh; page.layout.select (xy)) {
-                auto widget = &page.widgets.s[i];
+                auto widget = page.widgets.s[i];
                 evt.i      = i;
                 evt.xywh   = xywh;
                 evt.widget = widget;
@@ -46,26 +47,20 @@ import app;
 
 struct
 Widget {
-union {
-    mixin _Widget!(Widget.Type._);
-    Base   base;
-    Button button;
-}
+    DO_SWITCH   _do_switch;
+    Widget.Flags flags;
+    ubyte        value;
+    ubyte        reserved;
+    string       name;
+
+    alias DO_SWITCH = void delegate (Event* evt);
+
     void
     do_switch (Event* evt) {
-        switch (type) with (Type) {
-            case _      : base.do_switch (evt); break;
-            case BUTTON : button.do_switch (evt); break;
-            default:
-        }
+        assert(_do_switch !is null);
+        _do_switch (evt);
     }
-
-    enum 
-    Type :ubyte {
-        _,
-        BUTTON,
-    }
-
+    
     struct 
     Flags {
         ubyte a;
@@ -97,25 +92,29 @@ union {
     }
 }
 
-struct
-Base {
-    mixin _Widget!(Widget.Type._);
 
-    void
-    do_switch (Event* evt) {
-        //
-    }
-}
+//mixin template
+//_Widget (Widget.Type TYPE) {
+//struct {
+//    Widget.Type  type;
+//    Widget.Flags flags;
+//    ubyte        value;
+//    ubyte        reserved;
+//}
+//    mixin Do_switch;
+//}
 
 mixin template
-_Widget (Widget.Type TYPE) {
-struct {
-    Widget.Type  type = TYPE;
-    Widget.Flags flags;
-    ubyte        value;
-    ubyte        reserved;
-}
-    mixin Do_switch;
+Create () {
+    alias TWIDGET = typeof(this);
+    static
+    TWIDGET*
+    create (ARGS...) (ARGS args) {
+        auto widget = new TWIDGET (args);
+        widget._do_switch = &widget.do_switch;
+        widget.name = TWIDGET.stringof;
+        return widget;
+    }    
 }
 
 
@@ -142,8 +141,14 @@ Switch (ET1,ET2) {
 
     void 
     do_switch (Event* evt) {
+        bool _was;
+
         mixin (_Switch!(typeof(this),ET1));
         mixin (_Switch!(typeof(this),ET2));
+
+        static if (__traits (hasMember,T,"_super"))
+        static if (!is(typeof(T._super) == Widget))
+            if (!_was) _super.do_switch (evt);
     }
 }
 
@@ -161,7 +166,7 @@ static if (EnumFunctions!(EVENT_TYPE,Functions!T)) {
         foreach (fn_name; Functions!T)
             if (isEnumMember!(EVENT_TYPE, fn_name))
     s ~= format!"
-            case %s.%s : %s (evt); break;" ((fullyQualifiedName!EVENT_TYPE), fn_name, fn_name);
+            case %s.%s : %s (evt); _was=true; break;" ((fullyQualifiedName!EVENT_TYPE), fn_name, fn_name);
     s ~= "
             default                  :
         }
@@ -203,6 +208,25 @@ _Functions (T,MEMBERS...) {
         }
     }
 }
+
+//void 
+//_All_members_recucsive(T)() {
+//    // 1. Собственные члены структуры
+//    alias _members = __traits(allMembers, T);
+
+//    // 2. Члены из alias this
+//    static foreach (aliasName; __traits(getAliasThis, T)) {
+//        // Получаем тип поля, через которое сделан alias this
+//        alias AliasType = typeof(__traits(getMember, T.init, aliasName));
+        
+//        static if (is(AliasType == struct) || is(AliasType == class)) {
+//            AliasSeq!(_members,);
+//            writeln("--- From alias this (", aliasName, "): ---");
+//            printAllMembers!AliasType(); // Рекурсивный вызов
+//        }
+//    }
+//}
+
 
 template 
 isEnumMember (alias T, alias member) {

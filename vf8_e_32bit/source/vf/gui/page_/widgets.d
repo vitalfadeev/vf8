@@ -7,15 +7,13 @@ import vf.std.tstring256 : Tstring256;
 
 struct
 Widgets {
-    Tstring256!Widget s;
+    //Tstring256!Widget s;
     //Widget[ubyte.max+1] s;
+    Widget*[] s;
 
     void
     _init () {
-        import mod.widget;
-        foreach (w; s.range) {
-            w.type = Widget.Type._;
-        }
+        //
     }
 
     void

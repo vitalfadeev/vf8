@@ -17,7 +17,10 @@ import vf.gui.page_.strings : Strings;
 import vf.gui.page_.actions : Actions;
 import vf.gui.page_.styles  : Styles;
 import mod.widget           : Widget;
+import mod.widget.button    : Button;
+import mod.widget.volume    : Volume;
 import std.traits           : EnumMembers;
+import std.stdio : writeln;
 
 
 struct
@@ -110,21 +113,16 @@ Page {
     _init_widgets () {
         widgets._init ();
  
-        foreach (ubyte i; 0..12)
-            widgets.s[i].flags.enabled = true;
-        
-        widgets.s[0].type  = Widget.Type.BUTTON; // start 
-        widgets.s[1].type  = Widget.Type._;
-        widgets.s[2].type  = Widget.Type._;
-        widgets.s[3].type  = Widget.Type._;
-        widgets.s[4].type  = Widget.Type._;
-        widgets.s[5].type  = Widget.Type.BUTTON; // clock
-        widgets.s[6].type  = Widget.Type._;
-        widgets.s[7].type  = Widget.Type._;
-        widgets.s[8].type  = Widget.Type.BUTTON; // indicators
-        widgets.s[9].type  = Widget.Type.BUTTON; // indicators
-        widgets.s[10].type = Widget.Type.BUTTON; // indicators
-        widgets.s.length = 12;
+        foreach (ubyte i; 0..9) {
+            widgets.s ~= cast (Widget*) Button.create;
+            widgets.s[$-1].flags.enabled = true;
+        }        
+
+        widgets.s ~= cast (Widget*) Volume.create;
+        widgets.s[$-1].flags.enabled = true;
+
+        widgets.s ~= cast (Widget*) Button.create;
+        widgets.s[$-1].flags.enabled = true;
     }
 
     version (ACTIONS)
@@ -148,17 +146,17 @@ Page {
         s.fg   = 1;
         s.font = 1;
 
-        foreach (Widget.Type t; EnumMembers!(Widget.Type)) {
-            styles.s ~= Style (t);
+        foreach (widget; widgets.s) {
+            styles.s ~= Style (widget.name);
             s = &styles.s[$-1];
             s.flags.enabled = true;
 
-            switch (t) with (Widget.Type) {
-                case 1 /* start  */ : s.font = 1; s.text = 1; s.fg = 2; break;
-                case 2 /* clock  */ : s.font = 2; s.text = 2; s.fg = 2; break;
-                case 3 /* batary */ : s.font = 1; s.text = 3; s.fg = 2; break;
-                case 4 /* volume */ : s.font = 1; s.text = 4; s.fg = 2; break;
-                case 5 /* avia   */ : s.font = 1; s.text = 5; s.fg = 2; break;
+            switch (widget.name) {
+                case "Button" /* start  */ : s.font = 1; s.text = 1; s.fg = 2; break;
+                case "Volume" /* clock  */ : s.font = 2; s.text = 2; s.fg = 2; break;
+                //case 3 /* batary */ : s.font = 1; s.text = 3; s.fg = 2; break;
+                //case 4 /* volume */ : s.font = 1; s.text = 4; s.fg = 2; break;
+                //case 5 /* avia   */ : s.font = 1; s.text = 5; s.fg = 2; break;
                 default:
            }
 
