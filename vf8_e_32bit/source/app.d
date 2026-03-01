@@ -2,9 +2,9 @@ import std.stdio;
 
 import vf.gui.page                      : Page;
 import vf.gui.color                     : Color;
-import vf.gui.e                         : E;
 import vf.std.xywh                      : XY,WH,XYWH;
 import vf.gui.style 					: Style;
+import mod.widget 						: Widget;
 version (SDL) import vf.sdl.input       : Input;
 version (SDL) import vf.sdl.importc_sdl : SDL_Event,SDL_EventType, SDL_WindowEventID;
 version (SDL) import vf.sdl.importc_sdl : SDL_GetWindowFromID, SDL_DestroyWindow;
@@ -93,10 +93,10 @@ union {
     	"mod.volume", "Mod_volume", "Volume",    "volume",
 	));
 }
-	O*     o;
-    ubyte  i;    // e index
-    XYWH   xywh; // e xywh
-    E*     e;    // e
+	O*      o;
+    ubyte   i;    // e index
+    XYWH    xywh; // e xywh
+    Widget* widget;    // e
 
     // Type
     import vf.std.mixin_enum : Enum;
@@ -112,7 +112,7 @@ union {
     	"mod.draw",          "Mod_draw._Event.Type",
     	"mod.click",         "Mod_click._Event.Type",
     	"mod.action",        "Mod_action._Event.Type",
-    	"mod.widget_button", "Widget_button._Event.Type",
+    	"mod.widget.button", "Button._Event.Type",
     	"mod.volume",        "Mod_volume._Event.Type",
     	//"mod.widget_volume", "Widget_volume._Event.Type",
     	//"mod.show_quick_settings", "Show_quick_settings._Event.Type",
@@ -444,3 +444,19 @@ alias I  = ubyte;
 //       mute low mid high 
 // icon  .    .   .   .
 
+//  +-----------+
+// SDL     PRESSED
+//  |    RELEASEED
+//  |           |
+//  +-----------+
+//
+// SDL
+//   PRESSED
+// SDL
+//   RELEASED
+// 
+// Event
+//  |
+// 1 2 3 4 5 6 7.. 255
+//
+//

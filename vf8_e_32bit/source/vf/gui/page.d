@@ -7,7 +7,6 @@ import vf.std.tstring256;
 import vf.gui.color    : Color;
 import vf.gui.layout   : Layout;
 import vf.std.xywh     : XY,WH,XYWH;
-import vf.gui.e        : E;
 import vf.gui.style    : Style;
 import vf.sdl.window   : Window;
 
@@ -17,12 +16,12 @@ import vf.gui.page_.widgets : Widgets;
 import vf.gui.page_.strings : Strings;
 import vf.gui.page_.actions : Actions;
 import vf.gui.page_.styles  : Styles;
+import mod.widget           : Widget;
+import std.traits           : EnumMembers;
 
 
 struct
 Page {
-    Tstring256!E es;
-    pragma (msg, "es.size: ", es.sizeof);  // 1028
     WH           wh;         // ushort x ushort  16368 x 16368
     Layout       layout;     // grid, ...
     Colors       colors;
@@ -47,7 +46,6 @@ Page {
         _init_widgets ();
         version (ACTIONS) _init_actions ();
         _init_styles  ();
-        _init_es      ();
         _init_layout  ();
     }
 
@@ -98,22 +96,6 @@ Page {
     }
 
     void
-    _init_es () {
-        es[0].type  = 1; // start 
-        es[1].type  = 0;
-        es[2].type  = 0;
-        es[3].type  = 0;
-        es[4].type  = 0;
-        es[5].type  = 2; // clock
-        es[6].type  = 0;
-        es[7].type  = 0;
-        es[8].type  = 3; // indicators
-        es[9].type  = 4; // indicators
-        es[10].type = 5; // indicators
-        es.length = 12;
-    }
-
-    void
     _init_strings () {
         strings._init ();
         strings.s[0] = "    ";
@@ -127,13 +109,22 @@ Page {
     void
     _init_widgets () {
         widgets._init ();
-
-        import mod.widget_button;
-        foreach (ubyte t; 0..256) {
-            widgets.s[t] = &(new Widget_button ()).do_switch;
-        }
-        import mod.widget_volume;
-        widgets.s[4] = &(new Widget_volume ()).do_switch;
+ 
+        foreach (ubyte i; 0..12)
+            widgets.s[i].flags.enabled = true;
+        
+        widgets.s[0].type  = Widget.Type.BUTTON; // start 
+        widgets.s[1].type  = Widget.Type._;
+        widgets.s[2].type  = Widget.Type._;
+        widgets.s[3].type  = Widget.Type._;
+        widgets.s[4].type  = Widget.Type._;
+        widgets.s[5].type  = Widget.Type.BUTTON; // clock
+        widgets.s[6].type  = Widget.Type._;
+        widgets.s[7].type  = Widget.Type._;
+        widgets.s[8].type  = Widget.Type.BUTTON; // indicators
+        widgets.s[9].type  = Widget.Type.BUTTON; // indicators
+        widgets.s[10].type = Widget.Type.BUTTON; // indicators
+        widgets.s.length = 12;
     }
 
     version (ACTIONS)
@@ -157,11 +148,12 @@ Page {
         s.fg   = 1;
         s.font = 1;
 
-        foreach (ubyte t; 0..255) {
+        foreach (Widget.Type t; EnumMembers!(Widget.Type)) {
             styles.s ~= Style (t);
             s = &styles.s[$-1];
+            s.flags.enabled = true;
 
-            switch (t) {
+            switch (t) with (Widget.Type) {
                 case 1 /* start  */ : s.font = 1; s.text = 1; s.fg = 2; break;
                 case 2 /* clock  */ : s.font = 2; s.text = 2; s.fg = 2; break;
                 case 3 /* batary */ : s.font = 1; s.text = 3; s.fg = 2; break;
@@ -178,20 +170,8 @@ Page {
             // pressed
             styles.s ~= *s;
             s2 = &styles.s[$-1];
-            s2.pressed = true;
+            s2.flags.pressed = true;
             s2.fg = 5; 
-            s2.bg = 2;
-            // selected
-            styles.s ~= *s;
-            s2 = &styles.s[$-1];
-            s2.selected = true;
-            s2.fg = 3; 
-            s2.bg = 4;
-            // focused
-            styles.s ~= *s;
-            s2 = &styles.s[$-1];
-            s2.focused = true;
-            s2.fg = 3; 
             s2.bg = 2;
         }
 

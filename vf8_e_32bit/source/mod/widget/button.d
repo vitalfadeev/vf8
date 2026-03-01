@@ -1,39 +1,22 @@
-module mod.widget_button;
+module mod.widget.button;
 
+version (SDL):
 import app : Event,EType;
+import mod.widget : Widget,_Widget,Do_switch;
 import vf.sdl.importc_sdl;
 
+
 struct
-Widget_button {  // e.type = WIDGET_BUTTON
-    void
-    do_switch (Event* evt) {
-        switch (evt.sdl.type) with (SDL_EventType) {
-            case SDL_MOUSEBUTTONDOWN : _do_sdl_button_dn  (evt); break;
-            case SDL_MOUSEBUTTONUP   : _do_sdl_button_up  (evt); break;
-            default                  :
-        }
-
-        switch (evt.type) with (Event.Type) {
-            case DRAW : _do_draw (evt); break;
-            default   :
-        }
-
-        switch (evt.type) with (Event.Type) {
-            case PRESS   : _do_press   (evt); break;
-            case RELEASE : _do_release (evt); break;
-            default      :
-        }
-    }
+Button {
+    mixin _Widget!(Widget.Type.BUTTON);
 
     void
-    _do_sdl_button_dn (Event* evt) {
-        auto e = &evt.o.page.es[evt.i];
-
+    SDL_MOUSEBUTTONDOWN (Event* evt) {
         with (evt.o)
         with (Event.Type)
         with (evt.sdl.button)
         switch (button) {
-            case SDL_BUTTON_LEFT   : e.pressed = true; send (PRESSED); break;
+            case SDL_BUTTON_LEFT   : flags.pressed = true; send_now (PRESSED); break;
             case SDL_BUTTON_MIDDLE : break;
             case SDL_BUTTON_RIGHT  : break;
             case SDL_BUTTON_X1     : break;
@@ -43,14 +26,12 @@ Widget_button {  // e.type = WIDGET_BUTTON
     }
 
     void
-    _do_sdl_button_up (Event* evt) {
-        auto e = &evt.o.page.es[evt.i];
-
+    SDL_MOUSEBUTTONUP (Event* evt) {
         with (evt.o)
         with (Event.Type)
         with (evt.sdl.button)
         switch (button) {
-            case SDL_BUTTON_LEFT   : e.pressed = false; send (RELEASED); break;
+            case SDL_BUTTON_LEFT   : flags.pressed = false; send_now (RELEASED); break;
             case SDL_BUTTON_MIDDLE : break;
             case SDL_BUTTON_RIGHT  : break;
             case SDL_BUTTON_X1     : break;
@@ -60,31 +41,27 @@ Widget_button {  // e.type = WIDGET_BUTTON
     }
 
     void
-    _do_press (Event* evt) {
-        auto e = &evt.o.page.es[evt.i];
-
+    PRESS (Event* evt) {
         with (evt.o)
         with (Event.Type){
-            e.pressed = true; 
+            flags.pressed = true; 
             send (PRESSED);
         }
     }
 
     void
-    _do_release (Event* evt) {
-        auto e = &evt.o.page.es[evt.i];
-
+    RELEASE (Event* evt) {
         with (evt.o)
         with (Event.Type){
-            e.pressed = false; 
+            flags.pressed = false; 
             send (RELEASED);
         }
     }
 
     void
-    _do_draw (Event* evt) {
-        auto e = &evt.o.page.es[evt.i];
-        auto style = evt.o.page.styles.get_e_style (*e);
+    DRAW (Event* evt) {
+        auto style = evt.o.page.styles.get_style (cast (Widget*) &this);
+        //auto style = evt.o.page.styles.get (type,flags);
 
         with (evt.o)
         with (evt.draw)
@@ -98,7 +75,7 @@ Widget_button {  // e.type = WIDGET_BUTTON
         with (evt.xywh)
         with (style)
         if (text) {
-            auto text_index = e.value;
+            auto text_index = value;
             text_index = 0;
             import std.utf;
             import std.range;
@@ -136,5 +113,5 @@ Widget_button {  // e.type = WIDGET_BUTTON
             RELEASED,
             RELEASE_INFO,
         }
-    }
+    }    
 }

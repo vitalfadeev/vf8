@@ -34,11 +34,11 @@ Mod_draw {
             ubyte i;
 
             // all widgets
-            foreach (e,xywh; lockstep (page.es.range, page.layout.range)) {
-                evt.i    = i;
-                evt.xywh = xywh;
-                evt.e    = &page.es[i];
-                page.widgets.do_widget_switch (evt);  // DRAW
+            foreach (widget,xywh; lockstep (page.widgets.s.range, page.layout.range)) {
+                evt.i      = i;
+                evt.xywh   = xywh;
+                evt.widget = widget;
+                widget.do_switch (evt);;  // DRAW
 
                 i++;
             }

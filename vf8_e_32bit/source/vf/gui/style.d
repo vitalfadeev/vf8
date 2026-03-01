@@ -2,25 +2,14 @@ module vf.gui.style;
 
 import vf.std.xywh   : WH;
 import vf.gui.color  : Color;
+import mod.widget    : Widget;
 
 
 struct
 Style {
     // for
-    ubyte type;
-    union {
-        ubyte flags;
-    struct {
-        bool disabled:1;  // enabled  / disabled
-        bool unvisible:1; // visible  / unvisible
-        bool focused:1;   // focused  / 
-        bool selected:1;  // selected / 
-        bool m_over:1;    // m_over   /
-        bool defined:1;   // defined  / undefined
-        bool pressed:1;   // pressed  / released
-        bool lamp_on:1;   // lamp_on  / lamp_off
-    }
-    }
+    Widget.Type  type;
+    Widget.Flags flags;
     
     // rules
     WH    wh;

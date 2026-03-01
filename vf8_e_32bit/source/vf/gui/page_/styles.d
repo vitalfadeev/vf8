@@ -1,7 +1,7 @@
 module vf.gui.page_.styles;
 
 import vf.gui.style : Style;
-import vf.gui.e     : E;
+import mod.widget   : Widget;
 
 
 struct
@@ -17,11 +17,12 @@ Styles {
     pragma (msg, "styles.size: ", s.sizeof);  // 261_120
 
     Style*
-    get (bool OR_CREATE=false) (ubyte type, ubyte flags) {
+    get (bool OR_CREATE=false) (Widget.Type type, Widget.Flags flags) {
         foreach (ref _s; s) {
             if (_s.type == type)
-            if (_s.flags == flags)
+            if (_s.flags == flags) {
                 return &_s;
+            }
         }
         return &s[0];
 
@@ -35,8 +36,8 @@ Styles {
     }
 
     Style*
-    get_e_style (E e) {
-        return get (e.type, e.flags);
+    get_style (Widget* widget) {
+        return get (widget.type, widget.base.flags);
     }
 
     void

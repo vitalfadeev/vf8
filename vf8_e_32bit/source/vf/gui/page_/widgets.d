@@ -1,31 +1,28 @@
 module vf.gui.page_.widgets;
 
-import app : Event;
+import app               : Event;
+import mod.widget        : Widget;
+import vf.std.tstring256 : Tstring256;
 
 
 struct
 Widgets {
-    DO_SWITCH_DG[ubyte.max+1] s;
-
-    alias DO_SWITCH_DG = void delegate (Event* evt);
+    Tstring256!Widget s;
+    //Widget[ubyte.max+1] s;
 
     void
     _init () {
-        //
-    }
-
-    DO_SWITCH_DG
-    get_e_widget_do_switch (ubyte type) {
-        return s[type];
+        import mod.widget;
+        foreach (w; s.range) {
+            w.type = Widget.Type._;
+        }
     }
 
     void
-    do_widget_switch (Event* evt) {
-        with (evt.o)
-        if (evt.e !is null) {
-            auto type   = evt.e.type;
-            auto widget_do_switch = get_e_widget_do_switch (type);
-            widget_do_switch (evt);     
-        }
-    }    
+    do_switch (Event* evt) {
+        //foreach (Widget* widget; s.range) {
+        //    if (widget.flags.enabled)
+        //        widget.do_switch (evt);
+        //}
+    }
 }
