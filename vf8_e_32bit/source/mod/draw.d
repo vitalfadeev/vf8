@@ -1,93 +1,37 @@
 module mod.draw;
 
-import app : Event,EType;
+import app : Event;
 import vf.std.xywh;
 import vf.sdl.importc_sdl;
 import vf.sdl.renderer_sdl;
 import vf.sdl.wm : Wm;
+import std.stdio : writeln;
 
 struct
-Mod_draw {
-    void
-    do_switch (Event* evt) {
-        switch (evt.type) with (Event.Type) {
-            case INIT   : _init      (evt); break;
-            case DRAW   : _do_draw   (evt); break;
-            case REDRAW : _do_redraw (evt); break;
-            default     :
-        }
-    }
+Mod_draw (O) {
+    O* o;
 
     void
-    _init (Event* evt) {
+    INIT () {
         //
     }
 
     void
-    _do_draw (Event* evt) {
-        with (evt.o)
-        with (evt.draw) {
-            import std.range     : lockstep;
-            import vf.gui.color  : Color;
+    DRAW (uint windowID, Renderer* renderer) {
+        import std.range : lockstep;
 
-            renderer.fonts = &page.fonts;
-            ubyte i;
+        renderer.fonts = &o.page.fonts;
 
-            // all widgets
-            foreach (widget,xywh; lockstep (page.widgets.s, page.layout.range)) {
-                evt.i      = i;
-                evt.xywh   = xywh;
-                evt.widget = widget;
-                widget.do_switch (evt);;  // DRAW
-
-                i++;
-            }
+        // all widgets
+        foreach (widget,xywh; lockstep (o.page.widgets.s, o.page.layout.range)) {
+            widget.DRAW (renderer, xywh);  // DRAW
         }
     }
 
     version (SDL) 
     void
-    _do_redraw (Event* evt) {
-        with (evt.o)
-        with (Event.Type)
-        with (evt.redraw) {
-            Wm (). _send_draw (evt,windowID);
-        }
-    }
-
-    struct
-    _Event {
-        union {
-            Draw   draw;
-            Redraw redraw;
-        }
-
-        enum
-        Type {
-            DRAW,
-            DRAWED,
-            DRAW_INFO,
-            REDRAW,
-        }
-
-        struct
-        Draw {
-            EType       type;
-            version (SDL) import vf.sdl.renderer_sdl : Renderer;
-            version (SDL) 
-            uint        windowID;
-            Renderer*   renderer;
-            XYWH        xywh;
-        }
-
-        struct
-        Redraw {
-            EType       type;
-            version (SDL) import vf.sdl.renderer_sdl : Renderer;
-            version (SDL) 
-            uint        windowID;
-            Renderer*   renderer;
-            XYWH        xywh;
-        }
+    REDRAW (uint windowID, XYWH xywh) {
+        //Wm (o). DRAW (windowID);
+        writeln ("do REDRAW");
     }
 }

@@ -1,20 +1,11 @@
 module mod.volume;
 
-import app : Event,EType;
+import app : Event;
 
 struct
-Mod_volume {
-    void
-    do_switch (Event* evt) {
-        switch (evt.type) with (Event.Type) {
-            case VOLUME_MUTE     : _do_volume_mute     (evt); break;
-            case VOLUME          : _do_volume          (evt); break;
-            case VOLUME_UP       : _do_volume_up       (evt); break;
-            case VOLUME_DN       : _do_volume_dn       (evt); break;
-            case VOLUME_GET_INFO : _do_volume_get_info (evt); break;
-            default              :
-        }
-    }
+Mod_volume (O) {
+    O* o;
+    static ubyte volume;  
 
     enum
     Volume_type {
@@ -25,47 +16,41 @@ Mod_volume {
     }
 
     void
-    _do_volume_mute (Event* evt) {
-        with (evt.o)
-        with (Event.Type) {
+    VOLUME_MUTE () {
+        with (o) {
             ubyte volume = 0;
             //send (VOLUME_INFO, 0);
         }
     }
 
     void
-    _do_volume (Event* evt) {
-        with (evt.o)
-        with (Event.Type) {
+    VOLUME (Event* evt) {
+        with (o) {
             ubyte volume;   
             //send (VOLUME_INFO, volume);
         }
     }
 
     void
-    _do_volume_up (Event* evt) {
-        with (evt.o)
-        with (Event.Type) {
-            ubyte volume;  // +5%
-            //send (VOLUME_INFO, volume);
+    VOLUME_UP (Event* evt) {  // -5%
+        with (o) {
+            volume += volume.max / 100 * 5;  
+            hub.VOLUME_INFO (volume);
         }
     }
 
     void
-    _do_volume_dn (Event* evt) {
-        with (evt.o)
-        with (Event.Type) {
-            ubyte volume;  // -5%
-            //send (VOLUME_INFO, volume);
+    VOLUME_DN (Event* evt) { // -5%
+        with (o) {
+            volume -= volume.max / 100 * 5;  
+            hub.VOLUME_INFO (volume);
         }
     }
 
     void
-    _do_volume_get_info (Event* evt) {
-        with (evt.o)
-        with (Event.Type) {
-            ubyte volume;   
-            //send (VOLUME_INFO, volume);
+    VOLUME_GET_INFO (Event* evt) {
+        with (o) {
+            hub.VOLUME_INFO (volume);
         }
     }
 
@@ -76,30 +61,6 @@ Mod_volume {
             if (volume < volume.max/3)     return LOW;
             if (volume < (volume.max/3)*2) return MID;
             return HIGH;
-        }
-    }
-
-    struct
-    _Event {
-        union {
-            Volume volume;
-        }
-
-        enum 
-        Type {
-            VOLUME_MUTE,
-            VOLUME,
-            VOLUME_UP,
-            VOLUME_DN,
-            VOLUME_INFO,
-            VOLUME_GET_INFO,
-        }
-
-        struct
-        Volume {
-            EType       type;
-            ubyte       volume;
-            Volume_type volume_type;
         }
     }
 }

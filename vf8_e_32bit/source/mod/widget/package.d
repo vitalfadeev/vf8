@@ -10,57 +10,79 @@ import mod.volume;
 
 
 struct
-Mod_widget {    
+Mod_widget (O) {
+    O* o;
+
     void
-    do_switch (Event* evt) {
-        switch (evt.sdl.type) with (SDL_EventType) {
-            case SDL_MOUSEBUTTONDOWN : _do_sdl_button (evt); break;
-            case SDL_MOUSEBUTTONUP   : _do_sdl_button (evt); break;
-            default                  :
+    SDL_BUTTON (SDL_MouseButtonEvent* evt) {
+        with (evt) {
+            //
         }
+        //_select_and_call_widget (evt,x,y,windowID);
     }
 
     void
-    _do_sdl_button (Event* evt) {
-        import vf.sdl.importc_sdl;
+    SDL_MOUSEWHEEL (SDL_MouseWheelEvent* evt) {
+        with (evt) {
+            //
+        }
+        //_select_and_call_widget (evt,x,y,windowID);
+    }
 
-        with (evt.o)
-        with (Event.Type)
-        with (evt.sdl.button) {
-            auto xy = XY (x,y);
-            // widgets at xy
-            foreach (i,xywh; page.layout.select (xy)) {
-                auto widget = page.widgets.s[i];
-                evt.i      = i;
-                evt.xywh   = xywh;
-                evt.widget = widget;
-                widget.do_switch (evt);
+    //void
+    //_select_and_call_widget (int x, int y, uint windowID) {
+    //    import vf.sdl.importc_sdl;
+
+    //    with (o) {
+    //        auto xy = XY (x,y);
+    //        // widgets at xy
+    //        foreach (i,xywh; page.layout.select (xy)) {
+    //            auto widget = page.widgets.s[i];
+    //            widget.do_switch (evt);
                 
-                send (REDRAW, windowID, null, xywh);
-            }
-        }
-    }
+    //            hub.REDRAW (windowID, xywh);
+    //            //REDRAW (windowID, null, xywh);  // event REDRAW
+    //        }
+    //    }
+    //}
+
+    //void
+    //_all_call_widget (Event* evt) {
+    //    import vf.sdl.importc_sdl;
+    //    import std.range     : lockstep;
+
+    //    with (o) {
+    //        ubyte i;
+
+    //        // all widgets
+    //        foreach (widget,xywh; lockstep (page.widgets.s, page.layout.range)) {
+    //            widget.do_switch (evt);;
+
+    //            i++;
+    //        }
+    //    }
+    //}
 }
 
 import importc_sdl;
 import app;
+import vf.sdl.renderer_sdl : Renderer;
 
 struct
 Widget {
-    DO_SWITCH   _do_switch;
+    O*           o;
     Widget.Flags flags;
     ubyte        value;
     ubyte        reserved;
     string       name;
 
-    alias DO_SWITCH = void delegate (Event* evt);
-
     void
-    do_switch (Event* evt) {
-        assert(_do_switch !is null);
-        _do_switch (evt);
+    DRAW (Renderer* renderer, XYWH xywh) {
+        //
     }
-    
+
+
+    auto 
     struct 
     Flags {
         ubyte a;
@@ -107,107 +129,17 @@ Widget {
 mixin template
 Create () {
     alias TWIDGET = typeof(this);
+
     static
     TWIDGET*
     create (ARGS...) (ARGS args) {
         auto widget = new TWIDGET (args);
-        widget._do_switch = &widget.do_switch;
         widget.name = TWIDGET.stringof;
         return widget;
     }    
 }
 
-
-mixin template
-Do_switch () {
-    import mod.widget;
-    import app=app;
-    import importc_sdl=vf.sdl.importc_sdl;
-    mixin Switch!(importc_sdl.SDL_EventType, app.Event.Type);
-}
-
-mixin template
-Switch (ET1,ET2) {
-    alias T   = typeof (this);
-
-    //void
-    //do_switch (Event* evt) {
-    //    switch (evt.type) with (SDL_EventType) {
-    //        case SDL_MOUSEBUTTONDOWN : _do_sdl_button (evt); break;
-    //        case SDL_MOUSEBUTTONUP   : _do_sdl_button (evt); break;
-    //        default                  :
-    //    }
-    //}
-
-    void 
-    do_switch (Event* evt) {
-        bool _was;
-
-        mixin (_Switch!(typeof(this),ET1));
-        mixin (_Switch!(typeof(this),ET2));
-
-        static if (__traits (hasMember,T,"_super"))
-        static if (!is(typeof(T._super) == Widget))
-            if (!_was) _super.do_switch (evt);
-    }
-}
-
-import std.traits;
-import std.meta;
-import std.format;
-
-string
-_Switch (T,EVENT_TYPE) () {
-    string s;
-
-static if (EnumFunctions!(EVENT_TYPE,Functions!T)) {
-    s = "
-        switch (evt.type) {";
-        foreach (fn_name; Functions!T)
-            if (isEnumMember!(EVENT_TYPE, fn_name))
-    s ~= format!"
-            case %s.%s : %s (evt); _was=true; break;" ((fullyQualifiedName!EVENT_TYPE), fn_name, fn_name);
-    s ~= "
-            default                  :
-        }
-    ";
-}
-
-    return s;
-}
-
-template
-Functions (alias T) {
-    alias Functions = _Functions!(T,__traits(allMembers, T));
-}
-
-template
-_Functions (T,MEMBERS...) {
-    static if (MEMBERS.length == 0) {
-        alias _Functions = AliasSeq!();
-    }
-    static if (MEMBERS.length == 1) {
-        enum  memberName = MEMBERS[0];
-        alias member     = __traits(getMember, T, memberName);
-
-        static if (is(typeof(member) == function)) {
-            alias _Functions =  AliasSeq!(memberName);
-        } else {
-            alias _Functions =  AliasSeq!();
-        }
-    }
-    static if (MEMBERS.length > 1) {
-        enum  memberName = MEMBERS[0];
-        alias member     = __traits(getMember, T, memberName);
-        alias rest       = _Functions!(T,MEMBERS[1..$]);
-
-        static if (is(typeof(member) == function)) {
-            alias _Functions =  AliasSeq!(memberName,rest);
-        } else {
-            alias _Functions =  AliasSeq!(rest);
-        }
-    }
-}
+import vf.std.traits : Functions;
 
 //void 
 //_All_members_recucsive(T)() {

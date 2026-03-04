@@ -1,10 +1,12 @@
 module mod.action;
 
-import app : Event,EType;
+import app : Event;
 
 
 struct
-Mod_action {
+Mod_action (O) {
+    O* o;
+
     void
     do_switch (Event* evt) {
         switch (evt.type) with (Event.Type) {

@@ -1,45 +1,20 @@
 module mod.click;
 
-import app : Event,EType;
+import app : Event;
 import vf.std.xywh : XY;
 
 
 struct
-Mod_click {
-    void
-    do_switch (Event* evt) {
-        switch (evt.type) with (Event.Type) {
-            case INIT   : _init (evt); break;
-            case CLICK  : _click (evt); break;
-            default     :
-        }
-    }
+Mod_click (O) {
+    O* o;
 
     void
-    _init (Event* evt) {
+    INIT () {
         //
     }
 
     void
-    _click (Event* evt) {
+    CLICK () {
         //
-    }
-
-    struct
-    _Event {
-        union {
-            Click click;
-        }
-
-        enum
-        Type {
-            CLICK
-        }
-
-        struct
-        Click {
-            EType type;
-            XY    xy;
-        }
     }
 }

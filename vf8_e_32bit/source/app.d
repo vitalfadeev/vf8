@@ -1,5 +1,6 @@
 import std.stdio;
 
+import hub 								: Hub;
 import vf.gui.page                      : Page;
 import vf.gui.color                     : Color;
 import vf.std.xywh                      : XY,WH,XYWH;
@@ -14,20 +15,35 @@ void
 main () {
 	auto o = O ();
 	o.page = Page ();
-	o.do_switch = &Mod().do_switch;
+
+	// Register
+	with (o) {
+		version (SDL) import mod.sdl : Mod_sdl;
+		version (SDL) 
+		hub.register (new Mod_sdl!O (&o));
+		//
+		hub.register (new Mod!O (&o));
+	    import mod.sdl_wm : Mod_sdl_wm;
+		hub.register (new Mod_sdl_wm!O (&o));
+	    import mod.draw : Mod_draw;
+		hub.register (new Mod_draw!O (&o));
+	    import mod.widget : Mod_widget;
+		hub.register (new Mod_widget!O (&o));
+	    import mod.volume : Mod_volume;
+		hub.register (new Mod_volume!O (&o));
+	    version (ACTIONS) import mod.action : Mod_action;
+		version (ACTIONS) 
+		hub.register (new Mod_action!O (&o));
+	}
 
 	// INIT
 	with (o)
-	with (Event.Type)
-	send_now (INIT);
+	hub.INIT ();
 
 	// Event loop
 	with (o)
 	foreach (evt; input) {
-		evt.o      = &o;
-		evt.i      = 0;
-		evt.widget = null;
-		do_switch (evt);
+		hub.DO_SWITCH (evt);
 		if (quit) break;
 	}
 }
@@ -37,15 +53,9 @@ struct
 O {
     Input!Event input;
     bool 		quit;
-    DO_SWITCH   do_switch;
     Page        page;  // base page
     Page[]      pages;
-
-    alias DO_SWITCH = void delegate (Event* evt);
-
-    // send
-	import vf.base.send;
-	mixin vf.base.send.Send!Event;
+    Hub         hub;
 }
 
 // SDL_Event sdl_event
@@ -55,168 +65,39 @@ O {
 //     type > 0x8000
 // cast (Event) sdl_event
 
-template
-Evtmix (RECS...) {
-	enum Mod = RECS[0];
-	enum Kls = RECS[1];
-	enum Evt = RECS[2];
-	enum Var = RECS[3];
-
-	import std.format : format;
-
-	static if (RECS.length == 0) 
-		enum Evtmix = "";
-	static if (RECS.length == 4) 
-		enum Evtmix =  
-			format!"import %s : %s;\n" (Mod,Kls) ~
-			format!"%s._Event.%s %s;\n" (Kls,Evt,Var);
-	static if (RECS.length > 4) 
-		enum Evtmix =  
-			format!"import %s : %s;\n" (Mod,Kls) ~
-			format!"%s._Event.%s %s;\n" (Kls,Evt,Var) ~ 
-			Evtmix!(RECS[4..$]);
-	static if (RECS.length < 4) 
-		static assert (0, "expect RECS.length >= 4");
-}
-
-alias EType = ushort;
-
 struct
 Event {
-union {
-    Type   type;
-    Init   _init;
-    mixin (Evtmix!(
-    	"mod.sdl",    "Mod_sdl",    "SDL_Event", "sdl",
-    	"mod.draw",   "Mod_draw",   "Draw",      "draw",
-    	"mod.draw",   "Mod_draw",   "Redraw",    "redraw",
-    	"mod.click",  "Mod_click",  "Click",     "click",
-    	"mod.action", "Mod_action", "Action",    "action",
-    	"mod.volume", "Mod_volume", "Volume",    "volume",
-	));
-}
-	O*      o;
-    ubyte   i;    // e index
-    XYWH    xywh; // e xywh
-    Widget* widget;    // e
-
-    // Type
-    import vf.std.mixin_enum : Enum;
-
-    enum 
-    _Type :EType {  // 0xFFFF
-    	INIT,
-    }
-
-    mixin Enum!("Type", 0x8000, 
-    	"app",               "Event._Type",
-    	"mod.sdl",           "Mod_sdl._Event.Type",
-    	"mod.draw",          "Mod_draw._Event.Type",
-    	"mod.click",         "Mod_click._Event.Type",
-    	"mod.action",        "Mod_action._Event.Type",
-    	"mod.widget.button", "Button._Event.Type",
-    	"mod.volume",        "Mod_volume._Event.Type",
-    	//"mod.widget_volume", "Widget_volume._Event.Type",
-    	//"mod.show_quick_settings", "Show_quick_settings._Event.Type",
-		);
-
-    struct
-    Base {
-        Type type = Type._;
-    }
-
-    struct
-    Init {
-        Type type = Type.INIT;
-    }
-
-    string
-    type_to_string () {
-    	import vf.sdl.importc_sdl : SDL_USEREVENT;
-    	import std.conv : to;
-    	if (this.type < SDL_USEREVENT)
-    		return (cast (SDL_EventType) this.sdl.type).to!string;    	
-    	else
-    		return this.type.to!string;
-    }
+    SDL_Event sdl;
+    alias sdl this;
 }
 
 struct
-Mod {
+Mod (O) {
+	O* o;
+
 	void
-	do_switch (Event* evt) {
-		log_event (evt);
-
-		version (SDL) import mod.sdl : Mod_sdl;
-		version (SDL) 
-		Mod_sdl     ().do_switch (evt);
-
-	    switch (evt.type) with (Event.Type) {
-	        case INIT   : _do_init   (evt); break;
-	        default     :
-	    }
-
-	    import mod.draw : Mod_draw;
-	    Mod_draw    ().do_switch (evt);
-	    import mod.widget : Mod_widget;
-	    Mod_widget  ().do_switch (evt);  // set evt.i
-	    version (ACTIONS) import mod.action : Mod_action;
-		version (ACTIONS) 
-		Mod_action  ().do_switch (evt);
+	INIT () {
+		init_window ();
+		init_gui ();
 	}
 
 	void
-	_do_init (Event* evt) {
-		with (evt._init) {
-			init_window (evt);
-			init_gui (evt);
-		}
-	}
-
-	void
-	init_window (Event* evt) {
+	init_window () {
 		import vf.sdl.wm : Wm;
-		Wm ().new_window ();
+		Wm!O (o).new_window ();
 	}
 
 	void
-	init_gui (Event* evt) {
-		_init_page (evt);
+	init_gui () {
+		_init_page ();
 	}
 
 	void
-	_init_page (Event* evt) {
-	    evt.o.page._init ();
+	_init_page () {
+	    o.page._init ();
 	}
 }
 
-
-void
-log_event (Event* evt) {
-	import std.stdio : writefln;
-	import vf.sdl.importc_sdl;
-
-	with (Event.Type)
-	if (evt.sdl.type == SDL_MOUSEMOTION)
-	    {}
-	else
-	if (evt.sdl.type == SDL_MOUSEWHEEL)
-		writefln ("%s %s", cast (SDL_EventType)evt.sdl.type, cast (SDL_MouseWheelDirection) evt.sdl.wheel.direction);
-	else
-	if (evt.sdl.type == SDL_WINDOWEVENT)
-	    writefln ("%s %d %s ", cast (SDL_EventType)evt.sdl.type, evt.sdl.window.windowID, cast (SDL_WindowEventID) evt.sdl.window.event);
-	else
-	if (evt.sdl.type == SDL_KEYDOWN)
-	    writefln ("%s %s", cast (SDL_EventType)evt.sdl.type, evt.sdl.key.keysym.scancode);
-	else
-	if (evt.sdl.type == SDL_KEYUP)
-	    writefln ("%s %s", cast (SDL_EventType)evt.sdl.type, evt.sdl.key.keysym.scancode);
-	else
-	if (evt.sdl.type < SDL_USEREVENT)
-	    writefln ("%s", cast (SDL_EventType) evt.sdl.type);    
-	else
-	    writefln ("%s", cast (Event.Type) evt.type);
-}
 
 alias I  = ubyte;
 

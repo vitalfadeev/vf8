@@ -36,9 +36,19 @@ Send (Event) {  // if (is (Event==struct) && is(Event.Type == enum))
     send (const Event.Type type, uint windowID, Renderer* renderer, XYWH xywh) {
         Event evt;
         switch (type) with (Event.Type) {
-            case DRAW   : evt.draw   = typeof(evt.draw)   (type,windowID,renderer,xywh); break;
-            case REDRAW : evt.redraw = typeof(evt.redraw) (type,windowID,renderer,xywh); break;
-            default     : assert (0);
+            case DRAW        : evt.draw   = typeof(evt.draw)   (type,windowID,renderer,xywh); break;
+            default          : assert (0);
+        }
+        evt.type = type;
+        evt.o    = &this;
+        input ~= &evt;
+    }
+    void
+    send (const Event.Type type, uint windowID, XYWH xywh) {
+        Event evt;
+        switch (type) with (Event.Type) {
+            case REDRAW      : evt.redraw = typeof(evt.redraw) (type,windowID,xywh); break;
+            default          : assert (0);
         }
         evt.type = type;
         evt.o    = &this;
@@ -49,6 +59,17 @@ Send (Event) {  // if (is (Event==struct) && is(Event.Type == enum))
         Event evt;
         switch (type) with (Event.Type) {
             case ACTION : evt.action = typeof(evt.action) (type,saction); break;
+            default     : assert (0);
+        }
+        evt.type = type;
+        evt.o    = &this;
+        input ~= &evt;
+    }
+    void
+    send (const Event.Type type, ubyte volume) {
+        Event evt;
+        switch (type) with (Event.Type) {
+            case VOLUME_INFO : evt.volume = typeof(evt.volume) (type,volume); break;
             default     : assert (0);
         }
         evt.type = type;

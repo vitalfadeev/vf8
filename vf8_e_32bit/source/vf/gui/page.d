@@ -153,7 +153,7 @@ Page {
 
             switch (widget.name) {
                 case "Button" /* start  */ : s.font = 1; s.text = 1; s.fg = 2; break;
-                case "Volume" /* clock  */ : s.font = 2; s.text = 2; s.fg = 2; break;
+                case "Volume" /* volume  */ : s.font = 1; s.text = 4; s.fg = 2; break;
                 //case 3 /* batary */ : s.font = 1; s.text = 3; s.fg = 2; break;
                 //case 4 /* volume */ : s.font = 1; s.text = 4; s.fg = 2; break;
                 //case 5 /* avia   */ : s.font = 1; s.text = 5; s.fg = 2; break;

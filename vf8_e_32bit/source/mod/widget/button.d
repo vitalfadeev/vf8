@@ -1,26 +1,25 @@
 module mod.widget.button;
 
 version (SDL):
-import app : Event,EType;
-import mod.widget : Widget,Do_switch,Create;
+import app : Event;
+import mod.widget : Widget,Create;
 import vf.sdl.importc_sdl;
-import std.stdio : writeln;
+import vf.sdl.renderer_sdl : Renderer;
+import vf.std.xywh : XYWH;
 
 
 struct
 Button {
     Widget _super;
     alias _super this;
-    mixin Do_switch;
     mixin Create;
 
     void
-    SDL_MOUSEBUTTONDOWN (Event* evt) {
-        with (evt.o)
-        with (Event.Type)
-        with (evt.sdl.button)
+    SDL_MOUSEBUTTONDOWN (SDL_MouseButtonEvent* evt) {
+        with (o)
+        with (evt)
         switch (button) {
-            case SDL_BUTTON_LEFT   : flags.pressed = true; send_now (PRESSED); break;
+            case SDL_BUTTON_LEFT   : flags.pressed = true; hub.PRESSED (); break;
             case SDL_BUTTON_MIDDLE : break;
             case SDL_BUTTON_RIGHT  : break;
             case SDL_BUTTON_X1     : break;
@@ -30,12 +29,11 @@ Button {
     }
 
     void
-    SDL_MOUSEBUTTONUP (Event* evt) {
-        with (evt.o)
-        with (Event.Type)
-        with (evt.sdl.button)
+    SDL_MOUSEBUTTONUP (SDL_MouseButtonEvent* evt) {
+        with (o)
+        with (evt)
         switch (button) {
-            case SDL_BUTTON_LEFT   : flags.pressed = false; send_now (RELEASED); break;
+            case SDL_BUTTON_LEFT   : flags.pressed = false; hub.RELEASED (); break;
             case SDL_BUTTON_MIDDLE : break;
             case SDL_BUTTON_RIGHT  : break;
             case SDL_BUTTON_X1     : break;
@@ -45,43 +43,38 @@ Button {
     }
 
     void
-    PRESS (Event* evt) {
-        with (evt.o)
-        with (Event.Type){
+    PRESS () {
+        with (o) {
             flags.pressed = true; 
-            send (PRESSED);
+            hub.PRESSED ();
         }
     }
 
     void
-    RELEASE (Event* evt) {
-        with (evt.o)
-        with (Event.Type){
+    RELEASE () {
+        with (o) {
             flags.pressed = false; 
-            send (RELEASED);
+            hub.RELEASED ();
         }
     }
 
     void
-    DRAW (Event* evt) {
-        //auto style = evt.o.page.styles.get_style (cast (Widget*) &this);
-        auto style = evt.o.page.styles.get (name,flags);
-        writeln ("DRAW: ", this.name);
+    DRAW (Renderer* renderer, XYWH xywh) {
+        auto style = o.page.styles.get_style (cast (Widget*) &this);
+        //auto style = evt.o.page.styles.get (name,flags);
 
-        with (evt.o)
-        with (evt.draw)
-        with (evt.xywh)
+        with (o)
         with (style)
+        with (xywh)
         if (w > 0 && h > 0)
             renderer.draw_rect (x,y,w,h,page.colors.s[fg],page.colors.s[bg]);
 
-        with (evt.o)
-        with (evt.draw)
-        with (evt.xywh)
+        with (o)
         with (style)
+        with (xywh)
         if (text) {
             auto text_index = value;
-            text_index = 0;
+            text_index = value;
             import std.utf;
             import std.range;
             import std.array;
