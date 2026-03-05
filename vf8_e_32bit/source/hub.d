@@ -3,6 +3,8 @@ import vf.std.traits : Functions;
 import std.traits;
 import std.string;
 import std.stdio : writeln;
+import std.format : format;
+import std.stdio : writefln;
 
 
 struct
@@ -45,6 +47,8 @@ Hub {
     void
     opDispatch (string name, ARGS...) (ARGS args) {
         pragma (msg, "opDispatch: ", name, " ", ARGS);
+        writeln (name, " ", ARGS.stringof, ": ", args);
+
         // init
         Typed typed;
         foreach (par; ARGS) {
@@ -66,7 +70,7 @@ Hub {
 
         // info
         if (!found) {
-            //assert (0, "Not found delegate for "~name~" ("~ARGS.stringof~")");
+            //assert (0, name~ " "~ ARGS.stringof~ ", no listener ");
             writeln (name, " ", ARGS.stringof, ", no listener ");
         }
     }

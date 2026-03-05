@@ -5,7 +5,6 @@ import app : Event;
 import mod.widget : Widget;
 import vf.sdl.importc_sdl;
 import mod.widget.button;
-import mod.volume;
 import std.stdio : writeln;
 import vf.sdl.renderer_sdl : Renderer;
 
@@ -30,27 +29,25 @@ Volume {
         with (o)
         with (evt)
         switch (direction) with (SDL_MouseWheelDirection) {
-            case SDL_MOUSEWHEEL_NORMAL  : hub.VOLUME_UP (); hub.REDRAW (windowID); break;
-            case SDL_MOUSEWHEEL_FLIPPED : hub.VOLUME_DN (); hub.REDRAW (windowID); break;
+            case SDL_MOUSEWHEEL_NORMAL  : (y > 0)? hub.VOLUME_UP (): hub.VOLUME_DN (); hub.REDRAW (windowID); break;
+            case SDL_MOUSEWHEEL_FLIPPED : (y < 0)? hub.VOLUME_DN (): hub.VOLUME_DN (); hub.REDRAW (windowID); break;
             default                     :
         }
     }
 
     void
-    VOLUME_INFO () {
-        //with (evt.o)
-        //with (Event.Type)
-        //with (evt.volume)
-        //switch (volume_type) with (Mod_volume.Volume_type) {
-        //    case MUTE : value = 0; break;
-        //    case LOW  : value = 1; break;
-        //    case MID  : value = 2; break;
-        //    case HIGH : value = 3; break;
-        //    default   :
-        //}
+    VOLUME_INFO (ubyte volume) {
+        with (o)
+        switch (volume_type (volume)) with (Volume_type) {
+            case MUTE : value = 0; break;
+            case LOW  : value = 1; break;
+            case MID  : value = 2; break;
+            case HIGH : value = 3; break;
+            default   :
+        }
 
-        //with (o)
-        //hub.REDRAW (windowID);
+        with (o)
+        hub.REDRAW (/*windowID*/cast (uint) 1);
     }
 
     void
@@ -58,3 +55,22 @@ Volume {
         _super.DRAW (renderer);
     }
 }
+
+Volume_type
+volume_type (ubyte volume) {
+    with (Volume_type) {
+        if (volume == 0)               return MUTE;
+        if (volume < volume.max/3)     return LOW;
+        if (volume < (volume.max/3)*2) return MID;
+        return HIGH;
+    }
+}
+
+enum
+Volume_type {
+    MUTE,
+    LOW,
+    MID,
+    HIGH,
+}
+

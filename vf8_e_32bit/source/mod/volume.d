@@ -5,62 +5,71 @@ import app : Event;
 struct
 Mod_volume (O) {
     O* o;
-    static ubyte volume;  
-
-    enum
-    Volume_type {
-        MUTE,
-        LOW,
-        MID,
-        HIGH,
-    }
+    ubyte volume;
+    ubyte unmuted_volume;
+    bool  muted;
 
     void
     VOLUME_MUTE () {
         with (o) {
-            ubyte volume = 0;
-            //send (VOLUME_INFO, 0);
-        }
-    }
+            if (muted) return;
 
-    void
-    VOLUME (Event* evt) {
-        with (o) {
-            ubyte volume;   
-            //send (VOLUME_INFO, volume);
-        }
-    }
-
-    void
-    VOLUME_UP (Event* evt) {  // -5%
-        with (o) {
-            volume += volume.max / 100 * 5;  
+            unmuted_volume = volume;
+            volume = 0;
+            muted = true;
             hub.VOLUME_INFO (volume);
         }
     }
 
     void
-    VOLUME_DN (Event* evt) { // -5%
+    VOLUME_UNMUTE () {
         with (o) {
-            volume -= volume.max / 100 * 5;  
+            if (!muted) return;
+
+            volume = unmuted_volume;
+            muted = false;
             hub.VOLUME_INFO (volume);
         }
     }
 
     void
-    VOLUME_GET_INFO (Event* evt) {
+    VOLUME () {
         with (o) {
             hub.VOLUME_INFO (volume);
         }
     }
 
-    Volume_type
-    _volume_type (ubyte volume) {
-        with (Volume_type) {
-            if (volume == 0)               return MUTE;
-            if (volume < volume.max/3)     return LOW;
-            if (volume < (volume.max/3)*2) return MID;
-            return HIGH;
+    void
+    VOLUME_UP () {  // +5%
+        with (o) {
+            auto d = (volume.max / 100 * 5);
+            auto able = volume.max - volume;
+            if (able > d) {
+                volume += d;
+            } else {
+                volume = volume.max;
+            }
+            hub.VOLUME_INFO (volume);
+        }
+    }
+
+    void
+    VOLUME_DN () { // -5%
+        with (o) {
+            auto d = (volume.max / 100 * 5);
+            if (volume > d) {
+                volume -= d;
+            } else {
+                volume = volume.min;
+            }
+            hub.VOLUME_INFO (volume);
+        }
+    }
+
+    void
+    VOLUME_GET_INFO () {
+        with (o) {
+            hub.VOLUME_INFO (volume);
         }
     }
 }
