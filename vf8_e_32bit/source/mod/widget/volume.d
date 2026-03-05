@@ -17,6 +17,7 @@ Volume {
     void
     SDL_MOUSEBUTTONDOWN (SDL_MouseButtonEvent* evt) {
         _super.SDL_MOUSEBUTTONDOWN (evt);
+        o.hub.REDRAW (evt.windowID);
     }
 
     void

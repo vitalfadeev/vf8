@@ -14,22 +14,25 @@ Hub {
     void
     register (T) (T* t) {
         writeln ("register: ", T.stringof);
-        foreach (fn_name; Functions!T) {
-            if (fn_name != fn_name.toUpper) continue;
+        Typed typed;
+        Rec*  rec;
+        static foreach (fn_name; Functions!T) {
+            static if (fn_name == fn_name.toUpper) {
+                writeln ("  ", fn_name);
 
-            writeln ("  ", fn_name);
+                typed.s.length = Parameters!(__traits(getMember,T,fn_name)).length;
+                static foreach(i,par; Parameters!(__traits(getMember,T,fn_name))) {
+                    typed.s[i] = typeid (par);
+                }
+                typed.dg = cast (DG) &__traits(getMember,t,fn_name); // delegate
 
-            Typed typed;
-            foreach(par; Parameters!(__traits(getMember,T,fn_name))) {
-                typed.s ~= typeid (par);
+                rec = fn_name in s;
+                if (rec !is null)
+                    rec.typeds ~= typed;
+                else
+                    s[fn_name] = Rec([typed]);
             }
-            typed.dg = cast (DG) &__traits(getMember,t,fn_name); // delegate
 
-            auto rec = fn_name in s;
-            if (rec !is null)
-                rec.typeds ~= typed;
-            else
-                s[fn_name] = Rec([typed]);
         }
     }
 
@@ -47,12 +50,16 @@ Hub {
     void
     opDispatch (string name, ARGS...) (ARGS args) {
         pragma (msg, "opDispatch: ", name, " ", ARGS);
-        writeln (name, " ", ARGS.stringof, ": ", args);
+        static if (ARGS.length)
+            writeln (name, " ", ARGS.stringof, " ", args);
+        else
+            writeln (name, " ", ARGS.stringof);
 
         // init
         Typed typed;
-        foreach (par; ARGS) {
-            typed.s ~= typeid (par);
+        typed.s.length = ARGS.length;
+        static foreach (i,par; ARGS) {
+            typed.s[i] = typeid (par);
         }
 
         // do
