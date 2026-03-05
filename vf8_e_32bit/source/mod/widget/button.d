@@ -65,7 +65,6 @@ Button {
 
     void
     DRAW (Renderer* renderer) {
-        writeln ("DRAW on Button");
         auto style = o.page.styles.get_style (cast (Widget*) &this);
         //auto style = evt.o.page.styles.get (name,flags);
 

@@ -208,7 +208,6 @@ Page (O) {
 
     void
     DRAW (uint windowID, Renderer* renderer) {
-        writeln (1);
         renderer.fonts = &fonts;
         with (o)
         hub.DRAW (renderer);  // to widgets

@@ -67,7 +67,7 @@ Hub {
         // info
         if (!found) {
             //assert (0, "Not found delegate for "~name~" ("~ARGS.stringof~")");
-            writeln ("Not found delegate for "~name~" ("~ARGS.stringof~")");
+            writeln (name, " ", ARGS.stringof, ", no listener ");
         }
     }
 

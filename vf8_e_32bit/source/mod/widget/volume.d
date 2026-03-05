@@ -55,7 +55,6 @@ Volume {
 
     void
     DRAW (Renderer* renderer) {
-        writeln ("DRAW on Volume");
         _super.DRAW (renderer);
     }
 }
