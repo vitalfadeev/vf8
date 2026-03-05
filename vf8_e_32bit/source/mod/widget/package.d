@@ -67,6 +67,7 @@ Mod_widget (O) {
 import importc_sdl;
 import app;
 import vf.sdl.renderer_sdl : Renderer;
+import std.stdio : writeln;
 
 struct
 Widget {
@@ -75,10 +76,11 @@ Widget {
     ubyte        value;
     ubyte        reserved;
     string       name;
+    Xywh         xywh;
 
     void
-    DRAW (Renderer* renderer, XYWH xywh) {
-        //
+    DRAW (Renderer* renderer) {
+        writeln ("default DRAW on widget");
     }
 
 
@@ -126,18 +128,19 @@ Widget {
 //    mixin Do_switch;
 //}
 
-mixin template
-Create () {
-    alias TWIDGET = typeof(this);
+//mixin template
+//Create () {
+//    alias TWIDGET = typeof(this);
 
-    static
-    TWIDGET*
-    create (ARGS...) (ARGS args) {
-        auto widget = new TWIDGET (args);
-        widget.name = TWIDGET.stringof;
-        return widget;
-    }    
-}
+//    static
+//    TWIDGET*
+//    create (ARGS...) (ARGS args) {
+//        auto widget = new TWIDGET (args);
+//        o.hub.register (widget);
+//        widget.name = TWIDGET.stringof;
+//        return widget;
+//    }    
+//}
 
 import vf.std.traits : Functions;
 

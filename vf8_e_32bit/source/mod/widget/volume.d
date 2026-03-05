@@ -2,28 +2,36 @@ module mod.widget.volume;
 
 version (SDL):
 import app : Event;
-import mod.widget : Widget,Create;
+import mod.widget : Widget;
 import vf.sdl.importc_sdl;
 import mod.widget.button;
 import mod.volume;
 import std.stdio : writeln;
-import vf.std.xywh : XYWH;
+import vf.sdl.renderer_sdl : Renderer;
 
 
 struct
 Volume {
     Button _super;
     alias _super this;
-    mixin Create;
-    //mixin OpDispatch;
+
+    void
+    SDL_MOUSEBUTTONDOWN (SDL_MouseButtonEvent* evt) {
+        _super.SDL_MOUSEBUTTONDOWN (evt);
+    }
+
+    void
+    SDL_MOUSEBUTTONUP (SDL_MouseButtonEvent* evt) {
+        _super.SDL_MOUSEBUTTONUP (evt);
+    }
 
     void
     SDL_MOUSEWHEEL (SDL_MouseWheelEvent* evt) {
         with (o)
         with (evt)
         switch (direction) with (SDL_MouseWheelDirection) {
-            case SDL_MOUSEWHEEL_NORMAL  : hub.VOLUME_UP (); writeln (1); break;
-            case SDL_MOUSEWHEEL_FLIPPED : hub.VOLUME_DN (); break;
+            case SDL_MOUSEWHEEL_NORMAL  : hub.VOLUME_UP (); hub.REDRAW (windowID); break;
+            case SDL_MOUSEWHEEL_FLIPPED : hub.VOLUME_DN (); hub.REDRAW (windowID); break;
             default                     :
         }
     }
@@ -40,28 +48,14 @@ Volume {
         //    case HIGH : value = 3; break;
         //    default   :
         //}
-        with (o)
-        //send (REDRAW, 1, null, XYWH());
-        hub.REDRAW (cast (uint)1, XYWH());
-        //(cast(Widget)this).REDRAW (1, null, XYWH());
-        //(this.as!Widget).REDRAW (1, null, XYWH());
+
+        //with (o)
+        //hub.REDRAW (windowID);
     }
 
-    //void
-    //DRAW (Event* evt) {
-    //    _super.DRAW (evt);
-    //}
-
-    struct
-    _Event {
-        enum
-        Type {
-            PRESS,    // request
-            PRESSED,
-            PRESS_INFO,
-            RELEASE,  // request
-            RELEASED,
-            RELEASE_INFO,
-        }
-    }    
+    void
+    DRAW (Renderer* renderer) {
+        writeln ("DRAW on Volume");
+        _super.DRAW (renderer);
+    }
 }

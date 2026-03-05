@@ -2,7 +2,7 @@ module vf.gui.layout;
 
 version (GUI):
 version (E_32BIT_PAGED):
-import vf.std.xywh     : XY,WH,XYWH;
+import vf.std.xywh     : Xy,Wh,Xywh;
 
 
 union
@@ -13,7 +13,7 @@ union {
     Quick_settings_layout   quick_settings;
 }
     auto range ()       { return grid.range (); }
-    auto select (XY xy) { return grid.select (xy); }
+    auto select (Xy xy) { return grid.select (xy); }
 
     enum 
     Type {
@@ -27,7 +27,7 @@ struct
 Grid_layout {
     Layout.Type type;
     // total
-    WH     total_wh;
+    Wh     total_wh;
     // xy
     ushort cells_on_x;
     ushort cells_on_y;
@@ -85,31 +85,31 @@ Grid_layout {
 
     Range
     range () {
-        return Range (&this);  // return XYWH,XYWH,...
+        return Range (&this);  // return Xywh,Xywh,...
     }
 
     auto
-    select (XY xy) {
+    select (Xy xy) {
         return filter (range,xy);
     }
 
     auto
-    filter (R) (R range, XY xy) {
+    filter (R) (R range, Xy xy) {
         return Filter!R (range,xy);
     }
 
     struct
     Filter (R) {
         R      range;
-        XY     xy;
+        Xy     xy;
         ubyte  i;
         import std.typecons;
-        alias  Result = Tuple!(ubyte,XYWH);
+        alias  Result = Tuple!(ubyte,Xywh);
         Result front () { return tuple (i,range.front); }
         bool   empty () { while (!range.empty && !range.front.has (xy)) this.popFront (); return range.empty; }
         void   popFront () { range.popFront; i++; }
 
-        this (R range, XY xy) {
+        this (R range, Xy xy) {
             this.range = range;
             this.xy = xy;
         }
@@ -122,7 +122,7 @@ Grid_layout {
         Loca loca;
         N    n;
 
-        XYWH front;
+        Xywh front;
         bool empty () { return n == 0; }
         void popFront () { 
             import std.range;
@@ -219,7 +219,7 @@ struct
 Quick_settings_layout {
     Layout.Type type;
     // total
-    WH     total_wh;
+    Wh     total_wh;
     // xy
     ushort cells1_on_x;
     ushort cells1_on_y;
@@ -274,7 +274,7 @@ Quick_settings_layout {
 
     Range
     range () {
-        return Range (&this);  // return XYWH,XYWH,...
+        return Range (&this);  // return Xywh,Xywh,...
     }
 
     struct
@@ -285,7 +285,7 @@ Quick_settings_layout {
         N    n;
         N    i;
 
-        XYWH front;
+        Xywh front;
         bool empty () { return n == 0; }
         void popFront () { 
             import std.range;

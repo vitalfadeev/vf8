@@ -1,7 +1,7 @@
 module mod.click;
 
 import app : Event;
-import vf.std.xywh : XY;
+import vf.std.xywh : Xy;
 
 
 struct

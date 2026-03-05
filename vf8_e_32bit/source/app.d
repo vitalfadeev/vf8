@@ -3,7 +3,7 @@ import std.stdio;
 import hub 								: Hub;
 import vf.gui.page                      : Page;
 import vf.gui.color                     : Color;
-import vf.std.xywh                      : XY,WH,XYWH;
+import vf.std.xywh                      : Xy,Wh,Xywh;
 import vf.gui.style 					: Style;
 import mod.widget 						: Widget;
 version (SDL) import vf.sdl.input       : Input;
@@ -14,10 +14,10 @@ version (SDL) import vf.sdl.importc_sdl : SDL_GetWindowFromID, SDL_DestroyWindow
 void 
 main () {
 	auto o = O ();
-	o.page = Page ();
-
-	// Register
 	with (o) {
+		page = new Page!O (&o);
+
+		// Register
 		version (SDL) import mod.sdl : Mod_sdl;
 		version (SDL) 
 		hub.register (new Mod_sdl!O (&o));
@@ -25,8 +25,8 @@ main () {
 		hub.register (new Mod!O (&o));
 	    import mod.sdl_wm : Mod_sdl_wm;
 		hub.register (new Mod_sdl_wm!O (&o));
-	    import mod.draw : Mod_draw;
-		hub.register (new Mod_draw!O (&o));
+		//
+		hub.register (o.page);
 	    import mod.widget : Mod_widget;
 		hub.register (new Mod_widget!O (&o));
 	    import mod.volume : Mod_volume;
@@ -34,17 +34,16 @@ main () {
 	    version (ACTIONS) import mod.action : Mod_action;
 		version (ACTIONS) 
 		hub.register (new Mod_action!O (&o));
-	}
 
-	// INIT
-	with (o)
-	hub.INIT ();
+		// INIT
+		hub.INIT ();
+		hub.LAYOUT ();
 
-	// Event loop
-	with (o)
-	foreach (evt; input) {
-		hub.DO_SWITCH (evt);
-		if (quit) break;
+		// Event loop
+		foreach (evt; input) {
+			hub.DO_SWITCH (evt);
+			if (quit) break;
+		}
 	}
 }
 
@@ -53,8 +52,8 @@ struct
 O {
     Input!Event input;
     bool 		quit;
-    Page        page;  // base page
-    Page[]      pages;
+    Page!O*     page;  // base page
+    //Page*[]      pages;
     Hub         hub;
 }
 
@@ -83,8 +82,8 @@ Mod (O) {
 
 	void
 	init_window () {
-		import vf.sdl.wm : Wm;
-		Wm!O (o).new_window ();
+		with (o)
+		hub.NEW_WINDOW (1024,600);
 	}
 
 	void

@@ -4,7 +4,6 @@ version (SDL):
 import app : Event;
 import vf.std.xywh;
 import vf.sdl.importc_sdl;
-import vf.sdl.wm : Wm;
 
 
 struct

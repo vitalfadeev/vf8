@@ -33,7 +33,7 @@ Send (Event) {  // if (is (Event==struct) && is(Event.Type == enum))
     }
     import vf.sdl.renderer_sdl : Renderer;
     void
-    send (const Event.Type type, uint windowID, Renderer* renderer, XYWH xywh) {
+    send (const Event.Type type, uint windowID, Renderer* renderer, Xywh xywh) {
         Event evt;
         switch (type) with (Event.Type) {
             case DRAW        : evt.draw   = typeof(evt.draw)   (type,windowID,renderer,xywh); break;
@@ -44,7 +44,7 @@ Send (Event) {  // if (is (Event==struct) && is(Event.Type == enum))
         input ~= &evt;
     }
     void
-    send (const Event.Type type, uint windowID, XYWH xywh) {
+    send (const Event.Type type, uint windowID, Xywh xywh) {
         Event evt;
         switch (type) with (Event.Type) {
             case REDRAW      : evt.redraw = typeof(evt.redraw) (type,windowID,xywh); break;

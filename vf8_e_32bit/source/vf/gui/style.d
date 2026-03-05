@@ -1,6 +1,6 @@
 module vf.gui.style;
 
-import vf.std.xywh   : WH;
+import vf.std.xywh   : Wh;
 import vf.gui.color  : Color;
 import mod.widget    : Widget;
 
@@ -12,7 +12,7 @@ Style {
     Widget.Flags flags;
     
     // rules
-    WH    wh;
+    Wh    wh;
     ubyte fg;
     ubyte bg;
     ubyte font;

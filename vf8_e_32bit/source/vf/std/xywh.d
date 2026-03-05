@@ -1,7 +1,7 @@
 module vf.std.xywh;
 
 struct
-XY {
+Xy {
 union {
     ushort a;
 struct {
@@ -16,7 +16,7 @@ struct {
 }
 
 struct
-WH {
+Wh {
 union {
     ushort a;
 struct {
@@ -32,12 +32,12 @@ struct {
 }
 
 struct
-XYWH {
+Xywh {
 union {
     uint a;
 struct {
-    XY xy;
-    WH wh;
+    Xy xy;
+    Wh wh;
 }
 struct {
     uint x;
@@ -48,7 +48,7 @@ struct {
 }
 
     bool
-    has (XY xy) {
+    has (Xy xy) {
         if (this.x <= xy.x)
         if (this.y <= xy.y)
         if (xy.x < this.x + this.w)
@@ -60,6 +60,6 @@ struct {
     string
     toString () {
         import std.format;
-        return format!"XYWH(%3d,%3d %3d x%3d)" (x,y,w,h);
+        return format!"Xywh(%3d,%3d %3d x%3d)" (x,y,w,h);
     }
 }

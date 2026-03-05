@@ -6,7 +6,7 @@ version (E_32BIT_PAGED):
 import vf.std.tstring256;
 import vf.gui.color    : Color;
 import vf.gui.layout   : Layout;
-import vf.std.xywh     : XY,WH,XYWH;
+import vf.std.xywh     : Xy,Wh,Xywh;
 import vf.gui.style    : Style;
 import vf.sdl.window   : Window;
 
@@ -20,12 +20,14 @@ import mod.widget           : Widget;
 import mod.widget.button    : Button;
 import mod.widget.volume    : Volume;
 import std.traits           : EnumMembers;
+import vf.sdl.renderer_sdl  : Renderer;
 import std.stdio : writeln;
 
 
 struct
-Page {
-    WH           wh;         // ushort x ushort  16368 x 16368
+Page (O) {
+    O* o;
+    Wh           wh;         // ushort x ushort  16368 x 16368
     Layout       layout;     // grid, ...
     Colors       colors;
     Fonts        fonts;
@@ -109,19 +111,30 @@ Page {
         strings.s[5] = "󰀝󰀝󰀝󰀝";
     }
 
+    TWIDGET*
+    create (TWIDGET,ARGS...) (ARGS args) {
+        auto twidget = new TWIDGET (args);
+        o.hub.register (twidget);
+        auto widget = cast (Widget*) twidget;
+        widget.o    = o;
+        widget.name = TWIDGET.stringof;
+        widgets.s ~= widget;
+        return twidget;
+    }        
+
     void
     _init_widgets () {
         widgets._init ();
  
         foreach (ubyte i; 0..9) {
-            widgets.s ~= cast (Widget*) Button.create;
+            create!Button;
             widgets.s[$-1].flags.enabled = true;
         }        
 
-        widgets.s ~= cast (Widget*) Volume.create;
+        create!Volume;
         widgets.s[$-1].flags.enabled = true;
 
-        widgets.s ~= cast (Widget*) Button.create;
+        create!Button;
         widgets.s[$-1].flags.enabled = true;
     }
 
@@ -181,5 +194,33 @@ Page {
         // max
         // 256 types * 6 flags = 1536 * 10 = 15_360 Bytes
         // 256 types * 2^6 flags = 256*64 = 16384 *10 = 163_840 Bytes
+    }
+
+    void
+    LAYOUT () {
+        import std.range : lockstep;
+
+        // all widgets
+        foreach (widget,xywh; lockstep (widgets.s, layout.range)) {
+            widget.xywh = xywh;  // cache xywh
+        }
+    }
+
+    void
+    DRAW (uint windowID, Renderer* renderer) {
+        writeln (1);
+        renderer.fonts = &fonts;
+        with (o)
+        hub.DRAW (renderer);  // to widgets
+    }
+
+    void
+    REDRAW (uint windowID) {
+        with (o) {
+            Renderer renderer;
+            renderer.draw_start (windowID);
+            hub.DRAW (windowID, &renderer);  // to Page
+            renderer.draw_end (windowID);
+        }
     }
 }

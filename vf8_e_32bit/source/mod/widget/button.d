@@ -2,24 +2,27 @@ module mod.widget.button;
 
 version (SDL):
 import app : Event;
-import mod.widget : Widget,Create;
+import mod.widget : Widget;
 import vf.sdl.importc_sdl;
 import vf.sdl.renderer_sdl : Renderer;
-import vf.std.xywh : XYWH;
+import vf.std.xywh : Xywh;
+import vf.std.xywh : Xy;
+import std.stdio : writeln;
 
 
 struct
 Button {
     Widget _super;
     alias _super this;
-    mixin Create;
 
     void
     SDL_MOUSEBUTTONDOWN (SDL_MouseButtonEvent* evt) {
+        if (!xywh.has (Xy (evt.x, evt.y))) return;
+
         with (o)
         with (evt)
         switch (button) {
-            case SDL_BUTTON_LEFT   : flags.pressed = true; hub.PRESSED (); break;
+            case SDL_BUTTON_LEFT   : this.PRESS (); hub.REDRAW (windowID); break;
             case SDL_BUTTON_MIDDLE : break;
             case SDL_BUTTON_RIGHT  : break;
             case SDL_BUTTON_X1     : break;
@@ -30,10 +33,12 @@ Button {
 
     void
     SDL_MOUSEBUTTONUP (SDL_MouseButtonEvent* evt) {
+        if (!xywh.has (Xy (evt.x, evt.y))) return;
+
         with (o)
         with (evt)
         switch (button) {
-            case SDL_BUTTON_LEFT   : flags.pressed = false; hub.RELEASED (); break;
+            case SDL_BUTTON_LEFT   : this.RELEASE (); hub.REDRAW (windowID); break;
             case SDL_BUTTON_MIDDLE : break;
             case SDL_BUTTON_RIGHT  : break;
             case SDL_BUTTON_X1     : break;
@@ -45,7 +50,7 @@ Button {
     void
     PRESS () {
         with (o) {
-            flags.pressed = true; 
+            flags.pressed = true;
             hub.PRESSED ();
         }
     }
@@ -59,7 +64,8 @@ Button {
     }
 
     void
-    DRAW (Renderer* renderer, XYWH xywh) {
+    DRAW (Renderer* renderer) {
+        writeln ("DRAW on Button");
         auto style = o.page.styles.get_style (cast (Widget*) &this);
         //auto style = evt.o.page.styles.get (name,flags);
 
@@ -93,17 +99,4 @@ Button {
             renderer.draw_text (font,x,y,w,h,page.colors.s[fg],page.colors.s[bg],txt);
         }
     }
-
-    struct
-    _Event {
-        enum
-        Type {
-            PRESS,    // request
-            PRESSED,
-            PRESS_INFO,
-            RELEASE,  // request
-            RELEASED,
-            RELEASE_INFO,
-        }
-    }    
 }

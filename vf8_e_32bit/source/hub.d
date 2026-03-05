@@ -11,13 +11,15 @@ Hub {
 
     void
     register (T) (T* t) {
+        writeln ("register: ", T.stringof);
         foreach (fn_name; Functions!T) {
             if (fn_name != fn_name.toUpper) continue;
 
+            writeln ("  ", fn_name);
+
             Typed typed;
-            typed.length = Parameters!(__traits(getMember,T,fn_name)).length;
-            foreach(i,par; Parameters!(__traits(getMember,T,fn_name))) {
-                typed.s[i] = typeid (par);
+            foreach(par; Parameters!(__traits(getMember,T,fn_name))) {
+                typed.s ~= typeid (par);
             }
             typed.dg = cast (DG) &__traits(getMember,t,fn_name); // delegate
 
@@ -30,15 +32,28 @@ Hub {
     }
 
     void
+    unregister (T) (T* t) {
+        foreach (ref _rec; s) {
+            foreach (ref _typed; _rec.typeds) {
+                if (_typed.dg.ptr == t) {
+                    // remove _typed
+                }
+            }
+        }
+    }
+
+    void
     opDispatch (string name, ARGS...) (ARGS args) {
         pragma (msg, "opDispatch: ", name, " ", ARGS);
+        // init
         Typed typed;
-        typed.length = ARGS.length;
-        foreach(i,par; ARGS) {
-            typed.s[i] = typeid (par);
+        foreach (par; ARGS) {
+            typed.s ~= typeid (par);
         }
 
+        // do
         bool found = false;
+
         auto _rec = name in s;
         if (_rec !is null) {
             foreach (ref _typed; _rec.typeds) {
@@ -49,26 +64,29 @@ Hub {
             }
         }
 
+        // info
         if (!found) {
             //assert (0, "Not found delegate for "~name~" ("~ARGS.stringof~")");
+            writeln ("Not found delegate for "~name~" ("~ARGS.stringof~")");
         }
     }
+
 
     struct
     Rec {
         Typed[] typeds;
     }
+
     struct
     Typed {
-        size_t           length;
-        TypeInfo[8]      s; // max 8 types
-        DG               dg;
+        TypeInfo[] s; // max 8 types
+        DG         dg;
 
         bool
         opEquals (Typed b) {
-            if (this.length != b.length)
+            if (this.s.length != b.s.length)
                 return false;
-            for (auto i=0; i < this.length; i++)
+            for (auto i=0; i < this.s.length; i++)
                 if (this.s[i] != b.s[i])
                     return false;
 
