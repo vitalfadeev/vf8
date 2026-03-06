@@ -1,11 +1,12 @@
 module mod.action;
 
+version (ACTIONS):
 import app : Event;
+import app : o;
 
 
 struct
-Mod_action (O) {
-    O* o;
+Action {
 
     void
     do_switch (Event* evt) {

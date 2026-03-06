@@ -15,12 +15,4 @@ Widgets {
     _init () {
         //
     }
-
-    void
-    do_switch (Event* evt) {
-        //foreach (Widget* widget; s.range) {
-        //    if (widget.flags.enabled)
-        //        widget.do_switch (evt);
-        //}
-    }
 }

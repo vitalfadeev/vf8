@@ -1,12 +1,14 @@
 module mod.widget.volume;
 
 version (SDL):
-import app : Event;
-import mod.widget : Widget;
+import mod.widget          : Widget;
 import vf.sdl.importc_sdl;
 import mod.widget.button;
-import std.stdio : writeln;
 import vf.sdl.renderer_sdl : Renderer;
+import vf.gui.style        : Style;
+import app : o;
+import std.stdio : writeln;
+import vf.std.xywh         : Xy;
 
 
 struct
@@ -16,12 +18,14 @@ Volume {
 
     void
     SDL_MOUSEBUTTONDOWN (SDL_MouseButtonEvent* evt) {
+        writeln ("Volume SDL_MOUSEBUTTONDOWN");
+        if (!xywh.has (Xy (evt.x, evt.y))) return;
         _super.SDL_MOUSEBUTTONDOWN (evt);
-        o.hub.REDRAW (evt.windowID);
     }
 
     void
     SDL_MOUSEBUTTONUP (SDL_MouseButtonEvent* evt) {
+        if (!xywh.has (Xy (evt.x, evt.y))) return;
         _super.SDL_MOUSEBUTTONUP (evt);
     }
 
@@ -52,8 +56,8 @@ Volume {
     }
 
     void
-    DRAW (Renderer* renderer) {
-        _super.DRAW (renderer);
+    draw (Style* style, Renderer* renderer) {
+        _super.draw (style, renderer);
     }
 }
 

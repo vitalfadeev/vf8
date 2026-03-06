@@ -17,22 +17,13 @@ Renderer {
     }
 
     void
-    draw_start (uint windowID) {
-        SDL_Window* window = SDL_GetWindowFromID (windowID);
-        draw_start (window);
-    }
-    void
     draw_start (SDL_Window* window) {
         _renderer = new_renderer (window);
+        // clear
         SDL_SetRenderDrawColor (_renderer, 0x00, 0x00, 0x00, 0xFF);
         SDL_RenderClear (_renderer);
     }
 
-    void
-    draw_end (uint windowID) {
-        SDL_Window* window = SDL_GetWindowFromID (windowID);
-        draw_end (window);
-    }
     void
     draw_end (SDL_Window* window) {
         // Rasterize
@@ -56,14 +47,14 @@ Renderer {
     }
 
     void
-    draw_text (uint font_id, uint x, uint y, uint w, uint h, Color fg, Color bg, string text) {
+    draw_text (TTF_Font* font, uint x, uint y, uint w, uint h, Color fg, Color bg, string text) {
         import vf.sdl.draw_char;
         
         if (text.length == 0) return;
 
         int size_w,size_h;
         auto surface = 
-            _draw_text (fonts.s[font_id],x,y,w,h,fg,bg,text, &size_w,&size_h);
+            _draw_text (font,x,y,w,h,fg,bg,text, &size_w,&size_h);
         scope (exit) SDL_FreeSurface (surface);
 
         SDL_Texture* texture = SDL_CreateTextureFromSurface (_renderer, surface);

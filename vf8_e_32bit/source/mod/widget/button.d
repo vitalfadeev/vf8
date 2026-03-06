@@ -1,13 +1,14 @@
 module mod.widget.button;
 
 version (SDL):
-import app : Event;
-import mod.widget : Widget;
+import mod.widget          : Widget;
 import vf.sdl.importc_sdl;
 import vf.sdl.renderer_sdl : Renderer;
-import vf.std.xywh : Xywh;
-import vf.std.xywh : Xy;
+import vf.std.xywh         : Xywh;
+import vf.std.xywh         : Xy;
+import vf.gui.style        : Style;
 import std.stdio : writeln;
+import app : o;
 
 
 struct
@@ -18,11 +19,12 @@ Button {
     void
     SDL_MOUSEBUTTONDOWN (SDL_MouseButtonEvent* evt) {
         if (!xywh.has (Xy (evt.x, evt.y))) return;
+        writeln ("Button SDL_MOUSEBUTTONDOWN");
 
         with (o)
         with (evt)
         switch (button) {
-            case SDL_BUTTON_LEFT   : this.PRESS (); hub.REDRAW (windowID); break;
+            case SDL_BUTTON_LEFT   : this.PRESS (); page.redraw (&this._super); break;
             case SDL_BUTTON_MIDDLE : break;
             case SDL_BUTTON_RIGHT  : break;
             case SDL_BUTTON_X1     : break;
@@ -38,7 +40,7 @@ Button {
         with (o)
         with (evt)
         switch (button) {
-            case SDL_BUTTON_LEFT   : this.RELEASE (); hub.REDRAW (windowID); break;
+            case SDL_BUTTON_LEFT   : this.RELEASE (); page.redraw (&this._super); break;
             case SDL_BUTTON_MIDDLE : break;
             case SDL_BUTTON_RIGHT  : break;
             case SDL_BUTTON_X1     : break;
@@ -64,15 +66,12 @@ Button {
     }
 
     void
-    DRAW (Renderer* renderer) {
-        auto style = o.page.styles.get_style (cast (Widget*) &this);
-        //auto style = evt.o.page.styles.get (name,flags);
-
+    draw (Style* style, Renderer* renderer) {
         with (o)
         with (style)
         with (xywh)
         if (w > 0 && h > 0)
-            renderer.draw_rect (x,y,w,h,page.colors.s[fg],page.colors.s[bg]);
+            renderer.draw_rect (x,y,w,h,style.get.fg,style.get.bg);
 
         with (o)
         with (style)
@@ -85,7 +84,7 @@ Button {
             import std.array;
             import std.conv;
             import std.uni;
-            auto str = page.strings.s[text];
+            auto str = style.get.text;
             string txt;
 
             txt = str.byGrapheme
@@ -95,7 +94,7 @@ Button {
                 .byCodePoint
                 .text;
 
-            renderer.draw_text (font,x,y,w,h,page.colors.s[fg],page.colors.s[bg],txt);
+            renderer.draw_text (get.font,x,y,w,h,style.get.fg,style.get.bg,txt);
         }
     }
 }

@@ -2,12 +2,11 @@ module mod.click;
 
 import app : Event;
 import vf.std.xywh : Xy;
+import app : o;
 
 
 struct
-Mod_click (O) {
-    O* o;
-
+Click {
     void
     INIT () {
         //

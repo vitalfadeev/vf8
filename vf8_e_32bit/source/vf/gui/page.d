@@ -8,7 +8,6 @@ import vf.gui.color    : Color;
 import vf.gui.layout   : Layout;
 import vf.std.xywh     : Xy,Wh,Xywh;
 import vf.gui.style    : Style;
-import vf.sdl.window   : Window;
 
 import vf.gui.page_.colors  : Colors;
 import vf.gui.page_.fonts   : Fonts;
@@ -21,12 +20,14 @@ import mod.widget.button    : Button;
 import mod.widget.volume    : Volume;
 import std.traits           : EnumMembers;
 import vf.sdl.renderer_sdl  : Renderer;
+import vf.sdl.importc_sdl   : SDL_Window;
+import mod.sdl_wm           : Sdl_wm;
 import std.stdio : writeln;
-
+import app : o;
+import std.stdio : writefln;
 
 struct
-Page (O) {
-    O* o;
+Page {
     Wh           wh;         // ushort x ushort  16368 x 16368
     Layout       layout;     // grid, ...
     Colors       colors;
@@ -35,7 +36,7 @@ Page (O) {
     Strings      strings;
     Actions      actions;
     Styles       styles;
-    Window*      window;
+    SDL_Window*  window;
 
     //void
     //do_switch (Event* evt) {
@@ -44,6 +45,7 @@ Page (O) {
 
     void
     _init () {
+        _init_window  ();
         _init_colors  ();
         _init_fonts   ();
         _init_icons   ();
@@ -55,10 +57,14 @@ Page (O) {
     }
 
     void
+    _init_window () {
+        window = Sdl_wm.new_window (wh.w, wh.h);
+    }
+
+    void
     _init_layout () {
         with (layout.grid) {
-            import vf.sdl.window : WINDOW_DEFAULT_W, WINDOW_DEFAULT_H;
-            total_wh.w     = WINDOW_DEFAULT_W;
+            total_wh.w     = wh.w;
             total_wh.h     = 64;
             cells_offset_x =  0;
             cells_space_x  =  0;
@@ -116,8 +122,9 @@ Page (O) {
         auto twidget = new TWIDGET (args);
         o.hub.register (twidget);
         auto widget = cast (Widget*) twidget;
-        widget.o    = o;
-        widget.name = TWIDGET.stringof;
+        widget.name    = TWIDGET.stringof;
+        widget.page    = &this;
+        widget.draw_dg = &twidget.draw;
         widgets.s ~= widget;
         return twidget;
     }        
@@ -197,7 +204,7 @@ Page (O) {
     }
 
     void
-    LAYOUT () {
+    _layout () {
         import std.range : lockstep;
 
         // all widgets
@@ -207,19 +214,33 @@ Page (O) {
     }
 
     void
-    DRAW (uint windowID, Renderer* renderer) {
-        renderer.fonts = &fonts;
-        with (o)
-        hub.DRAW (renderer);  // to widgets
+    draw (Renderer* renderer) {
+        writeln ("PAGE DRAW");
+        foreach (widget; widgets.s) {
+            auto style = styles.get_style (widget);
+            style.get.fg   = colors.s[style.fg];
+            style.get.bg   = colors.s[style.bg];
+            style.get.text = strings.s[style.text];
+            style.get.font = fonts.s[style.font];
+
+            widget.draw_dg (style, renderer);
+        }
     }
 
     void
-    REDRAW (uint windowID) {
+    redraw (Widget* widget) {
+        writeln ("PAGE REDRAW");
         with (o) {
+            auto style = styles.get_style (widget);
+            style.get.fg   = colors.s[style.fg];
+            style.get.bg   = colors.s[style.bg];
+            style.get.text = strings.s[style.text];
+            style.get.font = fonts.s[style.font];
+
             Renderer renderer;
-            renderer.draw_start (windowID);
-            hub.DRAW (windowID, &renderer);  // to Page
-            renderer.draw_end (windowID);
+            renderer.draw_start (window);
+            draw (&renderer);
+            renderer.draw_end (window);
         }
     }
 }

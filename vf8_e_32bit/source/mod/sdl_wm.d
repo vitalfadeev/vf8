@@ -4,15 +4,18 @@ version (SDL):
 import app : Event;
 import vf.std.xywh;
 import vf.sdl.importc_sdl;
-import vf.sdl.window : Window;
-import vf.sdl.window : WINDOW_DEFAULT_W, WINDOW_DEFAULT_H;
 import vf.sdl.renderer_sdl : Renderer;
+import vf.sdl.exceptions   : SDLException;
+import app : o;
+import std.stdio : writeln;
+
+enum WINDOW_DEFAULT_W = 1024;
+enum WINDOW_DEFAULT_H = 480;
 
 
 struct
-Mod_sdl_wm (O) {
-    O* o;
-    Window[] s;
+Sdl_wm {
+    static SDL_Window*[] s;
 
     void
     INIT () {
@@ -24,8 +27,9 @@ Mod_sdl_wm (O) {
         with (o)
         with (evt)
         switch (event) with (SDL_WindowEventID) {
-            case SDL_WINDOWEVENT_CLOSE   : _close_window (windowID); break;
-            case SDL_WINDOWEVENT_EXPOSED : _send_draw (windowID); break;
+            case SDL_WINDOWEVENT_SHOWN   : _shown   (windowID); break;
+            case SDL_WINDOWEVENT_EXPOSED : _exposed (windowID); break;
+            case SDL_WINDOWEVENT_CLOSE   : _close   (windowID); break;
             default                      :
         }
     }
@@ -44,28 +48,48 @@ Mod_sdl_wm (O) {
     //}
 
     void
-    NEW_WINDOW (int w=WINDOW_DEFAULT_W, int h=WINDOW_DEFAULT_H) {
-        s ~= Window (w,h);
+    _shown (uint windowID) {
+        writeln ("SHOWN");
+        auto _sdl_window = SDL_GetWindowFromID (windowID);
+        if (!_sdl_window) return;
+
+        s ~= _sdl_window;
+    }
+
+    void
+    _exposed (uint windowID) {
+        writeln ("EXPOSED");
+        _send_draw (windowID);
     }
 
     void
     _send_draw (uint windowID) {
+        writeln ("SEND DRAW");
         with (o) {
-            Renderer renderer;
-            renderer.draw_start (windowID);
-            hub.DRAW (windowID, &renderer);  // to Page
-            renderer.draw_end (windowID);
+            // Page with window
+            foreach (page; o.pages) {
+                auto _sdl_window = SDL_GetWindowFromID (windowID);
+                if (!_sdl_window) return;
+                writeln ("SEND DRAW 2");
+
+                if (page.window == _sdl_window) {
+                    Renderer renderer;
+                    renderer.draw_start (_sdl_window);
+                    page.draw (&renderer);  // to Page
+                    renderer.draw_end (_sdl_window);
+                }
+            }        
         }
     }
 
     void
-    _close_window (uint windowID) {
+    _close (uint windowID) {
         auto _sdl_window = SDL_GetWindowFromID (windowID);
         if (!_sdl_window) return;
         SDL_DestroyWindow (_sdl_window);
 
         import std.algorithm : countUntil, remove;
-        auto _i = countUntil!"a.window == b" (s, _sdl_window);
+        auto _i = countUntil!"a == b" (s, _sdl_window);
         if (_i != -1) s = s.remove (_i);
 
         _quit_on_last_window ();
@@ -75,6 +99,30 @@ Mod_sdl_wm (O) {
     _quit_on_last_window () {
         if (s.length == 0) o.quit = true;
     }
+
+    static
+    SDL_Window*
+    new_window (int w=WINDOW_DEFAULT_W, int h=WINDOW_DEFAULT_H) {
+        // Window
+        auto window = 
+            SDL_CreateWindow (
+                __FILE_FULL_PATH__, // "SDL2 Window",
+                SDL_WINDOWPOS_CENTERED_DISPLAY (0),
+                SDL_WINDOWPOS_CENTERED_DISPLAY (0),
+                w, h,
+                SDL_WINDOW_RESIZABLE
+                // | SDL_WINDOW_VULKAN
+                // | SDL_WINDOW_ALLOW_HIGHDPI
+            );
+
+        if (!window)
+            throw new SDLException ("Failed to create window");
+
+        // Update
+        SDL_UpdateWindowSurface (window);
+
+        return window;
+    }        
 }
 
 void

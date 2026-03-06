@@ -4,12 +4,11 @@ version (SDL):
 import app : Event;
 import vf.std.xywh;
 import vf.sdl.importc_sdl;
+import app : o;
 
 
 struct
-Mod_sdl (O) {
-    O* o;
-
+Sdl {
     void
     DO_SWITCH (Event* evt) {
         log_event (evt);

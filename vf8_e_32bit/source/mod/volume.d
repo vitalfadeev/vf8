@@ -1,10 +1,10 @@
 module mod.volume;
 
 import app : Event;
+import app : o;
 
 struct
-Mod_volume (O) {
-    O* o;
+Volume {
     ubyte volume;
     ubyte unmuted_volume;
     bool  muted;

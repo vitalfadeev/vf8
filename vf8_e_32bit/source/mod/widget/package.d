@@ -7,12 +7,11 @@ import vf.sdl.importc_sdl;
 import mod.widget.button;
 //import mod.widget.volume;
 import mod.volume;
+import app : o;
 
 
 struct
-Mod_widget (O) {
-    O* o;
-
+Mod_widget {
     void
     SDL_BUTTON (SDL_MouseButtonEvent* evt) {
         with (evt) {
@@ -68,20 +67,26 @@ import importc_sdl;
 import app;
 import vf.sdl.renderer_sdl : Renderer;
 import std.stdio : writeln;
+import vf.gui.style : Style;
+import vf.gui.page : Page;
+import vf.sdl.renderer_sdl : Renderer;
 
 struct
 Widget {
-    O*           o;
-    Widget.Flags flags;
+    Widget.Flags flags;  
     ubyte        value;
     ubyte        reserved;
-    string       name;
+    string       name;  // for find style
     Xywh         xywh;
+    Page*        page;
+    DRAW_DG      draw_dg;
 
-    void
-    DRAW (Renderer* renderer) {
+    alias DRAW_DG = void delegate (Style* style, Renderer* renderer);
+
+    void 
+    _draw (Style* style, Renderer* renderer) {
         writeln ("default DRAW on widget");
-    }
+    };
 
 
     auto 

@@ -6,38 +6,41 @@ import vf.gui.color                     : Color;
 import vf.std.xywh                      : Xy,Wh,Xywh;
 import vf.gui.style 					: Style;
 import mod.widget 						: Widget;
+import std.string 						: startsWith;
 version (SDL) import vf.sdl.input       : Input;
 version (SDL) import vf.sdl.importc_sdl : SDL_Event,SDL_EventType, SDL_WindowEventID;
 version (SDL) import vf.sdl.importc_sdl : SDL_GetWindowFromID, SDL_DestroyWindow;
 
 
+static O o;
+
 void 
 main () {
-	auto o = O ();
+	o = O ();
 	with (o) {
-		page = new Page!O (&o);
-
 		// Register
-		version (SDL) import mod.sdl : Mod_sdl;
-		version (SDL) 
-		hub.register (new Mod_sdl!O (&o));
-		//
-		hub.register (new Mod!O (&o));
-	    import mod.sdl_wm : Mod_sdl_wm;
-		hub.register (new Mod_sdl_wm!O (&o));
-		//
-		hub.register (o.page);
-	    import mod.widget : Mod_widget;
-		hub.register (new Mod_widget!O (&o));
-	    import mod.volume : Mod_volume;
-		hub.register (new Mod_volume!O (&o));
-	    version (ACTIONS) import mod.action : Mod_action;
-		version (ACTIONS) 
-		hub.register (new Mod_action!O (&o));
+		import mod.sdl;
+		import mod.sdl_wm;
+		import mod.widget;
+		import mod.volume;
+		version (ACTIONS) import mod.action;
+
+		hub.register (new Sdl);
+		hub.register (new Sdl_wm);
+		hub.register (new Mod_widget);
+		hub.register (new Volume);
+		version (ACTIONS) hub.register (new Actions);
 
 		// INIT
 		hub.INIT ();
 		hub.LAYOUT ();
+
+		// Load page
+		pages ~= new Page ();
+		pages[$-1].wh.w = 1024;
+		pages[$-1].wh.h = 600;
+		pages[$-1]._init ();
+		pages[$-1]._layout ();
 
 		// Event loop
 		foreach (evt; input) {
@@ -52,8 +55,7 @@ struct
 O {
     Input!Event input;
     bool 		quit;
-    Page!O*     page;  // base page
-    //Page*[]      pages;
+    Page*[]     pages;
     Hub         hub;
 }
 
@@ -68,33 +70,6 @@ struct
 Event {
     SDL_Event sdl;
     alias sdl this;
-}
-
-struct
-Mod (O) {
-	O* o;
-
-	void
-	INIT () {
-		init_window ();
-		init_gui ();
-	}
-
-	void
-	init_window () {
-		with (o)
-		hub.NEW_WINDOW (1024,600);
-	}
-
-	void
-	init_gui () {
-		_init_page ();
-	}
-
-	void
-	_init_page () {
-	    o.page._init ();
-	}
 }
 
 

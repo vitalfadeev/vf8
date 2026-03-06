@@ -13,7 +13,7 @@ Hub {
 
     void
     register (T) (T* t) {
-        writeln ("register: ", T.stringof);
+        writeln ("register: ", T.stringof, " ", t);
         Typed typed;
         Rec*  rec;
         static foreach (fn_name; Functions!T) {
@@ -51,9 +51,9 @@ Hub {
     opDispatch (string name, ARGS...) (ARGS args) {
         pragma (msg, "opDispatch: ", name, " ", ARGS);
         static if (ARGS.length)
-            writeln (name, " ", ARGS.stringof, " ", args);
+            writeln ("  ", name, " ", ARGS.stringof, " ", args);
         else
-            writeln (name, " ", ARGS.stringof);
+            writeln ("  ", name, " ", ARGS.stringof);
 
         // init
         Typed typed;
@@ -66,19 +66,19 @@ Hub {
         bool found = false;
 
         auto _rec = name in s;
-        if (_rec !is null) {
-            foreach (ref _typed; _rec.typeds) {
-                if (_typed == typed) {
-                    (cast (void delegate (ARGS)) _typed.dg) (args);
-                    found = true;
-                }
+        if (_rec !is null)
+        foreach (ref _typed; _rec.typeds) {
+            if (_typed == typed) {
+                writeln ("    DO ", _typed.dg.ptr);
+                (cast (void delegate (ARGS)) _typed.dg) (args);
+                found = true;
             }
         }
 
         // info
         if (!found) {
             //assert (0, name~ " "~ ARGS.stringof~ ", no listener ");
-            writeln (name, " ", ARGS.stringof, ", no listener ");
+            writeln ("  ", name, " ", ARGS.stringof, ", no listener ");
         }
     }
 
