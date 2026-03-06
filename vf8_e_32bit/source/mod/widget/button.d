@@ -19,7 +19,6 @@ Button {
     void
     SDL_MOUSEBUTTONDOWN (SDL_MouseButtonEvent* evt) {
         if (!xywh.has (Xy (evt.x, evt.y))) return;
-        writeln ("Button SDL_MOUSEBUTTONDOWN");
 
         with (o)
         with (evt)

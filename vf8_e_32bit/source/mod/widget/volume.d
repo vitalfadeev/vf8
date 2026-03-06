@@ -18,7 +18,6 @@ Volume {
 
     void
     SDL_MOUSEBUTTONDOWN (SDL_MouseButtonEvent* evt) {
-        writeln ("Volume SDL_MOUSEBUTTONDOWN");
         if (!xywh.has (Xy (evt.x, evt.y))) return;
         _super.SDL_MOUSEBUTTONDOWN (evt);
     }

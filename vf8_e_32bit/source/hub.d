@@ -2,9 +2,10 @@ import vf.std.traits : Functions;
 
 import std.traits;
 import std.string;
-import std.stdio : writeln;
+import std.traits;
+import std.stdio  : writeln;
 import std.format : format;
-import std.stdio : writefln;
+import std.stdio  : writefln;
 
 
 struct
@@ -14,23 +15,27 @@ Hub {
     void
     register (T) (T* t) {
         writeln ("register: ", T.stringof, " ", t);
-        Typed typed;
-        Rec*  rec;
+        Rec* rec;
         static foreach (fn_name; Functions!T) {
+            static if (!__traits(isStaticFunction, __traits(getMember,T,fn_name)))
+            //static if (isDelegate!(__traits(getMember,T,fn_name)))
             static if (fn_name == fn_name.toUpper) {
                 writeln ("  ", fn_name);
 
-                typed.s.length = Parameters!(__traits(getMember,T,fn_name)).length;
-                static foreach(i,par; Parameters!(__traits(getMember,T,fn_name))) {
-                    typed.s[i] = typeid (par);
-                }
-                typed.dg = cast (DG) &__traits(getMember,t,fn_name); // delegate
-
                 rec = fn_name in s;
-                if (rec !is null)
-                    rec.typeds ~= typed;
-                else
-                    s[fn_name] = Rec([typed]);
+                if (rec is null)
+                    s[fn_name] = Rec();
+                rec = fn_name in s;
+                rec.typeds.length += 1;
+
+                with (rec.typeds[$-1]) {
+                    s.length = Parameters!(__traits(getMember,T,fn_name)).length;
+                    static foreach(i,par; Parameters!(__traits(getMember,T,fn_name))) {
+                        s[i] = typeid (par);
+                    }
+
+                    dg = cast (DG) &__traits(getMember,t,fn_name); // delegate
+                }
             }
 
         }
@@ -69,7 +74,6 @@ Hub {
         if (_rec !is null)
         foreach (ref _typed; _rec.typeds) {
             if (_typed == typed) {
-                writeln ("    DO ", _typed.dg.ptr);
                 (cast (void delegate (ARGS)) _typed.dg) (args);
                 found = true;
             }
