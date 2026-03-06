@@ -49,7 +49,6 @@ Sdl_wm {
 
     void
     _shown (uint windowID) {
-        writeln ("SHOWN");
         auto _sdl_window = SDL_GetWindowFromID (windowID);
         if (!_sdl_window) return;
 
@@ -58,19 +57,16 @@ Sdl_wm {
 
     void
     _exposed (uint windowID) {
-        writeln ("EXPOSED");
         _send_draw (windowID);
     }
 
     void
     _send_draw (uint windowID) {
-        writeln ("SEND DRAW");
         with (o) {
             // Page with window
             foreach (page; o.pages) {
                 auto _sdl_window = SDL_GetWindowFromID (windowID);
                 if (!_sdl_window) return;
-                writeln ("SEND DRAW 2");
 
                 if (page.window == _sdl_window) {
                     Renderer renderer;

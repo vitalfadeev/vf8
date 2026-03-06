@@ -215,7 +215,6 @@ Page {
 
     void
     draw (Renderer* renderer) {
-        writeln ("PAGE DRAW");
         foreach (widget; widgets.s) {
             auto style = styles.get_style (widget);
             style.get.fg   = colors.s[style.fg];

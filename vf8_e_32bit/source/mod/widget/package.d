@@ -25,42 +25,7 @@ Mod_widget {
         with (evt) {
             //
         }
-        //_select_and_call_widget (evt,x,y,windowID);
     }
-
-    //void
-    //_select_and_call_widget (int x, int y, uint windowID) {
-    //    import vf.sdl.importc_sdl;
-
-    //    with (o) {
-    //        auto xy = XY (x,y);
-    //        // widgets at xy
-    //        foreach (i,xywh; page.layout.select (xy)) {
-    //            auto widget = page.widgets.s[i];
-    //            widget.do_switch (evt);
-                
-    //            hub.REDRAW (windowID, xywh);
-    //            //REDRAW (windowID, null, xywh);  // event REDRAW
-    //        }
-    //    }
-    //}
-
-    //void
-    //_all_call_widget (Event* evt) {
-    //    import vf.sdl.importc_sdl;
-    //    import std.range     : lockstep;
-
-    //    with (o) {
-    //        ubyte i;
-
-    //        // all widgets
-    //        foreach (widget,xywh; lockstep (page.widgets.s, page.layout.range)) {
-    //            widget.do_switch (evt);;
-
-    //            i++;
-    //        }
-    //    }
-    //}
 }
 
 import importc_sdl;
