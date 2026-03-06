@@ -33,7 +33,6 @@ main () {
 
 		// INIT
 		hub.INIT ();
-		hub.LAYOUT ();
 
 		// Load page
 		pages ~= new Page ();
@@ -41,6 +40,10 @@ main () {
 		pages[$-1].wh.h = 600;
 		pages[$-1]._init ();
 		pages[$-1]._layout ();
+		hub.register (pages[$-1]);
+
+		// Layout
+		hub.LAYOUT ();
 
 		// Event loop
 		foreach (evt; input) {

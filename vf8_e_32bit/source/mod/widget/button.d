@@ -23,7 +23,7 @@ Button {
         with (o)
         with (evt)
         switch (button) {
-            case SDL_BUTTON_LEFT   : this.PRESS (); page.redraw (&this._super); break;
+            case SDL_BUTTON_LEFT   : this.PRESS (); break;
             case SDL_BUTTON_MIDDLE : break;
             case SDL_BUTTON_RIGHT  : break;
             case SDL_BUTTON_X1     : break;
@@ -39,7 +39,7 @@ Button {
         with (o)
         with (evt)
         switch (button) {
-            case SDL_BUTTON_LEFT   : this.RELEASE (); page.redraw (&this._super); break;
+            case SDL_BUTTON_LEFT   : this.RELEASE (); break;
             case SDL_BUTTON_MIDDLE : break;
             case SDL_BUTTON_RIGHT  : break;
             case SDL_BUTTON_X1     : break;
@@ -53,6 +53,7 @@ Button {
         with (o) {
             flags.pressed = true;
             hub.PRESSED ();
+            hub.REDRAW (cast(Widget*)&this); 
         }
     }
 
@@ -61,6 +62,7 @@ Button {
         with (o) {
             flags.pressed = false; 
             hub.RELEASED ();
+            hub.REDRAW (cast(Widget*)&this); 
         }
     }
 

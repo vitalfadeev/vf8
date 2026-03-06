@@ -228,7 +228,7 @@ Page {
     }
 
     void
-    redraw (Widget* widget) {
+    REDRAW (Widget* widget) {
         writeln ("PAGE REDRAW");
         with (o) {
             auto style = styles.get_style (widget);
