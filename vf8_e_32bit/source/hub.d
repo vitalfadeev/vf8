@@ -73,7 +73,7 @@ Hub {
         auto _rec = name in s;
         if (_rec !is null)
         foreach (ref _typed; _rec.typeds) {
-            writeln ("    found ", name, " ", _typed);
+            //writeln ("    found ", name, " ", _typed);
             if (_typed == typed) {
                 (cast (void delegate (ARGS)) _typed.dg) (args);
                 found = true;

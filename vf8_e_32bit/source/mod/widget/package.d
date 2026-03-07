@@ -237,7 +237,13 @@ Childs {
         s ~= cast (Widget*) twidget;
     }
 
-    bool empty () { return s.length == 0; }
-    auto front () { return s[0]; }
+    bool empty  () { return s.length == 0; }
+    auto front  () { return s[0]; }
+    auto length () { return s.length; }
+
+    auto
+    norecursive () {
+        return s[];
+    }
 }
 

@@ -5,7 +5,7 @@ version (E_32BIT_PAGED):
 
 import vf.std.tstring256;
 import vf.gui.color    : Color;
-import vf.gui.layout   : Layout;
+import vf.gui.layout   : Layout,Line_layout,Lcr_layout;
 import vf.std.xywh     : Xy,Wh,Xywh;
 
 import vf.gui.page_.colors  : Colors;
@@ -50,7 +50,6 @@ Page {
         with (o)
         Sdl_wm ().new_window (wh.w, wh.h, &window);
     }
-
 
     void
     _init_colors () {
@@ -109,9 +108,11 @@ Page {
     LAYOUT () {
         // all widgets recursive
         if (widget !is null) 
-        if (!widget.childs.empty) 
-        if (widget.childs.layout_dg !is null) 
-            widget.childs.layout_dg (widget);
+        foreach (_widget; widget.recursive)  { // include this.widget
+            if (!_widget.childs.empty) 
+            if (_widget.childs.layout_dg !is null) 
+                _widget.childs.layout_dg (_widget);
+        }
     }
 
     void
@@ -156,60 +157,64 @@ void
 create_ui (Page* page) {
     // main
     auto main = page.create!Main ();
+    main.xywh.w = 1024;
+    main.xywh.h = 64;
+    main.childs.layout_dg = &(new Lcr_layout).layout;
 
     // layout
     auto left = page.create!Left ();
+    left.xywh.w = 64*1;
+    left.xywh.h = 64;
+    left.childs.layout_dg = &(new Line_layout).layout;
     main.childs.put (left);
 
     auto center = page.create!Center ();
+    center.xywh.w = 64*1;
+    center.xywh.h = 64;
+    center.xywh.x = 1024/2 - 64*1/2;
+    center.childs.layout_dg = &(new Line_layout).layout;
     main.childs.put (center);
 
     auto right = page.create!Right ();
+    right.xywh.w = 64*4;
+    right.xywh.h = 64;
+    right.xywh.x = 1024 - 64*4;
+    right.childs.layout_dg = &(new Line_layout).layout;
     main.childs.put (right);
 
     // buttons
     auto start = page.create!Start ();
+    start.xywh.w = 64;
+    start.xywh.h = 64;
     left.childs.put (start);
 
     auto clock = page.create!Clock ();
+    clock.xywh.w = 64;
+    clock.xywh.h = 64;
     center.childs.put (clock);
 
     auto lan = page.create!Lan ();
+    lan.xywh.w = 64;
+    lan.xywh.h = 64;
     right.childs.put (lan);
 
     auto wifi = page.create!Wifi ();
+    wifi.xywh.w = 64;
+    wifi.xywh.h = 64;
     right.childs.put (wifi);
 
     auto volume = page.create!Volume_ ();
+    volume.xywh.w = 64;
+    volume.xywh.h = 64;
     right.childs.put (volume);
 
     auto battery = page.create!Battery ();
+    battery.xywh.w = 64;
+    battery.xywh.h = 64;
     right.childs.put (battery);
-
-    // layout
-    Layout layout;
-    _init_layout (&layout, page.wh);
 
     //
     page.widget = cast (Widget*) main;
-}
-void
-_init_layout (Layout* layout, Wh wh) {
-    with (layout.grid) {
-        total_wh.w     = wh.w;
-        total_wh.h     = 64;
-        cells_offset_x =  0;
-        cells_space_x  =  0;
-        cells_w        = 64;
-        cells_h        = 64;
-        first_cell_w   = 64;
-        first_cell_h   = 64;
-        order[0] = Order_rec (1,3);
-        order[1] = Order_rec (2,2);
-        order[2] = Order_rec (3,1);
-        order[3] = Order_rec (4,2);
-        order[4] = Order_rec (5,3);
-    }
 }
 
 //
@@ -246,30 +251,30 @@ Start {
 
 struct
 Clock {
-    Widget _super;
+    Button _super;
     alias _super this;    
 }
 
 struct
 Lan {
-    Widget _super;
+    Button _super;
     alias _super this;    
 }
 
 struct
 Wifi {
-    Widget _super;
+    Button _super;
     alias _super this;    
 }
 
 struct
 Volume_ {
-    Widget _super;
+    Button _super;
     alias _super this;    
 }
 
 struct
 Battery {
-    Widget _super;
+    Button _super;
     alias _super this;    
 }

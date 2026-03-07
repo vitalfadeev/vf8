@@ -3,6 +3,8 @@ module vf.gui.layout;
 version (GUI):
 version (E_32BIT_PAGED):
 import vf.std.xywh     : Xy,Wh,Xywh;
+import mod.widget      : Widget;
+import std.stdio : writeln;
 
 
 union
@@ -20,6 +22,38 @@ union {
         _,
         GRID,
         QUICK_SETTINGS,
+    }
+}
+
+struct
+Line_layout {    
+    void
+    layout (Widget* widget) {
+        Xy xy = widget.xywh.xy;
+
+        foreach (_widget; widget.childs.norecursive) {
+            _widget.xywh.xy = xy;
+
+            xy.x += _widget.xywh.w;
+        }
+    }
+}
+
+struct
+Lcr_layout {    
+    void
+    layout (Widget* widget) {
+        Xy xy = widget.xywh.xy;
+        Wh wh = widget.xywh.wh;
+
+        foreach (i,_widget; widget.childs.norecursive) {
+            switch (i) {
+                case 0: _widget.xywh.xy.x = xy.x; break;
+                case 1: _widget.xywh.xy.x = xy.x + (wh.w - (cast (uint) _widget.childs.length) * 64) / 2; break;
+                case 2: _widget.xywh.xy.x = xy.x + (wh.w - (cast (uint) _widget.childs.length) * 64); break;
+                default:
+            }
+        }
     }
 }
 
