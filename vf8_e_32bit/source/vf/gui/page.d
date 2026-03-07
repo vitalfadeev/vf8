@@ -84,10 +84,13 @@ Page {
         o.hub.register (twidget);
         auto widget = cast (Widget*) twidget;
         widget.page    = &this;
-        widget.page    = &this;
         static if (__traits(hasMember,TWIDGET,"style"))
             widget.style_dg = &__traits(getMember,twidget,"style");
-        widgets.s ~= widget;
+        static if (__traits(hasMember,TWIDGET,"draw"))
+            widget.draw_dg  = &__traits(getMember,twidget,"draw");
+        widget.xywh.w = 64;
+        widget.xywh.h = 64;
+        widget.name   = TWIDGET.stringof;
         return twidget;
     }        
 
@@ -116,7 +119,10 @@ Page {
         with (o) {
             renderer.draw_start (window,true);
             foreach (_widget; widget.recursive)
-                _widget.draw (renderer);
+                writeln (_widget.name);
+            foreach (_widget; widget.recursive)
+                if (_widget.draw_dg !is null)
+                    _widget.draw_dg (renderer);
             renderer.draw_end (window);
         }
     }
@@ -149,35 +155,35 @@ Page {
 void
 create_ui (Page* page) {
     // main
-    auto main = new Main ();
+    auto main = page.create!Main ();
 
     // layout
-    auto left = new Left ();
+    auto left = page.create!Left ();
     main.childs.put (left);
 
-    auto center = new Center ();
+    auto center = page.create!Center ();
     main.childs.put (center);
 
-    auto right = new Right ();
+    auto right = page.create!Right ();
     main.childs.put (right);
 
     // buttons
-    auto start = new Start ();
+    auto start = page.create!Start ();
     left.childs.put (start);
 
-    auto clock = new Clock ();
+    auto clock = page.create!Clock ();
     center.childs.put (clock);
 
-    auto lan = new Lan ();
+    auto lan = page.create!Lan ();
     right.childs.put (lan);
 
-    auto wifi = new Wifi ();
+    auto wifi = page.create!Wifi ();
     right.childs.put (wifi);
 
-    auto volume = new Volume_ ();
+    auto volume = page.create!Volume_ ();
     right.childs.put (volume);
 
-    auto battery = new Battery ();
+    auto battery = page.create!Battery ();
     right.childs.put (battery);
 
     // layout
@@ -234,7 +240,7 @@ Right {
 //
 struct
 Start {
-    Widget _super;
+    Button _super;
     alias _super this;    
 }
 

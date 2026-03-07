@@ -37,6 +37,7 @@ Widget {
     Xywh     xywh;
     Flags    flags;  
     Page*    page;
+    string   name;  // for debug
     // style
     Color    fg;
     Color    bg;
@@ -45,10 +46,12 @@ Widget {
     Image    image;
     Image    image_set;
     STYLE_DG style_dg;
+    DRAW_DG  draw_dg;
     // childs
     Childs   childs;
 
     alias STYLE_DG = void delegate ();
+    alias DRAW_DG  = void delegate (Renderer*);
 
     struct
     Image {
@@ -65,7 +68,7 @@ Widget {
     draw (Renderer* renderer) {
         if (style_dg !is null) style_dg ();
 
-        writeln ("default DRAW on widget");
+        writeln ("default draw on widget");
     };
 
     auto
@@ -73,30 +76,29 @@ Widget {
         return Recursive (&this);
     }
 
+    import std.range;   
     struct
     Recursive {  // in deep
-        Widget* _this;
-
-        Widget*[][] childs_range;
-
         Widget* front;
-        bool    empty () { return front is null; }
-        void    popFront () { 
-            import std.range;
-
+        Widget*[][] childs_ranges;
+        Widget* _next;
+        bool    empty () { 
+            return (front is null);
+        }
+        void    popFront () { front = next (); }
+        auto    next () {
             in_deep:
             if (!front.childs.empty) {
-                childs_range ~= front.childs.s;
-                front  = childs_range.back.front;
+                childs_ranges ~= front.childs.s;
+                return childs_ranges.back.front;
             }
 
             go_right:
-            if (!childs_range.empty) {
-                if (!childs_range.back.empty) {
-                    childs_range.back.popFront ();
-                    if (!childs_range.back.empty) {
-                        front = childs_range.back.front; 
-                        return;
+            if (!childs_ranges.empty) {
+                if (!childs_ranges.back.empty) {
+                    childs_ranges.back.popFront ();
+                    if (!childs_ranges.back.empty) {
+                        return childs_ranges.back.front;
                     }
                     else {
                         goto go_up;
@@ -108,18 +110,13 @@ Widget {
             }
 
             go_up:
-            if (!childs_range.empty) {
-                childs_range.popFront ();
+            if (!childs_ranges.empty) {
+                childs_ranges.popBack ();
                 goto go_right;
             }
 
             end:
-            front = null;
-        }
-
-        this (Widget* _this) {
-            this._this = _this;
-            this.front = _this;
+            return null;
         }
     }
 

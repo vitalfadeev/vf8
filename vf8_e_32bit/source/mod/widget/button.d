@@ -68,6 +68,8 @@ Button {
     void
     style () {
         if (!text.length) text = [''];
+        xywh.w = 64;
+        xywh.h = 64;
         if (flags.pressed) {
             fg = 0xFFFFFFFF;  // 5
             bg = 0xFF888888;  // 2
@@ -79,6 +81,7 @@ Button {
 
     void
     draw (Renderer* renderer) {
+        writeln ("Button draw");
         if (style_dg !is null) style_dg ();
 
         with (xywh)
