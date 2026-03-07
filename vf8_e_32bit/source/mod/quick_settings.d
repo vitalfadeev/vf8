@@ -11,7 +11,10 @@ Quick_settings {
         // Page_qs
         // window
         with (o) {
-            pages ~= cast (Page*) (new Page_qs ());
+            auto page = new Page_qs ();
+            pages ~= cast (Page*) page;
+
+            page._init ();
         }
     }
 }
@@ -27,7 +30,6 @@ Page_qs {
         _init_fonts   ();
         _init_images  ();
         _init_widgets ();
-        _init_layout  ();
         _init_window  ();
     }
 

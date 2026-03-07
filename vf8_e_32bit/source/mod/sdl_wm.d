@@ -70,10 +70,7 @@ Sdl_wm {
 
                 if (page.window == _sdl_window) {
                     Renderer renderer;
-                    renderer.draw_start (_sdl_window);
-                    //page.draw (&renderer);  // to Page
-                    hub.DRAW (&renderer);  // to Page
-                    renderer.draw_end (_sdl_window);
+                    page.draw (&renderer);  // to Page
                 }
             }        
         }

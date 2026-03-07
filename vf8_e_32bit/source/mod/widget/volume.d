@@ -49,6 +49,14 @@ Volume {
     }
 
     void
+    PRESS () {
+        with (o) {
+            _super.PRESS ();
+            hub.QUICK_SETTINGS ();
+        }
+    }
+
+    void
     style () {
         _super.style ();
 
@@ -63,9 +71,9 @@ Volume {
     }
 
     void
-    DRAW (Renderer* renderer) {
+    draw (Renderer* renderer) {
         if (style_dg !is null) style_dg ();
-        _super.DRAW (renderer);
+        _super.draw (renderer);
     }
 }
 

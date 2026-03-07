@@ -4,9 +4,6 @@ version (SDL):
 import vf.std.xywh;
 import vf.gui.color  : Color;
 import vf.sdl.importc_sdl;
-import mod.widget.button;
-//import mod.widget.volume;
-import mod.volume;
 import app : o;
 
 
@@ -39,9 +36,6 @@ struct
 Widget {
     Xywh     xywh;
     Flags    flags;  
-    //ubyte    value;
-    //ubyte    reserved;
-    //string   name;  // for find style
     Page*    page;
     // style
     Color    fg;
@@ -51,6 +45,7 @@ Widget {
     Image    image;
     Image    image_set;
     STYLE_DG style_dg;
+    // childs
     Childs   childs;
 
     alias STYLE_DG = void delegate ();
@@ -67,12 +62,30 @@ Widget {
     }    
 
     void 
-    DRAW (Renderer* renderer) {
+    draw (Renderer* renderer) {
         if (style_dg !is null) style_dg ();
 
         writeln ("default DRAW on widget");
     };
 
+    auto
+    recursive () {
+        return Recursive (&this);
+    }
+
+    struct
+    Recursive {  // in deep
+        Widget* _this;
+
+        Widget* front;
+        bool    empty () { return front is null; }
+        void    popFront () { if (!_this.childs.empty) front = _this.childs.front; else front = null; }
+
+        this (Widget* _this) {
+            this._this = _this;
+            this.front = _this;
+        }
+    }
 
     auto 
     struct 
@@ -185,5 +198,13 @@ Childs {
     LAYOUT_DG layout_dg;
 
     alias LAYOUT_DG = void delegate (Widget* widget);
+
+    void 
+    put (TWIDGET) (TWIDGET* twidget) {
+        s ~= cast (Widget*) twidget;
+    }
+
+    bool empty () { return s.length == 0; }
+    auto front () { return s[0]; }
 }
 

@@ -78,15 +78,13 @@ Button {
     }
 
     void
-    DRAW (Renderer* renderer) {
+    draw (Renderer* renderer) {
         if (style_dg !is null) style_dg ();
 
-        with (o)
         with (xywh)
         if (w > 0 && h > 0)
             renderer.draw_rect (x,y,w,h,fg,bg);
 
-        with (o)
         with (xywh)
         if (text) {
             renderer.draw_text (page.fonts.s[1],x,y,w,h,fg,bg,text);

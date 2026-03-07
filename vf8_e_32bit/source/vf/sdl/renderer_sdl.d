@@ -17,11 +17,13 @@ Renderer {
     }
 
     void
-    draw_start (SDL_Window* window) {
+    draw_start (SDL_Window* window, bool clear) {
         _renderer = new_renderer (window);
         // clear
-        SDL_SetRenderDrawColor (_renderer, 0x00, 0x00, 0x00, 0xFF);
-        SDL_RenderClear (_renderer);
+        if (clear) {
+            SDL_SetRenderDrawColor (_renderer, 0x00, 0x00, 0x00, 0xFF);
+            SDL_RenderClear (_renderer);
+        }
     }
 
     void

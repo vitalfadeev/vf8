@@ -22,11 +22,13 @@ main () {
 		import mod.sdl_wm;
 		import mod.widget;
 		import mod.volume;
+		import mod.quick_settings;
 
 		hub.register (new Sdl);
 		hub.register (new Sdl_wm);
 		hub.register (new Mod_widget);
 		hub.register (new Volume);
+		hub.register (new Quick_settings);
 
 		// INIT
 		hub.INIT ();
@@ -35,8 +37,8 @@ main () {
 		auto page = new Page ();
 		page.wh.w = 1024;
 		page.wh.h = 600;
-		pages ~= page;
 		hub.register (page);
+		pages ~= page;
 		page._init ();
 
 		// Layout
