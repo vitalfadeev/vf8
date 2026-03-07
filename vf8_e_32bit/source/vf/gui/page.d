@@ -183,6 +183,9 @@ create_ui (Page* page) {
     // layout
     Layout layout;
     _init_layout (&layout, page.wh);
+
+    //
+    page.widget = cast (Widget*) main;
 }
 void
 _init_layout (Layout* layout, Wh wh) {

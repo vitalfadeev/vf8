@@ -77,9 +77,45 @@ Widget {
     Recursive {  // in deep
         Widget* _this;
 
+        Widget*[][] childs_range;
+
         Widget* front;
         bool    empty () { return front is null; }
-        void    popFront () { if (!_this.childs.empty) front = _this.childs.front; else front = null; }
+        void    popFront () { 
+            import std.range;
+
+            in_deep:
+            if (!front.childs.empty) {
+                childs_range ~= front.childs.s;
+                front  = childs_range.back.front;
+            }
+
+            go_right:
+            if (!childs_range.empty) {
+                if (!childs_range.back.empty) {
+                    childs_range.back.popFront ();
+                    if (!childs_range.back.empty) {
+                        front = childs_range.back.front; 
+                        return;
+                    }
+                    else {
+                        goto go_up;
+                    }
+                }
+                else {
+                    goto go_up;
+                }
+            }
+
+            go_up:
+            if (!childs_range.empty) {
+                childs_range.popFront ();
+                goto go_right;
+            }
+
+            end:
+            front = null;
+        }
 
         this (Widget* _this) {
             this._this = _this;
