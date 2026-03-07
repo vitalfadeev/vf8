@@ -52,6 +52,8 @@ Button {
     PRESS () {
         with (o) {
             flags.pressed = true;
+            fg = 0xFFFFFFFF;  // 5
+            bg = 0xFF888888;  // 2
             hub.PRESSED ();
             hub.REDRAW (cast(Widget*)&this); 
         }
@@ -61,6 +63,8 @@ Button {
     RELEASE () {
         with (o) {
             flags.pressed = false; 
+            fg = 0xFFCCCCCC; // 3
+            bg = 0xFF444444; // 1
             hub.RELEASED ();
             hub.REDRAW (cast(Widget*)&this); 
         }
@@ -68,42 +72,28 @@ Button {
 
     void
     DRAW (Renderer* renderer) {
-        with (page) {            
-            auto style = styles.get_style (cast(Widget*) &this);
-            style.get.fg   = colors.s[style.fg];
-            style.get.bg   = colors.s[style.bg];
-            style.get.text = strings.s[style.text];
-            style.get.font = fonts.s[style.font];
+        if (!text.length) text = [''];
+        if (!fg._a) fg = 0xFFCCCCCC; // 3
+        if (!bg._a) bg = 0xFF444444; // 1
+        //with (page) {            
+            //auto style = styles.get_style (cast(Widget*) &this);
+            //style.get.fg   = colors.s[style.fg];
+            //style.get.bg   = colors.s[style.bg];
+            //style.get.text = style.text;
+            //style.get.font = fonts.s[style.font];
 
             with (o)
-            with (style)
+            //with (style)
             with (xywh)
             if (w > 0 && h > 0)
-                renderer.draw_rect (x,y,w,h,style.get.fg,style.get.bg);
+                renderer.draw_rect (x,y,w,h,fg,bg);
 
             with (o)
-            with (style)
+            //with (style)
             with (xywh)
             if (text) {
-                auto text_index = value;
-                text_index = value;
-                import std.utf;
-                import std.range;
-                import std.array;
-                import std.conv;
-                import std.uni;
-                auto str = style.get.text;
-                string txt;
-
-                txt = str.byGrapheme
-                    .array
-                    .drop (text_index)
-                    .take (1)
-                    .byCodePoint
-                    .text;
-
-                renderer.draw_text (get.font,x,y,w,h,style.get.fg,style.get.bg,txt);
+                renderer.draw_text (page.fonts.s[1],x,y,w,h,fg,bg,text);
             }
-        }
+        //}
     }
 }

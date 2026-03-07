@@ -2,6 +2,7 @@ module mod.widget;
 
 version (SDL):
 import vf.std.xywh;
+import vf.gui.color  : Color;
 import vf.sdl.importc_sdl;
 import mod.widget.button;
 //import mod.widget.volume;
@@ -37,21 +38,33 @@ import vf.sdl.renderer_sdl : Renderer;
 
 struct
 Widget {
-    Widget.Flags flags;  
-    ubyte        value;
-    ubyte        reserved;
-    string       name;  // for find style
-    Xywh         xywh;
-    Page*        page;
+    Flags   flags;  
+    ubyte   value;
+    ubyte   reserved;
+    string  name;  // for find style
+    Xywh    xywh;
+    Page*   page;
+    Color   fg;
+    Color   bg;
+    dchar[] text;
+    dchar[] text_set;
+    Image   image;
+    Image   image_set;
+
+    struct
+    Image {
+        size_t length;
+        void*  ptr;
+    }
 
     void 
     DRAW (Renderer* renderer) {
         with (page) {            
-            auto style = styles.get_style (cast(Widget*) &this);
-            style.get.fg   = colors.s[style.fg];
-            style.get.bg   = colors.s[style.bg];
-            style.get.text = strings.s[style.text];
-            style.get.font = fonts.s[style.font];
+            //auto style = styles.get_style (cast(Widget*) &this);
+            //style.get.fg   = colors.s[style.fg];
+            //style.get.bg   = colors.s[style.bg];
+            //style.get.text = style.text;
+            //style.get.font = fonts.s[style.font];
 
             writeln ("default DRAW on widget");
         }

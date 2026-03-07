@@ -47,7 +47,7 @@ Renderer {
     }
 
     void
-    draw_text (TTF_Font* font, uint x, uint y, uint w, uint h, Color fg, Color bg, string text) {
+    draw_text (TTF_Font* font, uint x, uint y, uint w, uint h, Color fg, Color bg, dchar[] text) {
         import vf.sdl.draw_char;
         
         if (text.length == 0) return;
@@ -79,19 +79,23 @@ Renderer {
 
     version (SDLTTF) import vf.sdl.importc_sdl_ttf;
     SDL_Surface*
-    _draw_text (TTF_Font* font, uint x, uint y, uint w, uint h, Color fg, Color bg, string text, int* size_w,  int* size_h) {
-        import std.string : toStringz;
+    _draw_text (TTF_Font* font, uint x, uint y, uint w, uint h, Color fg, Color bg, dchar[] text, int* size_w,  int* size_h) {
         import vf.sdl.exceptions : TTFException;
 
-        auto textz = text.toStringz;
         SDL_Color sdl_fg = cast (SDL_Color) fg.sdl_color;  // struct rgba
 
-        auto surface = TTF_RenderUTF8_Solid (font,textz,sdl_fg);
+        // TTF_RenderGlyph32_Blended
+        auto surface = TTF_RenderGlyph32_Blended (font,text[0],sdl_fg);
+        //auto surface = TTF_RenderUNICODE_Solid (font,textz,sdl_fg);
 
         if (surface is null)
             throw new TTFException ("TTF_RenderUTF8_Solid");        
 
-        TTF_SizeUTF8 (font,textz,size_w,size_h);
+        int minx, maxx, miny, maxy, advance;
+        TTF_GlyphMetrics32 (font,text[0], &minx, &maxx, &miny, &maxy, &advance);
+        *size_w = maxx - minx;
+        *size_h = maxy - miny;
+        //TTF_SizeUTF8 (font,textz,size_w,size_h);
 
         return surface;
     }

@@ -16,9 +16,10 @@ Style {
     ubyte fg;
     ubyte bg;
     ubyte font;
-    ubyte text;
-    ubyte iconset;
-    ubyte icon;
+    dchar[] text;
+    dchar[] text_set;
+    string image;
+    string image_set;
     ubyte event_on;
     ubyte event_on_arg;
 
@@ -28,7 +29,8 @@ Style {
     Get {
         Color     fg;
         Color     bg;
-        string    text;
+        dchar[]   text;
+        dchar[]   text_set;
         TTF_Font* font;
     }
 }

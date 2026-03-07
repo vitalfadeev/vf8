@@ -41,12 +41,13 @@ Volume {
 
     void
     VOLUME_INFO (ubyte volume) {
+        text_set = ['', '', '', ''];
         with (o)
         switch (volume_type (volume)) with (Volume_type) {
-            case MUTE : value = 0; break;
-            case LOW  : value = 1; break;
-            case MID  : value = 2; break;
-            case HIGH : value = 3; break;
+            case MUTE : text = text_set[0..1]; break;
+            case LOW  : text = text_set[1..2]; break;
+            case MID  : text = text_set[2..3]; break;
+            case HIGH : text = text_set[3..4]; break;
             default   :
         }
 
@@ -56,12 +57,15 @@ Volume {
 
     void
     DRAW (Renderer* renderer) {
+        if (!text.length) text = [''];
+        if (!fg._a) fg = 0xFFCCCCCC; // 3
+        if (!bg._a) bg = 0xFF444444; // 1
         with (page) {            
-            auto style = styles.get_style (cast(Widget*) &this);
-            style.get.fg   = colors.s[style.fg];
-            style.get.bg   = colors.s[style.bg];
-            style.get.text = strings.s[style.text];
-            style.get.font = fonts.s[style.font];
+            //auto style = styles.get_style (cast(Widget*) &this);
+            //style.get.fg   = colors.s[style.fg];
+            //style.get.bg   = colors.s[style.bg];
+            //style.get.text = style.text;
+            //style.get.font = fonts.s[style.font];
 
             _super.DRAW (renderer);
         }

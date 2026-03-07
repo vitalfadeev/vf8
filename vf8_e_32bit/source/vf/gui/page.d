@@ -173,8 +173,8 @@ Page {
             s.flags.enabled = true;
 
             switch (widget.name) {
-                case "Button" /* start  */ : s.font = 1; s.text = 1; s.fg = 2; break;
-                case "Volume" /* volume  */ : s.font = 1; s.text = 4; s.fg = 2; break;
+                case "Button" /* start  */ :  s.font = 1; s.text = [''];           s.fg = 2; break;
+                case "Volume" /* volume  */ : s.font = 1; s.text_set = ['', '', '', '']; s.text = s.text_set[0..1]; s.fg = 2; break;
                 //case 3 /* batary */ : s.font = 1; s.text = 3; s.fg = 2; break;
                 //case 4 /* volume */ : s.font = 1; s.text = 4; s.fg = 2; break;
                 //case 5 /* avia   */ : s.font = 1; s.text = 5; s.fg = 2; break;
