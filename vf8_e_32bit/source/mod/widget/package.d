@@ -1,7 +1,6 @@
 module mod.widget;
 
 version (SDL):
-import app : Event;
 import vf.std.xywh;
 import vf.sdl.importc_sdl;
 import mod.widget.button;
@@ -44,13 +43,18 @@ Widget {
     string       name;  // for find style
     Xywh         xywh;
     Page*        page;
-    DRAW_DG      draw_dg;
-
-    alias DRAW_DG = void delegate (Style* style, Renderer* renderer);
 
     void 
-    _draw (Style* style, Renderer* renderer) {
-        writeln ("default DRAW on widget");
+    DRAW (Renderer* renderer) {
+        with (page) {            
+            auto style = styles.get_style (cast(Widget*) &this);
+            style.get.fg   = colors.s[style.fg];
+            style.get.bg   = colors.s[style.bg];
+            style.get.text = strings.s[style.text];
+            style.get.font = fonts.s[style.font];
+
+            writeln ("default DRAW on widget");
+        }
     };
 
 

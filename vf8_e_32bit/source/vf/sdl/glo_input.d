@@ -7,7 +7,7 @@ import vf.sdl.importc_sdl : SDL_Init,SDL_Event,SDL_WaitEvent,SDL_RegisterEvents,
 struct
 Glo_input (Event) {
     Event*     front ()    { return &_event; };
-    bool       empty ()    { return (SDL_WaitEvent (&_event.sdl) == 0); }
+    bool       empty ()    { return (SDL_WaitEvent (&_event) == 0); }
     void       popFront () {}
     Event     _event;
 

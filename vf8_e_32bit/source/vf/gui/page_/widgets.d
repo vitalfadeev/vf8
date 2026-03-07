@@ -1,6 +1,5 @@
 module vf.gui.page_.widgets;
 
-import app               : Event;
 import mod.widget        : Widget;
 import vf.std.tstring256 : Tstring256;
 

@@ -45,7 +45,6 @@ Page {
 
     void
     _init () {
-        _init_window  ();
         _init_colors  ();
         _init_fonts   ();
         _init_icons   ();
@@ -54,11 +53,13 @@ Page {
         version (ACTIONS) _init_actions ();
         _init_styles  ();
         _init_layout  ();
+        _init_window  ();
     }
 
     void
     _init_window () {
-        window = Sdl_wm.new_window (wh.w, wh.h);
+        with (o)
+        Sdl_wm ().new_window (wh.w, wh.h, &window);
     }
 
     void
@@ -124,7 +125,7 @@ Page {
         auto widget = cast (Widget*) twidget;
         widget.name    = TWIDGET.stringof;
         widget.page    = &this;
-        widget.draw_dg = &twidget.draw;
+        //widget.draw_dg = &twidget.draw;
         widgets.s ~= widget;
         return twidget;
     }        
@@ -204,7 +205,7 @@ Page {
     }
 
     void
-    _layout () {
+    LAYOUT () {
         import std.range : lockstep;
 
         // all widgets
@@ -214,31 +215,11 @@ Page {
     }
 
     void
-    draw (Renderer* renderer) {
-        foreach (widget; widgets.s) {
-            auto style = styles.get_style (widget);
-            style.get.fg   = colors.s[style.fg];
-            style.get.bg   = colors.s[style.bg];
-            style.get.text = strings.s[style.text];
-            style.get.font = fonts.s[style.font];
-
-            widget.draw_dg (style, renderer);
-        }
-    }
-
-    void
     REDRAW (Widget* widget) {
-        writeln ("PAGE REDRAW");
         with (o) {
-            auto style = styles.get_style (widget);
-            style.get.fg   = colors.s[style.fg];
-            style.get.bg   = colors.s[style.bg];
-            style.get.text = strings.s[style.text];
-            style.get.font = fonts.s[style.font];
-
             Renderer renderer;
             renderer.draw_start (window);
-            draw (&renderer);
+            hub.DRAW (&renderer);
             renderer.draw_end (window);
         }
     }

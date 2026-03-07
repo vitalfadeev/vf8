@@ -35,12 +35,12 @@ main () {
 		hub.INIT ();
 
 		// Load page
-		pages ~= new Page ();
-		pages[$-1].wh.w = 1024;
-		pages[$-1].wh.h = 600;
-		pages[$-1]._init ();
-		pages[$-1]._layout ();
-		hub.register (pages[$-1]);
+		auto page = new Page ();
+		page.wh.w = 1024;
+		page.wh.h = 600;
+		pages ~= page;
+		hub.register (page);
+		page._init ();
 
 		// Layout
 		hub.LAYOUT ();
@@ -56,10 +56,10 @@ main () {
 
 struct
 O {
-    Input!Event input;
-    bool 		quit;
-    Page*[]     pages;
-    Hub         hub;
+    Input!SDL_Event input;
+    bool 		    quit;
+    Page*[]         pages;
+    Hub             hub;
 }
 
 // SDL_Event sdl_event
@@ -68,13 +68,6 @@ O {
 //     SDL_Event
 //     type > 0x8000
 // cast (Event) sdl_event
-
-struct
-Event {
-    SDL_Event sdl;
-    alias sdl this;
-}
-
 
 alias I  = ubyte;
 

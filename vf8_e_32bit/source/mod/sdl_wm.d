@@ -1,11 +1,11 @@
 module mod.sdl_wm;
 
 version (SDL):
-import app : Event;
 import vf.std.xywh;
 import vf.sdl.importc_sdl;
 import vf.sdl.renderer_sdl : Renderer;
 import vf.sdl.exceptions   : SDLException;
+import vf.sdl.log_event : log_event;
 import app : o;
 import std.stdio : writeln;
 
@@ -71,7 +71,8 @@ Sdl_wm {
                 if (page.window == _sdl_window) {
                     Renderer renderer;
                     renderer.draw_start (_sdl_window);
-                    page.draw (&renderer);  // to Page
+                    //page.draw (&renderer);  // to Page
+                    hub.DRAW (&renderer);  // to Page
                     renderer.draw_end (_sdl_window);
                 }
             }        
@@ -96,11 +97,10 @@ Sdl_wm {
         if (s.length == 0) o.quit = true;
     }
 
-    static
-    SDL_Window*
-    new_window (int w=WINDOW_DEFAULT_W, int h=WINDOW_DEFAULT_H) {
+    void
+    new_window (int w, int h, SDL_Window** window) {
         // Window
-        auto window = 
+        auto _window = 
             SDL_CreateWindow (
                 __FILE_FULL_PATH__, // "SDL2 Window",
                 SDL_WINDOWPOS_CENTERED_DISPLAY (0),
@@ -111,40 +111,12 @@ Sdl_wm {
                 // | SDL_WINDOW_ALLOW_HIGHDPI
             );
 
-        if (!window)
+        if (!_window)
             throw new SDLException ("Failed to create window");
 
         // Update
-        SDL_UpdateWindowSurface (window);
+        SDL_UpdateWindowSurface (_window);
 
-        return window;
+        *window = _window;
     }        
 }
-
-void
-log_event (Event* evt) {
-    import std.stdio : writefln;
-    import vf.sdl.importc_sdl;
-
-    with (SDL_EventType)
-    if (evt.sdl.type == SDL_MOUSEMOTION)
-        {}
-    else
-    if (evt.sdl.type == SDL_MOUSEWHEEL)
-        writefln ("%s %s", cast (SDL_EventType)evt.sdl.type, cast (SDL_MouseWheelDirection) evt.sdl.wheel.direction);
-    else
-    if (evt.sdl.type == SDL_WINDOWEVENT)
-        writefln ("%s %d %s ", cast (SDL_EventType)evt.sdl.type, evt.sdl.window.windowID, cast (SDL_WindowEventID) evt.sdl.window.event);
-    else
-    if (evt.sdl.type == SDL_KEYDOWN)
-        writefln ("%s %s", cast (SDL_EventType)evt.sdl.type, evt.sdl.key.keysym.scancode);
-    else
-    if (evt.sdl.type == SDL_KEYUP)
-        writefln ("%s %s", cast (SDL_EventType)evt.sdl.type, evt.sdl.key.keysym.scancode);
-    else
-    if (evt.sdl.type < SDL_USEREVENT)
-        writefln ("%s", cast (SDL_EventType) evt.sdl.type);    
-    else
-        writefln ("%s", evt.type);
-}
-

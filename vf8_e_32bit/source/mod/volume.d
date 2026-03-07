@@ -1,6 +1,5 @@
 module mod.volume;
 
-import app : Event;
 import app : o;
 
 struct

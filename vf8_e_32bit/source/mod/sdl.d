@@ -1,16 +1,16 @@
 module mod.sdl;
 
 version (SDL):
-import app : Event;
 import vf.std.xywh;
 import vf.sdl.importc_sdl;
+import vf.sdl.log_event : log_event;
 import app : o;
 
 
 struct
 Sdl {
     void
-    DO_SWITCH (Event* evt) {
+    DO_SWITCH (SDL_Event* evt) {
         log_event (evt);
 
         with (o)
@@ -49,32 +49,5 @@ Sdl {
             default                  :
         }
     }
-}
-
-void
-log_event (Event* evt) {
-    import std.stdio : writefln;
-    import vf.sdl.importc_sdl;
-
-    with (SDL_EventType)
-    if (evt.sdl.type == SDL_MOUSEMOTION)
-        {}
-    else
-    if (evt.sdl.type == SDL_MOUSEWHEEL)
-        writefln ("%s %s", cast (SDL_EventType)evt.sdl.type, cast (SDL_MouseWheelDirection) evt.sdl.wheel.direction);
-    else
-    if (evt.sdl.type == SDL_WINDOWEVENT)
-        writefln ("%s %d %s ", cast (SDL_EventType)evt.sdl.type, evt.sdl.window.windowID, cast (SDL_WindowEventID) evt.sdl.window.event);
-    else
-    if (evt.sdl.type == SDL_KEYDOWN)
-        writefln ("%s %s", cast (SDL_EventType)evt.sdl.type, evt.sdl.key.keysym.scancode);
-    else
-    if (evt.sdl.type == SDL_KEYUP)
-        writefln ("%s %s", cast (SDL_EventType)evt.sdl.type, evt.sdl.key.keysym.scancode);
-    else
-    if (evt.sdl.type < SDL_USEREVENT)
-        writefln ("%s", cast (SDL_EventType) evt.sdl.type);    
-    else
-        writefln ("%s", evt.type);
 }
 

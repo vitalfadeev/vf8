@@ -55,8 +55,16 @@ Volume {
     }
 
     void
-    draw (Style* style, Renderer* renderer) {
-        _super.draw (style, renderer);
+    DRAW (Renderer* renderer) {
+        with (page) {            
+            auto style = styles.get_style (cast(Widget*) &this);
+            style.get.fg   = colors.s[style.fg];
+            style.get.bg   = colors.s[style.bg];
+            style.get.text = strings.s[style.text];
+            style.get.font = fonts.s[style.font];
+
+            _super.DRAW (renderer);
+        }
     }
 }
 

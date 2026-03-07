@@ -1,6 +1,6 @@
 module vf.gui.page_.actions;
 
-import app : Event;
+import vf.sdl.importc_sdl;
 
 
 struct
@@ -20,5 +20,5 @@ Actions {
 
 interface
 Action {
-    void _do (Event* evt);
+    void _do (SDL_Event* evt);
 }

@@ -67,35 +67,43 @@ Button {
     }
 
     void
-    draw (Style* style, Renderer* renderer) {
-        with (o)
-        with (style)
-        with (xywh)
-        if (w > 0 && h > 0)
-            renderer.draw_rect (x,y,w,h,style.get.fg,style.get.bg);
+    DRAW (Renderer* renderer) {
+        with (page) {            
+            auto style = styles.get_style (cast(Widget*) &this);
+            style.get.fg   = colors.s[style.fg];
+            style.get.bg   = colors.s[style.bg];
+            style.get.text = strings.s[style.text];
+            style.get.font = fonts.s[style.font];
 
-        with (o)
-        with (style)
-        with (xywh)
-        if (text) {
-            auto text_index = value;
-            text_index = value;
-            import std.utf;
-            import std.range;
-            import std.array;
-            import std.conv;
-            import std.uni;
-            auto str = style.get.text;
-            string txt;
+            with (o)
+            with (style)
+            with (xywh)
+            if (w > 0 && h > 0)
+                renderer.draw_rect (x,y,w,h,style.get.fg,style.get.bg);
 
-            txt = str.byGrapheme
-                .array
-                .drop (text_index)
-                .take (1)
-                .byCodePoint
-                .text;
+            with (o)
+            with (style)
+            with (xywh)
+            if (text) {
+                auto text_index = value;
+                text_index = value;
+                import std.utf;
+                import std.range;
+                import std.array;
+                import std.conv;
+                import std.uni;
+                auto str = style.get.text;
+                string txt;
 
-            renderer.draw_text (get.font,x,y,w,h,style.get.fg,style.get.bg,txt);
+                txt = str.byGrapheme
+                    .array
+                    .drop (text_index)
+                    .take (1)
+                    .byCodePoint
+                    .text;
+
+                renderer.draw_text (get.font,x,y,w,h,style.get.fg,style.get.bg,txt);
+            }
         }
     }
 }
