@@ -4,7 +4,6 @@ import hub 								: Hub;
 import vf.gui.page                      : Page;
 import vf.gui.color                     : Color;
 import vf.std.xywh                      : Xy,Wh,Xywh;
-import vf.gui.style 					: Style;
 import mod.widget 						: Widget;
 import std.string 						: startsWith;
 version (SDL) import vf.sdl.input       : Input;
@@ -23,13 +22,11 @@ main () {
 		import mod.sdl_wm;
 		import mod.widget;
 		import mod.volume;
-		version (ACTIONS) import mod.action;
 
 		hub.register (new Sdl);
 		hub.register (new Sdl_wm);
 		hub.register (new Mod_widget);
 		hub.register (new Volume);
-		version (ACTIONS) hub.register (new Actions);
 
 		// INIT
 		hub.INIT ();

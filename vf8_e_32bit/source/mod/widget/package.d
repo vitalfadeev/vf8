@@ -32,24 +32,28 @@ import importc_sdl;
 import app;
 import vf.sdl.renderer_sdl : Renderer;
 import std.stdio : writeln;
-import vf.gui.style : Style;
 import vf.gui.page : Page;
 import vf.sdl.renderer_sdl : Renderer;
 
 struct
 Widget {
-    Flags   flags;  
-    ubyte   value;
-    ubyte   reserved;
-    string  name;  // for find style
-    Xywh    xywh;
-    Page*   page;
-    Color   fg;
-    Color   bg;
-    dchar[] text;
-    dchar[] text_set;
-    Image   image;
-    Image   image_set;
+    Xywh     xywh;
+    Flags    flags;  
+    //ubyte    value;
+    //ubyte    reserved;
+    //string   name;  // for find style
+    Page*    page;
+    // style
+    Color    fg;
+    Color    bg;
+    dchar[]  text;
+    dchar[]  text_set;
+    Image    image;
+    Image    image_set;
+    STYLE_DG style_dg;
+    Childs   childs;
+
+    alias STYLE_DG = void delegate ();
 
     struct
     Image {
@@ -57,17 +61,16 @@ Widget {
         void*  ptr;
     }
 
+    void
+    style () {
+        //
+    }    
+
     void 
     DRAW (Renderer* renderer) {
-        with (page) {            
-            //auto style = styles.get_style (cast(Widget*) &this);
-            //style.get.fg   = colors.s[style.fg];
-            //style.get.bg   = colors.s[style.bg];
-            //style.get.text = style.text;
-            //style.get.font = fonts.s[style.font];
+        if (style_dg !is null) style_dg ();
 
-            writeln ("default DRAW on widget");
-        }
+        writeln ("default DRAW on widget");
     };
 
 
@@ -173,3 +176,14 @@ EnumFunctions (alias EVENT_TYPE, FUNCTIONS...) {
         return false;
     }
 }
+
+
+struct
+Childs {
+    Widget*   parent;
+    Widget*[] s;
+    LAYOUT_DG layout_dg;
+
+    alias LAYOUT_DG = void delegate (Widget* widget);
+}
+

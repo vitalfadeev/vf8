@@ -6,7 +6,6 @@ import vf.sdl.importc_sdl;
 import vf.sdl.renderer_sdl : Renderer;
 import vf.std.xywh         : Xywh;
 import vf.std.xywh         : Xy;
-import vf.gui.style        : Style;
 import std.stdio : writeln;
 import app : o;
 
@@ -52,8 +51,6 @@ Button {
     PRESS () {
         with (o) {
             flags.pressed = true;
-            fg = 0xFFFFFFFF;  // 5
-            bg = 0xFF888888;  // 2
             hub.PRESSED ();
             hub.REDRAW (cast(Widget*)&this); 
         }
@@ -63,37 +60,36 @@ Button {
     RELEASE () {
         with (o) {
             flags.pressed = false; 
-            fg = 0xFFCCCCCC; // 3
-            bg = 0xFF444444; // 1
             hub.RELEASED ();
             hub.REDRAW (cast(Widget*)&this); 
         }
     }
 
     void
-    DRAW (Renderer* renderer) {
+    style () {
         if (!text.length) text = [''];
-        if (!fg._a) fg = 0xFFCCCCCC; // 3
-        if (!bg._a) bg = 0xFF444444; // 1
-        //with (page) {            
-            //auto style = styles.get_style (cast(Widget*) &this);
-            //style.get.fg   = colors.s[style.fg];
-            //style.get.bg   = colors.s[style.bg];
-            //style.get.text = style.text;
-            //style.get.font = fonts.s[style.font];
+        if (flags.pressed) {
+            fg = 0xFFFFFFFF;  // 5
+            bg = 0xFF888888;  // 2
+        } else {
+            fg = 0xFFCCCCCC; // 3
+            bg = 0xFF444444; // 1
+        }
+    }
 
-            with (o)
-            //with (style)
-            with (xywh)
-            if (w > 0 && h > 0)
-                renderer.draw_rect (x,y,w,h,fg,bg);
+    void
+    DRAW (Renderer* renderer) {
+        if (style_dg !is null) style_dg ();
 
-            with (o)
-            //with (style)
-            with (xywh)
-            if (text) {
-                renderer.draw_text (page.fonts.s[1],x,y,w,h,fg,bg,text);
-            }
-        //}
+        with (o)
+        with (xywh)
+        if (w > 0 && h > 0)
+            renderer.draw_rect (x,y,w,h,fg,bg);
+
+        with (o)
+        with (xywh)
+        if (text) {
+            renderer.draw_text (page.fonts.s[1],x,y,w,h,fg,bg,text);
+        }
     }
 }

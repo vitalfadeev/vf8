@@ -5,7 +5,6 @@ import mod.widget          : Widget;
 import vf.sdl.importc_sdl;
 import mod.widget.button;
 import vf.sdl.renderer_sdl : Renderer;
-import vf.gui.style        : Style;
 import app : o;
 import std.stdio : writeln;
 import vf.std.xywh         : Xy;
@@ -15,6 +14,8 @@ struct
 Volume {
     Button _super;
     alias _super this;
+
+    ubyte volume;
 
     void
     SDL_MOUSEBUTTONDOWN (SDL_MouseButtonEvent* evt) {
@@ -41,8 +42,17 @@ Volume {
 
     void
     VOLUME_INFO (ubyte volume) {
-        text_set = ['', '', '', ''];
+        this.volume = volume;
+
         with (o)
+        hub.REDRAW (cast (Widget*) &this);
+    }
+
+    void
+    style () {
+        _super.style ();
+
+        text_set = ['', '', '', ''];
         switch (volume_type (volume)) with (Volume_type) {
             case MUTE : text = text_set[0..1]; break;
             case LOW  : text = text_set[1..2]; break;
@@ -50,25 +60,12 @@ Volume {
             case HIGH : text = text_set[3..4]; break;
             default   :
         }
-
-        with (o)
-        hub.REDRAW (cast (Widget*) &this);
     }
 
     void
     DRAW (Renderer* renderer) {
-        if (!text.length) text = [''];
-        if (!fg._a) fg = 0xFFCCCCCC; // 3
-        if (!bg._a) bg = 0xFF444444; // 1
-        with (page) {            
-            //auto style = styles.get_style (cast(Widget*) &this);
-            //style.get.fg   = colors.s[style.fg];
-            //style.get.bg   = colors.s[style.bg];
-            //style.get.text = style.text;
-            //style.get.font = fonts.s[style.font];
-
-            _super.DRAW (renderer);
-        }
+        if (style_dg !is null) style_dg ();
+        _super.DRAW (renderer);
     }
 }
 

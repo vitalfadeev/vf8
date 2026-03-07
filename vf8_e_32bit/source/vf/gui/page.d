@@ -7,14 +7,11 @@ import vf.std.tstring256;
 import vf.gui.color    : Color;
 import vf.gui.layout   : Layout;
 import vf.std.xywh     : Xy,Wh,Xywh;
-import vf.gui.style    : Style;
 
 import vf.gui.page_.colors  : Colors;
 import vf.gui.page_.fonts   : Fonts;
 import vf.gui.page_.widgets : Widgets;
 import vf.gui.page_.strings : Strings;
-import vf.gui.page_.actions : Actions;
-import vf.gui.page_.styles  : Styles;
 import mod.widget           : Widget;
 import mod.widget.button    : Button;
 import mod.widget.volume    : Volume;
@@ -34,8 +31,6 @@ Page {
     Fonts        fonts;
     Widgets      widgets;
     Strings      strings;
-    Actions      actions;
-    Styles       styles;
     SDL_Window*  window;
 
     //void
@@ -47,11 +42,8 @@ Page {
     _init () {
         _init_colors  ();
         _init_fonts   ();
-        _init_icons   ();
-        _init_strings ();
+        _init_images  ();
         _init_widgets ();
-        version (ACTIONS) _init_actions ();
-        _init_styles  ();
         _init_layout  ();
         _init_window  ();
     }
@@ -103,19 +95,8 @@ Page {
     }
 
     void
-    _init_icons () {
+    _init_images () {
         //
-    }
-
-    void
-    _init_strings () {
-        strings._init ();
-        strings.s[0] = "    ";
-        strings.s[1] = "";
-        strings.s[2] = "";
-        strings.s[3] = "󰁹󰁹󰁹󰁹";
-        strings.s[4] = "";  // //        󰕾 󰕿 󰖀 󰝞 󰝟 󰖁 󰝝 󱄠 󱄡
-        strings.s[5] = "󰀝󰀝󰀝󰀝";
     }
 
     TWIDGET*
@@ -123,9 +104,11 @@ Page {
         auto twidget = new TWIDGET (args);
         o.hub.register (twidget);
         auto widget = cast (Widget*) twidget;
-        widget.name    = TWIDGET.stringof;
+        //widget.name    = TWIDGET.stringof;
         widget.page    = &this;
-        //widget.draw_dg = &twidget.draw;
+        widget.page    = &this;
+        static if (__traits(hasMember,TWIDGET,"style"))
+            widget.style_dg = &__traits(getMember,twidget,"style");
         widgets.s ~= widget;
         return twidget;
     }        
@@ -159,49 +142,9 @@ Page {
     }
 
     void
-    _init_styles () {
-        styles._init ();
-
-        Style* s = &styles.s[0];
-        Style* s2 = &styles.s[0];
-        s.fg   = 1;
-        s.font = 1;
-
-        foreach (widget; widgets.s) {
-            styles.s ~= Style (widget.name);
-            s = &styles.s[$-1];
-            s.flags.enabled = true;
-
-            switch (widget.name) {
-                case "Button" /* start  */ :  s.font = 1; s.text = [''];           s.fg = 2; break;
-                case "Volume" /* volume  */ : s.font = 1; s.text_set = ['', '', '', '']; s.text = s.text_set[0..1]; s.fg = 2; break;
-                //case 3 /* batary */ : s.font = 1; s.text = 3; s.fg = 2; break;
-                //case 4 /* volume */ : s.font = 1; s.text = 4; s.fg = 2; break;
-                //case 5 /* avia   */ : s.font = 1; s.text = 5; s.fg = 2; break;
-                default:
-           }
-
-            // base 
-            styles.s ~= *s;
-            s2 = &styles.s[$-1];
-            s2.fg = 3; 
-            s2.bg = 1;
-            // pressed
-            styles.s ~= *s;
-            s2 = &styles.s[$-1];
-            s2.flags.pressed = true;
-            s2.fg = 5; 
-            s2.bg = 2;
-        }
-
-        // disabled pressed selected focused m_over lamp_on
-        // 16
-        // type * 16  // base, button, check, radio, select, text
-        // 6*16 = 96 styles * 10 = 960 Bytes
-        //
-        // max
-        // 256 types * 6 flags = 1536 * 10 = 15_360 Bytes
-        // 256 types * 2^6 flags = 256*64 = 16384 *10 = 163_840 Bytes
+    style () {
+        wh.w = 1024;
+        wh.h = 600;
     }
 
     void
