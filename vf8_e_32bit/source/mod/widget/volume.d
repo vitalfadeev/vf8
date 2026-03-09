@@ -1,13 +1,13 @@
 module mod.widget.volume;
 
 version (SDL):
-import mod.widget          : Widget;
 import vf.sdl.importc_sdl;
-import mod.widget.button;
+import mod.widget.button   : Button;
+import mod.widget          : Widget;
 import vf.sdl.renderer_sdl : Renderer;
-import app : o;
-import std.stdio : writeln;
 import vf.std.xywh         : Xy;
+import std.stdio : writeln;
+import app : o;
 
 
 struct
@@ -17,42 +17,23 @@ Volume {
 
     ubyte volume;
 
-    //void
-    //SDL_MOUSEBUTTONDOWN (SDL_MouseButtonEvent* evt) {
-    //    if (!xywh.has (Xy (evt.x, evt.y))) return;
-    //    _super.SDL_MOUSEBUTTONDOWN (evt);
-    //}
-
-    //void
-    //SDL_MOUSEBUTTONUP (SDL_MouseButtonEvent* evt) {
-    //    if (!xywh.has (Xy (evt.x, evt.y))) return;
-    //    _super.SDL_MOUSEBUTTONUP (evt);
-    //}
-
-    //void
-    //SDL_MOUSEWHEEL (SDL_MouseWheelEvent* evt) {
-    //    with (o)
-    //    with (evt)
-    //    switch (direction) with (SDL_MouseWheelDirection) {
-    //        case SDL_MOUSEWHEEL_NORMAL  : (y > 0)? hub.VOLUME_UP (): hub.VOLUME_DN (); redraw (); break;
-    //        case SDL_MOUSEWHEEL_FLIPPED : (y < 0)? hub.VOLUME_DN (): hub.VOLUME_DN (); redraw (); break;
-    //        default                     :
-    //    }
-    //}
+    void
+    on_sdl_mousewheel (SDL_MouseWheelEvent* evt) {
+        writeln ("OK! sdl_mousewheel");
+        with (o)
+        with (evt)
+        switch (direction) with (SDL_MouseWheelDirection) {
+            case SDL_MOUSEWHEEL_NORMAL  : (y > 0)? hub.VOLUME_UP (): hub.VOLUME_DN (); redraw (); break;
+            case SDL_MOUSEWHEEL_FLIPPED : (y < 0)? hub.VOLUME_DN (): hub.VOLUME_DN (); redraw (); break;
+            default                     :
+        }
+    }
 
     void
     VOLUME_INFO (ubyte volume) {
         this.volume = volume;
         redraw ();
     }
-
-    //void
-    //PRESS () {
-    //    with (o) {
-    //        _super.PRESS ();
-    //        hub.QUICK_SETTINGS ();
-    //    }
-    //}
 
     void
     style () {

@@ -48,7 +48,6 @@ Sdl {
             foreach (page; pages) {
                 if (page.window._sdl_window == _sdl_window) {
                     page.sdl_mousebuttondown (evt);
-                    break;
                 }
             }        
         }
@@ -65,7 +64,6 @@ Sdl {
             foreach (page; pages) {
                 if (page.window._sdl_window == _sdl_window) {
                     page.sdl_mousebuttonup (evt);
-                    break;
                 }
             }        
         }
@@ -82,7 +80,6 @@ Sdl {
             foreach (page; pages) {
                 if (page.window._sdl_window == _sdl_window) {
                     page.sdl_mousewheel (evt);
-                    break;
                 }
             }        
         }

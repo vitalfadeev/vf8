@@ -296,7 +296,7 @@ Wifi {
 
 struct
 Volume_ {
-    Button _super;
+    Volume _super;
     alias _super this;
 
     void

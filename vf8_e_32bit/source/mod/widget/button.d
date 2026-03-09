@@ -17,7 +17,7 @@ Button {
 
     void
     on_sdl_mousebuttondown (SDL_MouseButtonEvent* evt) {
-        if (!xywh.has (Xy (evt.x, evt.y))) return;
+        //if (!xywh.has (Xy (evt.x, evt.y))) return;
 
         with (o)
         with (evt)
@@ -33,7 +33,7 @@ Button {
 
     void
     on_sdl_mousebuttonup (SDL_MouseButtonEvent* evt) {
-        if (!xywh.has (Xy (evt.x, evt.y))) return;
+        //if (!xywh.has (Xy (evt.x, evt.y))) return;
 
         with (o)
         with (evt)
