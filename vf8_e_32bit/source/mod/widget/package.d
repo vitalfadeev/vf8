@@ -20,7 +20,7 @@ import app;
 struct
 Widget {
     Xywh     xywh;
-    Flags    flags;  
+    Flags    flags;
     Page*    page;
     string   name;  // for debug
     // style

@@ -43,7 +43,9 @@ struct
 Column_layout {    
     void
     layout (Widget* widget) {
-        Xy xy = widget.xywh.xy;
+        int w;
+        int h;
+        Xy  xy = widget.xywh.xy;
 
         foreach (_widget; widget.childs.norecursive) {
             _widget.xywh.xy = xy;

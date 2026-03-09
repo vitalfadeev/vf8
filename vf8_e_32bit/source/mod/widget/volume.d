@@ -19,14 +19,25 @@ Volume {
 
     void
     on_sdl_mousewheel (SDL_MouseWheelEvent* evt) {
-        writeln ("OK! sdl_mousewheel");
         with (o)
         with (evt)
         switch (direction) with (SDL_MouseWheelDirection) {
-            case SDL_MOUSEWHEEL_NORMAL  : (y > 0)? hub.VOLUME_UP (): hub.VOLUME_DN (); redraw (); break;
-            case SDL_MOUSEWHEEL_FLIPPED : (y < 0)? hub.VOLUME_DN (): hub.VOLUME_DN (); redraw (); break;
+            case SDL_MOUSEWHEEL_NORMAL  : (y > 0)? up (): dn (); redraw (); break;
+            case SDL_MOUSEWHEEL_FLIPPED : (y < 0)? dn (): up (); redraw (); break;
             default                     :
         }
+    }
+
+    void
+    up () {
+        with (o)
+        hub.VOLUME_UP ();
+    }
+
+    void
+    dn () {
+        with (o)
+        hub.VOLUME_DN ();
     }
 
     void

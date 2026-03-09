@@ -2,9 +2,11 @@ module mod.quick_settings;
 
 import mod.widget        : Widget;
 import mod.widget.button : Button;
-import vf.gui.color    : Color;
+import mod.widget.check  : Check;
+import mod.widget.slider : Slider;
+import vf.gui.color      : Color;
 import vf.gui.layout;
-import vf.std.xywh     : Xy,Wh,Xywh;
+import vf.std.xywh       : Xy,Wh,Xywh;
 import vf.gui.page       : Page;
 import app : o;
 
@@ -107,7 +109,7 @@ create_ui (Page_qs* page) {
     // line 2-3, pos 3
     auto _3 = page.create!L3 ();
     _3.xywh.w = W;
-    _3.xywh.h = S3;
+    _3.xywh.h = S3*2;
     _3.childs.layout_dg = &(new Column_layout).layout;
     main.childs.put (_3);
 
@@ -269,31 +271,24 @@ Bright {
 
 struct
 Lan {
-    Button _super;
+    Check _super;
     alias _super this;   
 }
 
 struct
 Wifi {
-    Button _super;
+    Check _super;
     alias _super this;   
 }
 
 struct
 Power {
-    Button _super;
+    Check _super;
     alias _super this;   
 }
 
 struct
 Avia {
-    Button _super;
-    alias _super this;   
-}
-
-//
-struct
-Slider {
-    Widget _super;
+    Check _super;
     alias _super this;   
 }

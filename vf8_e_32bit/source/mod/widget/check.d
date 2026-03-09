@@ -1,18 +1,18 @@
-module mod.widget.button;
+module mod.widget.check;
 
 version (SDL):
-import mod.widget          : Widget;
 import vf.sdl.importc_sdl;
+import mod.widget.button   : Button;
+import mod.widget          : Widget;
 import vf.sdl.renderer_sdl : Renderer;
-import vf.std.xywh         : Xywh;
 import vf.std.xywh         : Xy;
 import std.stdio : writeln;
 import app : o;
 
 
 struct
-Button {
-    Widget _super;
+Check {
+    Button _super;
     alias _super this;
 
     void
@@ -46,7 +46,10 @@ Button {
     void
     press () {
         with (o) {
-            flags.pressed = true;
+            if (flags.pressed)
+                flags.pressed = false;
+            else
+                flags.pressed = true;
             on.pressed ();
             redraw ();
         }
@@ -55,7 +58,6 @@ Button {
     void
     release () {
         with (o) {
-            flags.pressed = false; 
             on.released ();
             redraw ();
         }
@@ -63,29 +65,31 @@ Button {
 
     void
     style () {
-        if (!text.length) text = [''];
-        //xywh.w = 64;
-        //xywh.h = 64;
-        if (flags.pressed) {
-            fg = 0xFFFFFFFF;  // 5
-            bg = 0xFF888888;  // 2
-        } else {
-            fg = 0xFFCCCCCC; // 3
-            bg = 0xFF444444; // 1
-        }
+        _super.style ();
     }
 
     void
     draw (Renderer* renderer) {
         if (style_dg !is null) style_dg ();
-
-        with (xywh)
-        if (w > 0 && h > 0)
-            renderer.draw_rect (x,y,w,h,fg,bg);
-
-        with (xywh)
-        if (text) {
-            renderer.draw_text (page.fonts.s[1],x,y,w,h,fg,bg,text);
-        }
+        _super.draw (renderer);
     }
 }
+
+Volume_type
+volume_type (ubyte volume) {
+    with (Volume_type) {
+        if (volume == 0)               return MUTE;
+        if (volume < volume.max/3)     return LOW;
+        if (volume < (volume.max/3)*2) return MID;
+        return HIGH;
+    }
+}
+
+enum
+Volume_type {
+    MUTE,
+    LOW,
+    MID,
+    HIGH,
+}
+
