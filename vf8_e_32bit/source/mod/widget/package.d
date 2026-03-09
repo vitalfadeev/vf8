@@ -69,7 +69,12 @@ Widget {
         if (style_dg !is null) style_dg ();
 
         writeln ("default draw on widget");
-    };
+    }
+
+    void
+    redraw () {
+        page.redraw (cast(Widget*)&this);         
+    }
 
     auto
     recursive () {

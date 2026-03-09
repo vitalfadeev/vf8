@@ -37,17 +37,17 @@ Sdl {
         o.quit = true;
     }   
 
-    void
-    SDL_KEYDOWN (SDL_KeyboardEvent* evt) {
-        // SDL_KEYDOWN
-        // SDL_KEYUP
-        with (o)
-        with (evt)
-        switch (keysym.scancode) {
-            case SDL_SCANCODE_ESCAPE : o.quit = true; break;
-            case SDL_SCANCODE_Q      : o.quit = true; break;
-            default                  :
-        }
-    }
+    //void
+    //SDL_KEYDOWN (SDL_KeyboardEvent* evt) {
+    //    // SDL_KEYDOWN
+    //    // SDL_KEYUP
+    //    with (o)
+    //    with (evt)
+    //    switch (keysym.scancode) {
+    //        case SDL_SCANCODE_ESCAPE : o.quit = true; break;
+    //        case SDL_SCANCODE_Q      : o.quit = true; break;
+    //        default                  :
+    //    }
+    //}
 }
 

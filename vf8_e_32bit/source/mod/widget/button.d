@@ -52,7 +52,7 @@ Button {
         with (o) {
             flags.pressed = true;
             hub.PRESSED ();
-            hub.REDRAW (cast(Widget*)&this); 
+            redraw ();
         }
     }
 
@@ -61,7 +61,7 @@ Button {
         with (o) {
             flags.pressed = false; 
             hub.RELEASED ();
-            hub.REDRAW (cast(Widget*)&this); 
+            redraw ();
         }
     }
 

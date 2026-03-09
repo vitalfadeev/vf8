@@ -44,7 +44,7 @@ main () {
 		page._init ();
 
 		// Layout
-		hub.LAYOUT ();
+		page.layout ();
 
 		// Event loop
 		foreach (evt; input) {

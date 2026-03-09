@@ -34,8 +34,8 @@ Volume {
         with (o)
         with (evt)
         switch (direction) with (SDL_MouseWheelDirection) {
-            case SDL_MOUSEWHEEL_NORMAL  : (y > 0)? hub.VOLUME_UP (): hub.VOLUME_DN (); hub.REDRAW (cast (Widget*) &this); break;
-            case SDL_MOUSEWHEEL_FLIPPED : (y < 0)? hub.VOLUME_DN (): hub.VOLUME_DN (); hub.REDRAW (cast (Widget*) &this); break;
+            case SDL_MOUSEWHEEL_NORMAL  : (y > 0)? hub.VOLUME_UP (): hub.VOLUME_DN (); redraw (); break;
+            case SDL_MOUSEWHEEL_FLIPPED : (y < 0)? hub.VOLUME_DN (): hub.VOLUME_DN (); redraw (); break;
             default                     :
         }
     }
@@ -43,9 +43,7 @@ Volume {
     void
     VOLUME_INFO (ubyte volume) {
         this.volume = volume;
-
-        with (o)
-        hub.REDRAW (cast (Widget*) &this);
+        redraw ();
     }
 
     void

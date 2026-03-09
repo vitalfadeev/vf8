@@ -11,23 +11,23 @@ import vf.std.xywh     : Xy,Wh,Xywh;
 import vf.gui.page_.colors  : Colors;
 import vf.gui.page_.fonts   : Fonts;
 import vf.gui.page_.strings : Strings;
+import vf.gui.window        : Window;
 import mod.widget           : Widget;
 import mod.widget.button    : Button;
 import mod.widget.volume    : Volume;
 import std.traits           : EnumMembers;
 import vf.sdl.renderer_sdl  : Renderer;
-import vf.sdl.importc_sdl   : SDL_Window;
 import std.stdio : writeln;
 import app : o;
 import std.stdio : writefln;
 
 struct
 Page {
-    Wh           wh;         // ushort x ushort  16368 x 16368
-    Colors       colors;
-    Fonts        fonts;
-    Widget*      widget;
-    SDL_Window*  window;
+    Wh      wh;         // ushort x ushort  16368 x 16368
+    Colors  colors;
+    Fonts   fonts;
+    Widget* widget;
+    Window  window;
     //Xy           window_xy;
 
     //void
@@ -46,9 +46,7 @@ Page {
 
     void
     _init_window () {
-        import mod.sdl_wm;
-        with (o)
-        Sdl_wm ().new_window (wh.w, wh.h, &window);
+         window.create (wh.w, wh.h);
     }
 
     void
@@ -103,7 +101,7 @@ Page {
     }
 
     void
-    LAYOUT () {
+    layout () {
         // all widgets recursive
         if (widget !is null) 
         foreach (_widget; widget.recursive)  { // include this.widget
@@ -114,28 +112,30 @@ Page {
     }
 
     void
-    draw (Renderer* renderer) {
+    draw () {
         with (o) {
-            renderer.draw_start (window,true);
-            foreach (_widget; widget.recursive)
-                writeln (_widget.name);
+            auto renderer = window.draw_start (true);
+            
             foreach (_widget; widget.recursive)
                 if (_widget.draw_dg !is null)
                     _widget.draw_dg (renderer);
-            renderer.draw_end (window);
+
+            window.draw_end (renderer);
         }
     }
 
     void
-    REDRAW (Widget* wanted_widget) {
+    redraw (Widget* wanted_widget) {
         with (o) 
         if (widget.page == &this) {
-            Renderer renderer;
-            renderer.draw_start (window,false);
+            auto renderer = window.draw_start (false);
+            
             foreach (_widget; widget.recursive)
-//                if (_widget == wanted_widget)
-                    _widget.draw_dg (&renderer);
-            renderer.draw_end (window);
+                //if (_widget == wanted_widget)
+                if (_widget.draw_dg !is null)
+                    _widget.draw_dg (renderer);
+
+            window.draw_end (renderer);
         }
     }
 }
@@ -268,7 +268,13 @@ Wifi {
 struct
 Volume_ {
     Button _super;
-    alias _super this;    
+    alias _super this;
+
+    void
+    PRESSED () {
+        with (o)
+        hub.QUICK_SETTINGS ();
+    }
 }
 
 struct

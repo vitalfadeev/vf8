@@ -1,6 +1,7 @@
 module mod.sdl_wm;
 
 version (SDL):
+import std.algorithm : countUntil, remove;
 import vf.std.xywh;
 import vf.sdl.importc_sdl;
 import vf.sdl.renderer_sdl : Renderer;
@@ -34,25 +35,23 @@ Sdl_wm {
         }
     }
 
-    //void
-    //SDL_KEYDOWN (SDL_KeyboardEvent* evt) {
-    //    // SDL_KEYDOWN
-    //    // SDL_KEYUP
-    //    with (o)
-    //    with (evt)
-    //    switch (keysym.scancode) {
-    //        case SDL_SCANCODE_ESCAPE : _close_window (evt,windowID); break;
-    //        case SDL_SCANCODE_Q      : _close_window (evt,windowID); break;
-    //        default                  :
-    //    }
-    //}
+    void
+    SDL_KEYDOWN (SDL_KeyboardEvent* evt) {
+        // SDL_KEYDOWN
+        // SDL_KEYUP
+        with (o)
+        with (evt)
+        switch (keysym.scancode) {
+            case SDL_SCANCODE_ESCAPE : _close (windowID); break;
+            case SDL_SCANCODE_Q      : _close (windowID); break;
+            default                  :
+        }
+    }
 
     void
     _shown (uint windowID) {
         auto _sdl_window = SDL_GetWindowFromID (windowID);
         if (!_sdl_window) return;
-
-        s ~= _sdl_window;
     }
 
     void
@@ -68,9 +67,8 @@ Sdl_wm {
                 auto _sdl_window = SDL_GetWindowFromID (windowID);
                 if (!_sdl_window) return;
 
-                if (page.window == _sdl_window) {
-                    Renderer renderer;
-                    page.draw (&renderer);  // to Page
+                if (page.window._sdl_window == _sdl_window) {
+                    page.draw ();
                 }
             }        
         }
@@ -80,10 +78,10 @@ Sdl_wm {
     _close (uint windowID) {
         auto _sdl_window = SDL_GetWindowFromID (windowID);
         if (!_sdl_window) return;
+
         SDL_DestroyWindow (_sdl_window);
 
-        import std.algorithm : countUntil, remove;
-        auto _i = countUntil!"a == b" (s, _sdl_window);
+        auto _i = s.countUntil (_sdl_window);
         if (_i != -1) s = s.remove (_i);
 
         _quit_on_last_window ();
@@ -94,10 +92,10 @@ Sdl_wm {
         if (s.length == 0) o.quit = true;
     }
 
-    void
-    new_window (int w, int h, SDL_Window** window) {
+    SDL_Window*
+    new_window (int w, int h) {
         // Window
-        auto _window = 
+        auto _sdl_window = 
             SDL_CreateWindow (
                 __FILE_FULL_PATH__, // "SDL2 Window",
                 SDL_WINDOWPOS_CENTERED_DISPLAY (0),
@@ -108,12 +106,14 @@ Sdl_wm {
                 // | SDL_WINDOW_ALLOW_HIGHDPI
             );
 
-        if (!_window)
+        if (!_sdl_window)
             throw new SDLException ("Failed to create window");
 
         // Update
-        SDL_UpdateWindowSurface (_window);
+        SDL_UpdateWindowSurface (_sdl_window);
 
-        *window = _window;
-    }        
+        s ~= _sdl_window;
+
+        return _sdl_window;
+    }    
 }

@@ -3,41 +3,22 @@ module vf.sdl.renderer_sdl;
 version (SDL):
 import std.conv : to;
 import vf.gui.color  : Color; 
-import vf.gui.page_.fonts;
 import vf.sdl.importc_sdl;
 
 
 struct
 Renderer {
     SDL_Renderer* _renderer;
-    Fonts*         fonts;
 
     ~this() {
         SDL_DestroyRenderer (_renderer);
     }
 
     void
-    draw_start (SDL_Window* window, bool clear) {
-        _renderer = new_renderer (window);
-        // clear
-        if (clear) {
-            SDL_SetRenderDrawColor (_renderer, 0x00, 0x00, 0x00, 0xFF);
-            SDL_RenderClear (_renderer);
-        }
+    clear () {
+        SDL_SetRenderDrawColor (_renderer, 0x00, 0x00, 0x00, 0xFF);
+        SDL_RenderClear (_renderer);        
     }
-
-    void
-    draw_end (SDL_Window* window) {
-        // Rasterize
-        SDL_RenderPresent (_renderer);
-
-        SDL_DestroyRenderer (_renderer);
-    }
-
-    SDL_Renderer* 
-    new_renderer (SDL_Window* window) {
-        return SDL_CreateRenderer (window, -1, SDL_RENDERER_SOFTWARE);
-    }    
 
     void
     draw_rect (uint x, uint y, uint w, uint h, Color fg, Color bg) {
@@ -100,5 +81,10 @@ Renderer {
         //TTF_SizeUTF8 (font,textz,size_w,size_h);
 
         return surface;
+    }
+
+    void
+    rasterize () {
+        SDL_RenderPresent (_renderer);        
     }
 }

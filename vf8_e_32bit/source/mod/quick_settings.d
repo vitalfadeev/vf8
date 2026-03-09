@@ -31,18 +31,21 @@ Page_qs {
 
     void
     _init () {
+        wh.w = 320;
+        wh.h = 600;
         _init_colors  ();
         _init_fonts   ();
         _init_images  ();
         _init_widgets ();
         _init_window  ();
+        this.layout ();
     }
 
     void
     _init_window () {
         import mod.sdl_wm;
         with (o)
-        Sdl_wm ().new_window (wh.w, wh.h, &window);
+        window.create (wh.w, wh.h);
     }
 
     void
