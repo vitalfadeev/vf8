@@ -8,6 +8,12 @@ import vf.std.xywh     : Xy,Wh,Xywh;
 import vf.gui.page       : Page;
 import app : o;
 
+enum W = 1024/2;
+enum S1 = 48;
+enum S2 = S1;
+enum S3 = 48;
+enum S4 = 64;
+
 
 struct
 Quick_settings {
@@ -17,7 +23,7 @@ Quick_settings {
         // window
         with (o) {
             auto page = new Page_qs ();
-            page.wh.w = 320;
+            page.wh.w = W;
             page.wh.h = 600;
             page.draw_dg = &page.draw;
             hub.register (page);
@@ -56,7 +62,7 @@ Page_qs {
 
     void
     style () {
-        wh.w = 320;
+        wh.w = W;
         wh.h = 600;
     }
 }
@@ -71,105 +77,102 @@ void
 create_ui (Page_qs* page) {
     // main
     auto main = page.create!Main ();
-    main.xywh.w = 1024;
-    main.xywh.h = 64;
+    main.xywh.w = W;
+    main.xywh.h = S1;
     main.childs.layout_dg = &(new Column_layout).layout;
 
     // layout
     // line 1
     auto left_right = page.create!Left_right ();
-    left_right.xywh.w = 64*1;
-    left_right.xywh.h = 64;
-    left_right.childs.layout_dg = &(new Lr_layout).layout;
+    left_right.xywh.w = W;
+    left_right.xywh.h = S1;
+    left_right.childs.layout_dg = &(new Lr_layout (S1)).layout;
     main.childs.put (left_right);
 
     // line 1, pos 1
     auto _1 = page.create!L1 ();
-    _1.xywh.w = 64*4;
-    _1.xywh.h = 64;
-    _1.xywh.x = 1024 - 64*4;
+    _1.xywh.w = S1*1;
+    _1.xywh.h = S1;
     _1.childs.layout_dg = &(new Line_layout).layout;
     left_right.childs.put (_1);
 
     // line 1, pos 2
     auto _2 = page.create!L2 ();
-    _2.xywh.w = 64*4;
-    _2.xywh.h = 64;
-    _2.xywh.x = 1024 - 64*4;
+    _2.xywh.w = S1*4;
+    _2.xywh.h = S1;
+    _2.xywh.x = W - S1*4;
     _2.childs.layout_dg = &(new Line_layout).layout;
     left_right.childs.put (_2);
 
     // line 2-3, pos 3
     auto _3 = page.create!L3 ();
-    _3.xywh.w = 64*4;
-    _3.xywh.h = 64;
-    _3.xywh.x = 1024 - 64*4;
+    _3.xywh.w = W;
+    _3.xywh.h = S3;
     _3.childs.layout_dg = &(new Column_layout).layout;
     main.childs.put (_3);
 
     // line 4, pos 4
     auto _4 = page.create!L4 ();
-    _4.xywh.w = 64*4;
-    _4.xywh.h = 64;
-    _4.xywh.x = 1024 - 64*4;
+    _4.xywh.w = W;
+    _4.xywh.h = S4*2;
     _4.childs.layout_dg = &(new Grid_layout_ (2,2)).layout;
     main.childs.put (_4);
 
     // buttons
     // 1-2
     auto battery = page.create!Battery ();
-    battery.xywh.w = 32;
-    battery.xywh.h = 32;
+    battery.xywh.w = S1;
+    battery.xywh.h = S1;
     _1.childs.put (battery);
 
     auto screenshot = page.create!Screenshot ();
-    screenshot.xywh.w = 32;
-    screenshot.xywh.h = 32;
+    screenshot.xywh.w = S1;
+    screenshot.xywh.h = S1;
     _2.childs.put (screenshot);
 
     auto settings = page.create!Settings ();
-    settings.xywh.w = 32;
-    settings.xywh.h = 32;
+    settings.xywh.w = S1;
+    settings.xywh.h = S1;
     _2.childs.put (settings);
 
     auto lock = page.create!Lock ();
-    lock.xywh.w = 32;
-    lock.xywh.h = 32;
+    lock.xywh.w = S1;
+    lock.xywh.h = S1;
     _2.childs.put (lock);
 
     auto quit = page.create!Quit ();
-    quit.xywh.w = 32;
-    quit.xywh.h = 32;
+    quit.xywh.w = S1;
+    quit.xywh.h = S1;
     _2.childs.put (quit);
 
     // 3
     auto volume = page.create!Volume__ ();
-    volume.xywh.w = 32;
-    volume.xywh.h = 32;
+    volume.xywh.w = W;
+    volume.xywh.h = S3;
     _3.childs.put (volume);
 
     auto bright = page.create!Bright ();
-    bright.xywh.w = 32;
-    bright.xywh.h = 32;
+    bright.xywh.w = W;
+    bright.xywh.h = S3;
     _3.childs.put (bright);
 
     // 4 
     auto lan = page.create!Lan ();
-    lan.xywh.w = 64;
-    lan.xywh.h = 64;
+    lan.xywh.w = W/2;
+    lan.xywh.h = S4;
     _4.childs.put (lan);
 
     auto wifi = page.create!Wifi ();
-    wifi.xywh.w = 64;
-    wifi.xywh.h = 64;
+    wifi.xywh.w = W/2;
+    wifi.xywh.h = S4;
     _4.childs.put (wifi);
 
     auto power = page.create!Power ();
-    power.xywh.w = 64;
-    power.xywh.h = 64;
+    power.xywh.w = W/2;
+    power.xywh.h = S4;
     _4.childs.put (power);
 
-    _new!Avia (page, 64, 64, _4);
+    _new!Avia (page, W/2, S4, _4);
 
     //
     page.widget = cast (Widget*) main;

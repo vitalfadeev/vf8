@@ -125,7 +125,7 @@ Page {
 
     void
     style () {
-        wh.w = 1024;
+        wh.w = W;
         wh.h = 600;
     }
 
@@ -180,64 +180,67 @@ Page {
 //     w volume
 //     w battery
 
+enum W = 1024;
+enum S1 = 48;
+
 void
 create_ui (Page* page) {
     // main
     auto main = page.create!Main ();
-    main.xywh.w = 1024;
-    main.xywh.h = 64;
-    main.childs.layout_dg = &(new Lcr_layout).layout;
+    main.xywh.w = W;
+    main.xywh.h = S1;
+    main.childs.layout_dg = &(new Lcr_layout (S1)).layout;
 
     // layout
     auto left = page.create!Left ();
-    left.xywh.w = 64*1;
-    left.xywh.h = 64;
+    left.xywh.w = S1*1;
+    left.xywh.h = S1;
     left.childs.layout_dg = &(new Line_layout).layout;
     main.childs.put (left);
 
     auto center = page.create!Center ();
-    center.xywh.w = 64*1;
-    center.xywh.h = 64;
-    center.xywh.x = 1024/2 - 64*1/2;
+    center.xywh.w = S1*1;
+    center.xywh.h = S1;
+    center.xywh.x = W/2 - S1*1/2;
     center.childs.layout_dg = &(new Line_layout).layout;
     main.childs.put (center);
 
     auto right = page.create!Right ();
-    right.xywh.w = 64*4;
-    right.xywh.h = 64;
-    right.xywh.x = 1024 - 64*4;
+    right.xywh.w = S1*4;
+    right.xywh.h = S1;
+    right.xywh.x = W - S1*4;
     right.childs.layout_dg = &(new Line_layout).layout;
     main.childs.put (right);
 
     // buttons
     auto start = page.create!Start ();
-    start.xywh.w = 64;
-    start.xywh.h = 64;
+    start.xywh.w = S1;
+    start.xywh.h = S1;
     left.childs.put (start);
 
     auto clock = page.create!Clock ();
-    clock.xywh.w = 64;
-    clock.xywh.h = 64;
+    clock.xywh.w = S1;
+    clock.xywh.h = S1;
     center.childs.put (clock);
 
     auto lan = page.create!Lan ();
-    lan.xywh.w = 64;
-    lan.xywh.h = 64;
+    lan.xywh.w = S1;
+    lan.xywh.h = S1;
     right.childs.put (lan);
 
     auto wifi = page.create!Wifi ();
-    wifi.xywh.w = 64;
-    wifi.xywh.h = 64;
+    wifi.xywh.w = S1;
+    wifi.xywh.h = S1;
     right.childs.put (wifi);
 
     auto volume = page.create!Volume_ ();
-    volume.xywh.w = 64;
-    volume.xywh.h = 64;
+    volume.xywh.w = S1;
+    volume.xywh.h = S1;
     right.childs.put (volume);
 
     auto battery = page.create!Battery ();
-    battery.xywh.w = 64;
-    battery.xywh.h = 64;
+    battery.xywh.w = S1;
+    battery.xywh.h = S1;
     right.childs.put (battery);
 
     //

@@ -55,6 +55,9 @@ Column_layout {
 
 struct
 Lcr_layout {    
+    int w;
+    int h;
+
     void
     layout (Widget* widget) {
         Xy xy = widget.xywh.xy;
@@ -63,8 +66,8 @@ Lcr_layout {
         foreach (i,_widget; widget.childs.norecursive) {
             switch (i) {
                 case 0: _widget.xywh.xy.x = xy.x; break;
-                case 1: _widget.xywh.xy.x = xy.x + (wh.w - (cast (uint) _widget.childs.length) * 64) / 2; break;
-                case 2: _widget.xywh.xy.x = xy.x + (wh.w - (cast (uint) _widget.childs.length) * 64); break;
+                case 1: _widget.xywh.xy.x = xy.x + (wh.w - (cast (uint) _widget.childs.length) * w) / 2; break;
+                case 2: _widget.xywh.xy.x = xy.x + (wh.w - (cast (uint) _widget.childs.length) * w); break;
                 default:
             }
         }
@@ -72,7 +75,10 @@ Lcr_layout {
 }
 
 struct
-Lr_layout {    
+Lr_layout {
+    int w;
+    int h;
+
     void
     layout (Widget* widget) {
         Xy xy = widget.xywh.xy;
@@ -81,7 +87,7 @@ Lr_layout {
         foreach (i,_widget; widget.childs.norecursive) {
             switch (i) {
                 case 0: _widget.xywh.xy.x = xy.x; break;
-                case 1: _widget.xywh.xy.x = xy.x + (wh.w - (cast (uint) _widget.childs.length) * 64); break;
+                case 1: _widget.xywh.xy.x = xy.x + (wh.w - (cast (uint) _widget.childs.length) * w); break;
                 default:
             }
         }
@@ -95,7 +101,19 @@ Grid_layout_ {
 
     void
     layout (Widget* widget) {
-        //
+        Xy xy = widget.xywh.xy;
+
+        foreach (i,_widget; widget.childs.norecursive) {
+            _widget.xywh.xy = xy;
+
+            if ((i+1) % size_x != 0) {          // row
+                xy.x += _widget.xywh.w;
+            } 
+            else {                          // new row
+                xy.x  = widget.xywh.xy.x;
+                xy.y += _widget.xywh.h;;
+            }
+        }
     }
 }
 
