@@ -3,11 +3,9 @@ module vf.gui.page;
 version (GUI):
 version (E_32BIT_PAGED):
 
-import vf.std.tstring256;
-import vf.gui.color    : Color;
-import vf.gui.layout   : Layout,Line_layout,Lcr_layout;
-import vf.std.xywh     : Xy,Wh,Xywh;
-
+import vf.gui.color         : Color;
+import vf.gui.layout        : Layout,Line_layout,Lcr_layout;
+import vf.std.xywh          : Xy,Wh,Xywh;
 import vf.gui.page_.colors  : Colors;
 import vf.gui.page_.fonts   : Fonts;
 import vf.gui.page_.strings : Strings;
@@ -17,9 +15,10 @@ import mod.widget.button    : Button;
 import mod.widget.volume    : Volume;
 import std.traits           : EnumMembers;
 import vf.sdl.renderer_sdl  : Renderer;
-import std.stdio : writeln;
-import app : o;
-import std.stdio : writefln;
+import vf.sdl.importc_sdl   : SDL_MouseButtonEvent,SDL_MouseWheelEvent;
+import std.stdio            : writeln;
+import app                  : o;
+import std.stdio            : writefln;
 
 struct
 Page {
@@ -88,6 +87,7 @@ Page {
             widget.style_dg = &__traits(getMember,twidget,"style");
         static if (__traits(hasMember,TWIDGET,"draw"))
             widget.draw_dg  = &__traits(getMember,twidget,"draw");
+        widget.on.register (twidget);
         widget.name   = TWIDGET.stringof;
         return twidget;
     }        
@@ -95,6 +95,32 @@ Page {
     void
     _init_widgets () {
         create_ui (&this);
+    }
+
+    void
+    sdl_mousebuttondown (SDL_MouseButtonEvent* evt) {
+        auto xy = Xy (evt.x, evt.y);
+        foreach (_widget; widget.recursive) {
+            if (_widget.xywh.has (xy)) {
+                _widget.on.sdl_mousebuttondown (evt);
+            }
+        }
+    }
+
+    void
+    sdl_mousebuttonup (SDL_MouseButtonEvent* evt) {
+        auto xy = Xy (evt.x, evt.y);
+        foreach (_widget; widget.recursive)
+            if (_widget.xywh.has (xy))
+                _widget.on.sdl_mousebuttonup (evt);
+    }
+
+    void
+    sdl_mousewheel (SDL_MouseWheelEvent* evt) {
+        auto xy = Xy (evt.x, evt.y);
+        foreach (_widget; widget.recursive)
+            if (_widget.xywh.has (xy))
+                _widget.on.sdl_mousewheel (evt);
     }
 
     void
@@ -274,7 +300,7 @@ Volume_ {
     alias _super this;
 
     void
-    PRESSED () {
+    on_pressed () {
         with (o)
         hub.QUICK_SETTINGS ();
     }

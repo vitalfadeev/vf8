@@ -18,9 +18,9 @@ Sdl {
             case SDL_QUIT            : hub.SDL_QUIT            (&evt.quit); break;
             case SDL_KEYDOWN         : hub.SDL_KEYDOWN         (&evt.key); break;
             case SDL_KEYUP           : hub.SDL_KEYUP           (&evt.key); break;
-            case SDL_MOUSEWHEEL      : hub.SDL_MOUSEWHEEL      (&evt.wheel); break;
-            case SDL_MOUSEBUTTONDOWN : hub.SDL_MOUSEBUTTONDOWN (&evt.button); break;
-            case SDL_MOUSEBUTTONUP   : hub.SDL_MOUSEBUTTONUP   (&evt.button); break;
+            case SDL_MOUSEWHEEL      : sdl_mousewheel          (&evt.wheel); break;
+            case SDL_MOUSEBUTTONDOWN : sdl_mousebuttondown     (&evt.button); break;
+            case SDL_MOUSEBUTTONUP   : sdl_mousebuttonup       (&evt.button); break;
             case SDL_WINDOWEVENT     : hub.SDL_WINDOWEVENT     (&evt.window); break;
             default                  :
         }
@@ -36,6 +36,57 @@ Sdl {
     SDL_QUIT (SDL_QuitEvent* evt) {
         o.quit = true;
     }   
+
+    void
+    sdl_mousebuttondown (SDL_MouseButtonEvent* evt) {
+        with (o)
+        with (evt) {
+            // Page with window
+            auto _sdl_window = SDL_GetWindowFromID (windowID);
+            if (!_sdl_window) return;
+            
+            foreach (page; pages) {
+                if (page.window._sdl_window == _sdl_window) {
+                    page.sdl_mousebuttondown (evt);
+                    break;
+                }
+            }        
+        }
+    }    
+
+    void
+    sdl_mousebuttonup (SDL_MouseButtonEvent* evt) {
+        with (o)
+        with (evt) {
+            // Page with window
+            auto _sdl_window = SDL_GetWindowFromID (windowID);
+            if (!_sdl_window) return;
+            
+            foreach (page; pages) {
+                if (page.window._sdl_window == _sdl_window) {
+                    page.sdl_mousebuttonup (evt);
+                    break;
+                }
+            }        
+        }
+    }    
+
+    void
+    sdl_mousewheel (SDL_MouseWheelEvent* evt) {
+        with (o)
+        with (evt) {
+            // Page with window
+            auto _sdl_window = SDL_GetWindowFromID (windowID);
+            if (!_sdl_window) return;
+            
+            foreach (page; pages) {
+                if (page.window._sdl_window == _sdl_window) {
+                    page.sdl_mousewheel (evt);
+                    break;
+                }
+            }        
+        }
+    }    
 
     //void
     //SDL_KEYDOWN (SDL_KeyboardEvent* evt) {

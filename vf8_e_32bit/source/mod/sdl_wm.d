@@ -63,10 +63,10 @@ Sdl_wm {
     _send_draw (uint windowID) {
         with (o) {
             // Page with window
-            foreach (page; o.pages) {
-                auto _sdl_window = SDL_GetWindowFromID (windowID);
-                if (!_sdl_window) return;
-
+            auto _sdl_window = SDL_GetWindowFromID (windowID);
+            if (!_sdl_window) return;
+            
+            foreach (page; pages) {
                 if (page.window._sdl_window == _sdl_window) {
                     if (page.draw_dg !is null)
                         page.draw_dg ();

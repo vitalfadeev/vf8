@@ -20,13 +20,11 @@ main () {
 		// Register
 		import mod.sdl;
 		import mod.sdl_wm;
-		import mod.widget;
 		import mod.volume;
 		import mod.quick_settings;
 
 		hub.register (new Sdl);
 		hub.register (new Sdl_wm);
-		hub.register (new Mod_widget);
 		hub.register (new Volume);
 		hub.register (new Quick_settings);
 

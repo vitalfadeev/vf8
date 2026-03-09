@@ -1,6 +1,7 @@
 module hub;
 
-import vf.std.traits : Functions_recursive, Fn_args_to_varname;
+import vf.std.traits : Functions_recursive;
+import vf.std.vars : Vars;
 import std.traits;
 import std.string;
 import std.traits;
@@ -15,6 +16,8 @@ struct
 Hub {
     Vars!(DG[]) _vars;
 
+    alias DG = void delegate ();
+
     void
     register (T) (T* t) {
         writeln ("register: ", T.stringof, " ", t);
@@ -26,7 +29,7 @@ Hub {
             static if (name == name.toUpper) {
                 writeln ("  ", name, " ", Parameters!(__traits(getMember,T,name)).stringof);
 
-                _dgs = _vars.var!(name,Parameters!(__traits(getMember,T,name))) ();
+                _dgs = _vars.var!(name,Parameters!(__traits(getMember,T,name)));
                 (*_dgs) ~= cast (DG) &__traits(getMember,t,name); // delegate
             }
         }
@@ -79,15 +82,5 @@ Hub {
             writeln ("  ", name, " ", ARGS.stringof, ", no listener ");
         }
     }
-
-    alias DG = void delegate ();
 }
 
-struct
-Vars (T) {
-    T*
-    var (string name, ARGS...) () {
-        static __gshared T _var;
-        return &_var;
-    }
-}

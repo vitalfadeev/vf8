@@ -16,13 +16,13 @@ Button {
     alias _super this;
 
     void
-    SDL_MOUSEBUTTONDOWN (SDL_MouseButtonEvent* evt) {
+    on_sdl_mousebuttondown (SDL_MouseButtonEvent* evt) {
         if (!xywh.has (Xy (evt.x, evt.y))) return;
 
         with (o)
         with (evt)
         switch (button) {
-            case SDL_BUTTON_LEFT   : this.PRESS (); break;
+            case SDL_BUTTON_LEFT   : this.press (); break;
             case SDL_BUTTON_MIDDLE : break;
             case SDL_BUTTON_RIGHT  : break;
             case SDL_BUTTON_X1     : break;
@@ -32,13 +32,13 @@ Button {
     }
 
     void
-    SDL_MOUSEBUTTONUP (SDL_MouseButtonEvent* evt) {
+    on_sdl_mousebuttonup (SDL_MouseButtonEvent* evt) {
         if (!xywh.has (Xy (evt.x, evt.y))) return;
 
         with (o)
         with (evt)
         switch (button) {
-            case SDL_BUTTON_LEFT   : this.RELEASE (); break;
+            case SDL_BUTTON_LEFT   : this.release (); break;
             case SDL_BUTTON_MIDDLE : break;
             case SDL_BUTTON_RIGHT  : break;
             case SDL_BUTTON_X1     : break;
@@ -48,19 +48,19 @@ Button {
     }
 
     void
-    PRESS () {
+    press () {
         with (o) {
             flags.pressed = true;
-            hub.PRESSED ();
+            on.pressed ();
             redraw ();
         }
     }
 
     void
-    RELEASE () {
+    release () {
         with (o) {
             flags.pressed = false; 
-            hub.RELEASED ();
+            on.released ();
             redraw ();
         }
     }

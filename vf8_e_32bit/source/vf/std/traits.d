@@ -67,11 +67,11 @@ Functions_recursive (alias T) {
 }
 
 template
-Fn_args_to_varname (string FN,ARGS...) {
+Fn_args_to_string (string FN,ARGS...) {
     import std.range;
     import std.algorithm;
     import std.meta;
-    enum Fn_args_to_varname = "_var_" ~ FN ~ "__" ~ Arg_to_string!ARGS;
+    enum Fn_args_to_string = FN ~ "__" ~ Arg_to_string!ARGS;
 }
 
 template
