@@ -17,8 +17,11 @@ Quick_settings {
         // window
         with (o) {
             auto page = new Page_qs ();
+            page.wh.w = 320;
+            page.wh.h = 600;
+            page.draw_dg = &page.draw;
+            hub.register (page);
             pages ~= cast (Page*) page;
-
             page._init ();
         }
     }
@@ -31,8 +34,6 @@ Page_qs {
 
     void
     _init () {
-        wh.w = 320;
-        wh.h = 600;
         _init_colors  ();
         _init_fonts   ();
         _init_images  ();

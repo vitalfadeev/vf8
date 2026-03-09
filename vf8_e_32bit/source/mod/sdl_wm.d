@@ -68,7 +68,8 @@ Sdl_wm {
                 if (!_sdl_window) return;
 
                 if (page.window._sdl_window == _sdl_window) {
-                    page.draw ();
+                    if (page.draw_dg !is null)
+                        page.draw_dg ();
                 }
             }        
         }

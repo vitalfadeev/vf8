@@ -39,6 +39,7 @@ main () {
 		auto page = new Page ();
 		page.wh.w = 1024;
 		page.wh.h = 600;
+		page.draw_dg = &page.draw;
 		hub.register (page);
 		pages ~= page;
 		page._init ();

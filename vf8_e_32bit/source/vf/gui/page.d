@@ -29,6 +29,9 @@ Page {
     Widget* widget;
     Window  window;
     //Xy           window_xy;
+    DRAW_DG draw_dg;
+
+    alias DRAW_DG = void delegate ();
 
     //void
     //do_switch (Event* evt) {
