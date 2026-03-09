@@ -3,7 +3,7 @@ module vf.gui.layout;
 version (GUI):
 version (E_32BIT_PAGED):
 import vf.std.xywh     : Xy,Wh,Xywh;
-import mod.widget      : Widget;
+import vf.gui.widget   : Widget;
 import std.stdio : writeln;
 
 

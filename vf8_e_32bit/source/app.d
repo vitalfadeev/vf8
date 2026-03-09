@@ -4,7 +4,7 @@ import hub 								: Hub;
 import vf.gui.page                      : Page;
 import vf.gui.color                     : Color;
 import vf.std.xywh                      : Xy,Wh,Xywh;
-import mod.widget 						: Widget;
+import vf.gui.widget    				: Widget;
 import std.string 						: startsWith;
 version (SDL) import vf.sdl.input       : Input;
 version (SDL) import vf.sdl.importc_sdl : SDL_Event,SDL_EventType, SDL_WindowEventID;

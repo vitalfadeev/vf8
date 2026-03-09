@@ -1,13 +1,13 @@
 module mod.quick_settings;
 
-import mod.widget        : Widget;
-import mod.widget.button : Button;
-import mod.widget.check  : Check;
-import mod.widget.slider : Slider;
-import vf.gui.color      : Color;
+import vf.gui.widget        : Widget;
+import vf.gui.widget.button : Button;
+import vf.gui.widget.check  : Check;
+import vf.gui.widget.slider : Slider;
+import vf.gui.color         : Color;
 import vf.gui.layout;
-import vf.std.xywh       : Xy,Wh,Xywh;
-import vf.gui.page       : Page;
+import vf.std.xywh          : Xy,Wh,Xywh;
+import vf.gui.page          : Page;
 import app : o;
 
 enum W = 1024/2;
