@@ -40,6 +40,20 @@ Line_layout {
 }
 
 struct
+Column_layout {    
+    void
+    layout (Widget* widget) {
+        Xy xy = widget.xywh.xy;
+
+        foreach (_widget; widget.childs.norecursive) {
+            _widget.xywh.xy = xy;
+
+            xy.y += _widget.xywh.h;
+        }
+    }
+}
+
+struct
 Lcr_layout {    
     void
     layout (Widget* widget) {
@@ -54,6 +68,34 @@ Lcr_layout {
                 default:
             }
         }
+    }
+}
+
+struct
+Lr_layout {    
+    void
+    layout (Widget* widget) {
+        Xy xy = widget.xywh.xy;
+        Wh wh = widget.xywh.wh;
+
+        foreach (i,_widget; widget.childs.norecursive) {
+            switch (i) {
+                case 0: _widget.xywh.xy.x = xy.x; break;
+                case 1: _widget.xywh.xy.x = xy.x + (wh.w - (cast (uint) _widget.childs.length) * 64); break;
+                default:
+            }
+        }
+    }
+}
+
+struct
+Grid_layout_ {    
+    ubyte size_x;
+    ubyte size_y;
+
+    void
+    layout (Widget* widget) {
+        //
     }
 }
 

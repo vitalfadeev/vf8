@@ -87,8 +87,6 @@ Page {
             widget.style_dg = &__traits(getMember,twidget,"style");
         static if (__traits(hasMember,TWIDGET,"draw"))
             widget.draw_dg  = &__traits(getMember,twidget,"draw");
-        widget.xywh.w = 64;
-        widget.xywh.h = 64;
         widget.name   = TWIDGET.stringof;
         return twidget;
     }        
@@ -135,8 +133,8 @@ Page {
             Renderer renderer;
             renderer.draw_start (window,false);
             foreach (_widget; widget.recursive)
-                if (_widget == wanted_widget)
-                    _widget.draw (&renderer);
+//                if (_widget == wanted_widget)
+                    _widget.draw_dg (&renderer);
             renderer.draw_end (window);
         }
     }

@@ -30,6 +30,8 @@ main () {
 		hub.register (new Volume);
 		hub.register (new Quick_settings);
 
+		writeln ("!!!START!!!");
+
 		// INIT
 		hub.INIT ();
 
