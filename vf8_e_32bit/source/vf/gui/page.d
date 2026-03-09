@@ -1,8 +1,6 @@
 module vf.gui.page;
 
 version (GUI):
-version (E_32BIT_PAGED):
-
 import vf.gui.color         : Color;
 import vf.gui.layout        : Layout,Line_layout,Lcr_layout;
 import vf.std.xywh          : Xy,Wh,Xywh;

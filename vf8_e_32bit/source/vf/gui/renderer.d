@@ -1,3 +1,3 @@
 module vf.gui.renderer;
 
-version (SDL) public import vf.sdl.renderer_sdl : Renderer;
+version (SDL) version (RENDERER_SDL) public import vf.sdl.renderer_sdl : Renderer;
