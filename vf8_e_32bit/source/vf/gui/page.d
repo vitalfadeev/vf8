@@ -117,7 +117,7 @@ Page {
 
     void
     sdl_mousewheel (SDL_MouseWheelEvent* evt) {
-        auto xy = Xy (evt.x, evt.y);
+        auto xy = Xy (evt.mouseX, evt.mouseY);
         foreach (_widget; widget.recursive)
             if (_widget.xywh.has (xy))
                 _widget.on.sdl_mousewheel (evt);
