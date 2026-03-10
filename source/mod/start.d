@@ -63,7 +63,7 @@ Page_start : Page {
         import mod.sdl_wm;
 
         // for get mouse click on noactive window
-        SDL_SetHint (SDL_HINT_MOUSE_FOCUS_CLICKTHROUGH, "1");
+        SDL_SetHint (cast (const(char)*) SDL_HINT_MOUSE_FOCUS_CLICKTHROUGH, "1");
 
         with (o)
         with (SDL_WindowFlags)
