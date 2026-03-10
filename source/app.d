@@ -1,360 +1,306 @@
-import core.stdc.stdio : printf;
-import std.stdio       : writeln;
-import vf.types        : GO,REG;
-import vf.o            : O;
-import vf.e_class      : E;
-import vf.event        : Event;
-import vf.attrs        : Calculated;
-import vf.klass        : Klass;
-import load_ui         : load_ui;
-import importc;
+import std.stdio;
+
+import hub 								: Hub;
+import vf.gui.page                      : Page;
+import vf.gui.color                     : Color;
+import vf.std.xywh                      : Xy,Wh,Xywh;
+import vf.gui.widget    				: Widget;
+import std.string 						: startsWith;
+version (SDL) import vf.sdl.input       : Input;
+version (SDL) import vf.sdl.importc_sdl : SDL_Event,SDL_EventType, SDL_WindowEventID;
+version (SDL) import vf.sdl.importc_sdl : SDL_GetWindowFromID, SDL_DestroyWindow;
 
 
-extern(C)
+static O o;
+
 void 
 main () {
-    auto o = O ();
-    with (o)
-    foreach (Event* evt; input ()) {
-        // OPEN
-        // LOAD_UI
-        // ...
-        // QUIT
+	o = new O ();
+	with (o) {
+		// Register
+		import mod.sdl;
+		import mod.sdl_wm;
+		import mod.volume;
+		import mod.start;
+		import mod.quick_settings;
 
-        send ();
-        send_now ();
-    }
+		hub.register (new Sdl);
+		hub.register (new Sdl_wm);
+		hub.register (new Volume);
+		hub.register (new Start);
+		hub.register (new Quick_settings);
+
+		writeln ("!!!START!!!");
+
+		// INIT
+		hub.INIT ();
+		hub.START ();
+
+		// Event loop
+		foreach (evt; input) {
+			hub.DO_SWITCH (evt);
+			if (quit) break;
+		}
+	}
 }
 
 
-//auto
-//collect_hotkeys (E e) {
-//    HKE[] hotkeys;
-
-//    foreach (_e; e.childs_recursive) {
-//        auto hk = _e.hotkey;
-//        if (hk.type == hk.Type._hotkey) {            
-//            if (hk._hotkey.a) {
-//                hotkeys ~= HKE (_e,hk._hotkey.a);
-//            }
-//        }
-//    }
-
-//    return hotkeys;
-//}
-
-//struct
-//HKE {
-//    E      e;
-//    string hk;
-//}
-
-
-
-// area
-//  area
-//   area
-//   area
-//   area
-//  area
-//   area
-//  area
-//   area
-//   area
-//   area
-
-// e panel window canvas
-//  e loc1
-//   e button 1
-//   e button 2
-//   e button 3
-//  e loc2
-//   e button clock
-//  e loc3
-//   e indicator 1
-//   e indicator 2
-//   e indicator 3
-//
-// window
-//   x = 0
-//   y = top
-//   w = screen.w
-//   h = 64
-//
-// loc1
-//   x = left
-//   y = 0
-//   w = 30%
-//   h = parent.h
-//
-// loc2
-//   x = center
-//   y = 0
-//   w = 30%
-//   h = parent.h
-//
-// loc3
-//   x = right
-//   y = 0
-//   w = 30%
-//   h = parent.h
-//
-// button1
-//  x = left
-//  y = 0
-//  w = parent.h
-//  h = parent.h
-//  icon = start
-//
-// button2
-//  x = left
-//  y = 0
-//  w = parent.h
-//  h = parent.h
-//
-// button3
-//  x = left
-//  y = 0
-//  w = parent.h
-//  h = parent.h
-
-//
-// on e
-// on klass
-// on indent
-// on e-end
-
-// on char
-
-// key Q -> Play 1
-//          btn 1 state pressed
-// btn 1 -> btn 1 state pressed
-//          Play 1
-//
-// hotkey
-// colect_hotkeys
-//   bind HOTKEY, PLAY 1
-//   bind CLICK,  PLAY 1
-
-// data.state  pressed | released
-//   on data_changed
-//      update_binded_widget
-//
-// e.binded_data
-//
-// on key press
-//   data.state = pressed
-//   data.update_binded_widget
-// on key release
-//   data.state = released
-//   data.update_binded_widget
-//
-// on data
-//   if data.state = pressed
-//     widget.klasses add pressed
-//   if data.state = released
-//     widget.klasses rem pressed
-//
-// on data.state
-//   pressed
-//     widget.klasses add pressed
-//   released
-//     widget.klasses rem pressed
-//
-// data.value 
-//   classes
-//
-// cond
-//   classes
-//
-// o.dg_returned_1
-//   add klass
-//   else
-//   rem klass
-// e.on (&o.dg_returned_1, add klass, rem klass)
-
-//
-// on button press
-//   dg
-//     data = x
-//     //send DATA_CHANGED
-//     //send REDRAW
-//
-// data = x
-//   send DATA_CHANGED
-//   send REDRAW
-//
-// e 
-//   DATA_CHANGED
-//     data == x ? red : green
-//   dynamic_klasses (&dg_data_eq_x, "red", "green")
-//   dynamic_klasses (&data.flag_1, "red", "green")
-//
-
-// struct
-// Data 
-//   _x
-//   void x (int a) { update_flags; send (DATA_CHANGED); send (REDRAW); }
-//   int  x (     ) {}
-//   
-//   bool flag_1
-//   void update_flags () { flag_1 = true; }
-
-// e flag_1!red
-// e flag_1_red
-// flag_1_red = Flag_klass (&data.flag_1, red)
-
-// e     button pressed red
-// flags      1       2   3
-// allow_klass red     flag_1
-// deny_klass  pressed flag_2
-
-
-// data
-//   flag_1
-//   on flag_1 == 1
-//     send PLAY_START_1  // and ignore PLAY_START_1  // source data
-//   on flag_1 == 0
-//     send PLAY_STOP_1
-//   on PLAY_START_1      // ignored on flag_1 == 1
-//     flag_1 = 1
-//     // no emit PLAY_START_1  // PLAY_START_1 == PLAY_START_1
-//   on PLAY_STOP_1
-//     flag_1 = 0
-// widget
-//   on PLAY_START_1
-//     klass "plaing"
-//   on PLAY_STOP_1
-//     rem klass "plaing"
-//   on CLICK
-//     send PLAY_START_1
-// key
-//   on PRESS
-//     send PLAY_START_1
-//   on RELEASE
-//     send PLAY_STOP_1
-// audio
-//   on PLAY_START_1
-//     play 1.wav
-//   on PLAY_STOP_1
-//     stop 1.wav
-
-// PLAY_START_1
-//   connect data
-//   connect widget
-//   connect audio
-// PLAY_STOP_1
-//   connect data
-//   connect widget
-//   connect audio
-
-// button
-//   on PRESS event PLAY_START_1
-//   on PLAY_START_1 event LAMP_ON
-//   on LAMP_ON add_klass "lamp_on"
-
-// key
-//   SDLK_a - is connect name
-//   SDLK_a - is out name
-//   SDLK_a - is wire name
-//
-// widget
-//   _SDLK_a - is in
-//    PRESS  - is out
-
-// key
-//  SDLK_a
-//    PLAY_1
-// audio
-//  _PLAY_1
-//     play 1.wav
-// mouse
-//   BTN_DOWN x,y
-// button
-//  _BTN_DOWN
-//    PLAY_1
-//  _PLAY_1
-//    PRESS
-//  _PRESS
-//    add_klass press
-//
-// widget
-//  _PLAY_1
-//     add klass "play"
-//  _BTN_DOWN
-//     PLAY_1
-
-mixin template
-Switches () {
-    //void
-    //_key_sw (Event* evt) {
-    //    switch (evt.type) with (evt.type) {
-    //        case KEYDOWN: if (KEY_A == evt.key.keysym.scancode) send (PLAY_1); break;
-    //        default:
-    //    }
-    //}
-
-    //void
-    //_audio_sw (Event* evt) {
-    //    switch (evt.type) with (evt.type) {
-    //        case PLAY_1: play ("1.wav"); break;
-    //        default:
-    //    }
-    //}
-
-    //void
-    //_mouse_sw (Event* evt) {
-    //    switch (evt.type) with (evt.type) {
-    //        case BUTTON_LEFT: break;
-    //        default:
-    //    }
-    //}
-
-    //void
-    //_button_sw (Event* evt) {
-    //    switch (evt.type) with (evt.type) {
-    //        case BUTTON_LEFT : send (PLAY_1); break;
-    //        case PLAY_1      : send (PRESS);  break;
-    //        case PRESS       : add_klass ("press"); break;
-    //        default:
-    //    }
-    //}
-
-    //void
-    //_widget_sw (Event* evt) {
-    //    switch (evt.type) with (evt.type) {
-    //        case PLAY_1      : add_klass ("play"); break;
-    //        case BUTTON_LEFT : send (PLAY_1);      break;
-    //        default:
-    //    }
-    //}
+class
+O {
+    Input!SDL_Event input;
+    bool 		    quit;
+    Page[]          pages;
+    Hub             hub;
 }
 
+// SDL_Event sdl_event
+// Event
+//   union
+//     SDL_Event
+//     type > 0x8000
+// cast (Event) sdl_event
 
-// e
-//   on CLICK OPEN_LAUNCHER
-//
-// OPEN_LAUNCHER
-//   exec "launcher"
-//   show window "launcher"
+alias I  = ubyte;
 
-// e window
-//  e page
-//    e icon data
-//      e image
-//      e text
-//    e icon data
-//    e icon data
-//    e icon data
-//    e icon data
-//    e icon data
-//    e icon data
-//    e icon data
-//    e icon data
-//    e icon data
-//
-// data : Klass
-//   set (k,evt,e,data)
-//     e.childs[0].img  = data.img
-//     e.childs[1].text = data.text
+// e start
+// e b2 
+// e b3
 // 
+// e 
+// e
+// e clock
+// e 
+// e  
+// 
+// e 
+// e
+// e indicators
+//
+// colors
+//   base       fg/bg
+//   selected   fg/bg
+//   disabled   fg/bg
+//   focused    fg/bg
+//   hover      fg/bg
+//   pressed    fg/bg
+//   lamp       fg/bg
+//
+// base   fg/bg
+// info   fg/bg
+// warn   fg/bg
+// error  fg/bg
+
+// windows
+// fonts
+// icons
+// sounds
+
+// start
+//
+// clock
+//
+// clipboard
+// locale
+// indicators
+//  lan
+//  wifi
+//  sound
+//  batary
+//
+// start
+//   w 128
+//   button
+//     on click ...
+//
+// clock
+//   button
+//     on click ...
+//
+// clipboard
+//   button
+// locale
+//   button
+// indicators
+//   button
+//     on click ...   // catch click on any of lan,wifi,sound,batary
+//     on click SHOW_QUICK_SETTINGS
+//
+// grid 256x256
+//
+// layout
+// 1:1 3:1 5:3
+// 1:1 3:1 5:7
+
+// page 2
+// QUICK_SETTINGS
+// 1   2 2 2
+// 3 -------
+// 3 -------
+// 4--- ---4
+// 4--- ---4
+// 4--- ---4
+//
+// bat    setting lock quit
+// volume
+// bright
+// lan                 wifi
+// power              light
+// style               avia
+//
+// bat
+//   w 128
+//
+//
+
+
+// 🛜 — Wireless (U+1F6DC
+// 📶 — Antenna Bars (U+1F4F6):
+// ᯤ — Tai Tham Consonant Sign Low 
+// 
+// █ (U+2588) — Сигнал 4/4
+// ▆ (U+2587) — Сигнал 3/4
+// ▄ (U+2584) — Сигнал 2/4
+// ▂ (U+2582) — Сигнал 1/4
+// _ (U+005F) — Нет сигнала 
+//
+// 
+// 󰖩 󰖪
+//  󰢼  󰢽  󰢾 
+//  󰢼  󰢽  󰢾 󰢿
+// 󰤟 
+// 󱚵
+// https://www.nerdfonts.com/cheat-sheet
+// 󰤟 \udb82\udd1f 
+// 󰤟 󰤢 󰤥 󰤨 󰤭 󰤯 󰤠 󰤡 󰤣 󰤤 󰤦 󰤧 󰤩 󰤪 󰤫 󰤬 󰤮 󱛋 󱛌 󱛍 󱛎 󱛏
+// 
+//        󰕾 󰕿 󰖀 󰝞 󰝟 󰖁 󰝝 󱄠 󱄡
+
+// slider
+//   on change APP_EVENT value  // value = 0..0xFF position
+// button
+//   on click APP_EVENT value   // value = 0..1    pressed
+// checkbox
+//   on click APP_EVENT value   // value = 0..1    checked
+// radio
+//   on click APP_EVENT value   // value = 0..0xFF id
+// select
+//   on click APP_EVENT value   // value = 0..0xFF id
+// text
+//   on change APP_EVENT value  // value = 0..0xFFFF wchar
+//   on key APP_EVENT value     // value = 0..0xFF   scancode
+
+// Sounds
+//   PLAY? 1
+//     send PLAY! 1
+// E
+//   PLAY! 1
+//     lamp_on
+//   CLICK
+//     pressed
+//     send PLAY? 1
+//   PLAY_END! 1
+//     lamp_off
+
+// PLAY?
+// PLAY!
+
+// Sounds
+//   PLAY_REQUEST
+//     send PLAY_START
+//     send PLAY_END
+//     send PLAY_INFO
+// E
+//   PLAY_START
+//     lamp_on
+//   PLAY_END
+//     lamp_off
+//   CLICK
+//     pressed
+//     send PLAY_REQUEST
+
+// Sounds
+//   PLAY_REQUEST n
+//     send PLAY_START n
+//     send PLAY_END n
+//     send PLAY_INFO n
+// E
+//   PLAY_START n
+//     lamp_on
+//   PLAY_END n
+//     lamp_off
+//   CLICK
+//     pressed
+//     send PLAY_REQUEST n
+//     send CLICK_INFO e.id
+//   CHANGE_REQUEST value
+//     send CHANGE_INFO e.id
+
+// PLAY
+//   PLAY 0  // request
+//   PLAY 1  // start
+//   PLAY 2  // end
+//   PLAY 3  // info
+
+// Event
+//   code
+//   flag  // request.start.end.info
+//
+//  00000011
+//        00 requesr
+//        01 start
+//        10 end
+//        11 info
+//
+// SDL_USEREVENT
+// 0x8000
+// 1000_0000_0000_0000
+// 1000_0000_0000_0011
+// 1000_0000_0000_0100 PLAY request
+// 1000_0000_0000_0101 PLAY start
+// 1000_0000_0000_0110 PLAY end
+// 1000_0000_0000_0111 PLAY info
+//
+// EVENT!("PLAY", ["REQUEST", "START", "END", "INFO"])
+
+//enum
+//Event2 {
+//	PLAY = 0x8000 | (1 << 2),
+//	PLAY_REQUEST = PLAY,
+//	PLAY_START,
+//	PLAY_END,
+//	PLAY_INFO,
+//	OPEN = 0x8000 | (2 << 2),
+//	OPEN_REQUEST = OPEN,
+//	OPEN_START,
+//	OPEN_END,
+//	OPEN_INFO
+//}
+
+// Button
+//       pressed released
+// icon  .       .
+//
+// Check
+//       pressed released
+// icon  .       .
+//
+// Volume
+//       mute low mid high 
+// icon  .    .   .   .
+
+//  +-----------+
+// SDL     PRESSED
+//  |    RELEASEED
+//  |           |
+//  +-----------+
+//
+// SDL
+//   PRESSED
+// SDL
+//   RELEASED
+// 
+// Event
+//  |
+// 1 2 3 4 5 6 7.. 255
+//
+//
