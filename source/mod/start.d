@@ -101,26 +101,26 @@ Page_start : Page {
 Widget
 create_ui (Hub* hub, Page page) {
     // main
-    auto main = new Main (hub,page);
+    auto main = new Main (page);
     main.xywh.w = W;
     main.xywh.h = S1;
     main.childs.layout_dg = &(new Lcr_layout (S1)).layout;
 
     // layout
-    auto left = new Left (hub,page);
+    auto left = new Left (page);
     left.xywh.w = S1*1;
     left.xywh.h = S1;
     left.childs.layout_dg = &(new Line_layout).layout;
     main.childs.put (left);
 
-    auto center = new Center (hub,page);
+    auto center = new Center (page);
     center.xywh.w = S1*1;
     center.xywh.h = S1;
     center.xywh.x = W/2 - S1*1/2;
     center.childs.layout_dg = &(new Line_layout).layout;
     main.childs.put (center);
 
-    auto right = new Right (hub,page);
+    auto right = new Right (page);
     right.xywh.w = S1*4;
     right.xywh.h = S1;
     right.xywh.x = W - S1*4;
@@ -128,32 +128,32 @@ create_ui (Hub* hub, Page page) {
     main.childs.put (right);
 
     // buttons
-    auto start = new Start_ (hub,page);
+    auto start = new Start_ (page);
     start.xywh.w = S1;
     start.xywh.h = S1;
     left.childs.put (start);
 
-    auto clock = new Clock (hub,page);
+    auto clock = new Clock (page);
     clock.xywh.w = S1;
     clock.xywh.h = S1;
     center.childs.put (clock);
 
-    auto lan = new Lan (hub,page);
+    auto lan = new Lan (page);
     lan.xywh.w = S1;
     lan.xywh.h = S1;
     right.childs.put (lan);
 
-    auto wifi = new Wifi (hub,page);
+    auto wifi = new Wifi (page);
     wifi.xywh.w = S1;
     wifi.xywh.h = S1;
     right.childs.put (wifi);
 
-    auto volume = new Volume_ (hub,page);
+    auto volume = new Volume_ (page);
     volume.xywh.w = S1;
     volume.xywh.h = S1;
     right.childs.put (volume);
 
-    auto battery = new Battery (hub,page);
+    auto battery = new Battery (page);
     battery.xywh.w = S1;
     battery.xywh.h = S1;
     right.childs.put (battery);
@@ -165,74 +165,74 @@ create_ui (Hub* hub, Page page) {
 //
 class
 Main : Widget {
-    this (Hub* hub, Page page) {
-        super (hub,page);
-        hub.register (this);
+    this (Page page) {
+        super (page);
+        o.hub.register (this);
     }        
 }
 
 class
 Left : Widget {
-    this (Hub* hub, Page page) {
-        super (hub,page);
-        hub.register (this);
+    this (Page page) {
+        super (page);
+        o.hub.register (this);
     }        
 }
 
 class
 Center : Widget {
-    this (Hub* hub, Page page) {
-        super (hub,page);
-        hub.register (this);
+    this (Page page) {
+        super (page);
+        o.hub.register (this);
     }        
 }
 
 class
 Right : Widget {
-    this (Hub* hub, Page page) {
-        super (hub,page);
-        hub.register (this);
+    this (Page page) {
+        super (page);
+        o.hub.register (this);
     }        
 }
 
 //
 class
 Start_ : Button {
-    this (Hub* hub, Page page) {
-        super (hub,page);
-        hub.register (this);
+    this (Page page) {
+        super (page);
+        o.hub.register (this);
     }        
 }
 
 class
 Clock : Button {
-    this (Hub* hub, Page page) {
-        super (hub,page);
-        hub.register (this);
+    this (Page page) {
+        super (page);
+        o.hub.register (this);
     }        
 }
 
 class
 Lan : Button {
-    this (Hub* hub, Page page) {
-        super (hub,page);
-        hub.register (this);
+    this (Page page) {
+        super (page);
+        o.hub.register (this);
     }        
 }
 
 class
 Wifi : Button {
-    this (Hub* hub, Page page) {
-        super (hub,page);
-        hub.register (this);
+    this (Page page) {
+        super (page);
+        o.hub.register (this);
     }        
 }
 
 class
 Volume_ : Volume {
-    this (Hub* hub, Page page) {
-        super (hub,page);
-        hub.register (this);
+    this (Page page) {
+        super (page);
+        o.hub.register (this);
     }        
 
     override
@@ -245,8 +245,8 @@ Volume_ : Volume {
 
 class
 Battery : Button {
-    this (Hub* hub, Page page) {
-        super (hub,page);
-        hub.register (this);
+    this (Page page) {
+        super (page);
+        o.hub.register (this);
     }        
 }

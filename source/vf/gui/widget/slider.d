@@ -16,9 +16,9 @@ class
 Slider : Button {
     ubyte value;
 
-    this (Hub* hub, Page page) {
-        super (hub,page);
-        hub.register (this);
+    this (Page page) {
+        super (page);
+        o.hub.register (this);
     }        
 
     override

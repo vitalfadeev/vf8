@@ -109,28 +109,28 @@ Page_qs : Page {
 Widget
 create_ui (Hub* hub, Page page) {
     // main
-    auto main = new Main (hub,page);
+    auto main = new Main (page);
     main.xywh.w = W;
     main.xywh.h = S1;
     main.childs.layout_dg = &(new Column_layout).layout;
 
     // layout
     // line 1
-    auto left_right = new Left_right (hub,page);
+    auto left_right = new Left_right (page);
     left_right.xywh.w = W;
     left_right.xywh.h = S1;
     left_right.childs.layout_dg = &(new Lr_layout (S1)).layout;
     main.childs.put (left_right);
 
     // line 1, pos 1
-    auto _1 = new L1 (hub,page);
+    auto _1 = new L1 (page);
     _1.xywh.w = S1*1;
     _1.xywh.h = S1;
     _1.childs.layout_dg = &(new Line_layout).layout;
     left_right.childs.put (_1);
 
     // line 1, pos 2
-    auto _2 = new L2 (hub,page);
+    auto _2 = new L2 (page);
     _2.xywh.w = S1*4;
     _2.xywh.h = S1;
     _2.xywh.x = W - S1*4;
@@ -138,14 +138,14 @@ create_ui (Hub* hub, Page page) {
     left_right.childs.put (_2);
 
     // line 2-3, pos 3
-    auto _3 = new L3 (hub,page);
+    auto _3 = new L3 (page);
     _3.xywh.w = W;
     _3.xywh.h = S3*2;
     _3.childs.layout_dg = &(new Column_layout).layout;
     main.childs.put (_3);
 
     // line 4, pos 4
-    auto _4 = new L4 (hub,page);
+    auto _4 = new L4 (page);
     _4.xywh.w = W;
     _4.xywh.h = S4*2;
     _4.childs.layout_dg = &(new Grid_layout_ (2,2)).layout;
@@ -153,59 +153,59 @@ create_ui (Hub* hub, Page page) {
 
     // buttons
     // 1-2
-    auto battery = new Battery (hub,page);
+    auto battery = new Battery (page);
     battery.xywh.w = S1;
     battery.xywh.h = S1;
     _1.childs.put (battery);
 
-    auto screenshot = new Screenshot (hub,page);
+    auto screenshot = new Screenshot (page);
     screenshot.xywh.w = S1;
     screenshot.xywh.h = S1;
     _2.childs.put (screenshot);
 
-    auto settings = new Settings (hub,page);
+    auto settings = new Settings (page);
     settings.xywh.w = S1;
     settings.xywh.h = S1;
     _2.childs.put (settings);
 
-    auto lock = new Lock (hub,page);
+    auto lock = new Lock (page);
     lock.xywh.w = S1;
     lock.xywh.h = S1;
     _2.childs.put (lock);
 
-    auto quit = new Quit (hub,page);
+    auto quit = new Quit (page);
     quit.xywh.w = S1;
     quit.xywh.h = S1;
     _2.childs.put (quit);
 
     // 3
-    auto volume = new Volume__ (hub,page);
+    auto volume = new Volume__ (page);
     volume.xywh.w = W;
     volume.xywh.h = S3;
     _3.childs.put (volume);
 
-    auto bright = new Bright (hub,page);
+    auto bright = new Bright (page);
     bright.xywh.w = W;
     bright.xywh.h = S3;
     _3.childs.put (bright);
 
     // 4 
-    auto lan = new Lan (hub,page);
+    auto lan = new Lan (page);
     lan.xywh.w = W/2;
     lan.xywh.h = S4;
     _4.childs.put (lan);
 
-    auto wifi = new Wifi (hub,page);
+    auto wifi = new Wifi (page);
     wifi.xywh.w = W/2;
     wifi.xywh.h = S4;
     _4.childs.put (wifi);
 
-    auto power = new Power (hub,page);
+    auto power = new Power (page);
     power.xywh.w = W/2;
     power.xywh.h = S4;
     _4.childs.put (power);
 
-    auto avia = new Avia (hub,page);
+    auto avia = new Avia (page);
     avia.xywh.w = W/2;
     avia.xywh.h = S4;
     _4.childs.put (avia);
@@ -226,137 +226,137 @@ _new (TWIDGET,Page,Loca) (Page* page, int w, int h, Loca* loca) {
 //
 class
 Main : Widget {
-    this (Hub* hub, Page page) {
-        super (hub,page);
-        hub.register (this);
+    this (Page page) {
+        super (page);
+        o.hub.register (this);
     }        
 }
 
 class
 Left_right : Widget {
-    this (Hub* hub, Page page) {
-        super (hub,page);
-        hub.register (this);
+    this (Page page) {
+        super (page);
+        o.hub.register (this);
     }        
 }
 
 class
 L1 : Widget {
-    this (Hub* hub, Page page) {
-        super (hub,page);
-        hub.register (this);
+    this (Page page) {
+        super (page);
+        o.hub.register (this);
     }        
 }
 
 class
 L2 : Widget {
-    this (Hub* hub, Page page) {
-        super (hub,page);
-        hub.register (this);
+    this (Page page) {
+        super (page);
+        o.hub.register (this);
     }        
 }
 
 class
 L3 : Widget {
-    this (Hub* hub, Page page) {
-        super (hub,page);
-        hub.register (this);
+    this (Page page) {
+        super (page);
+        o.hub.register (this);
     }        
 }
 
 class
 L4 : Widget {
-    this (Hub* hub, Page page) {
-        super (hub,page);
-        hub.register (this);
+    this (Page page) {
+        super (page);
+        o.hub.register (this);
     }        
 }
 
 //
 class
 Battery : Button {
-    this (Hub* hub, Page page) {
-        super (hub,page);
-        hub.register (this);
+    this (Page page) {
+        super (page);
+        o.hub.register (this);
     }        
 }
 
 class
 Screenshot : Button {
-    this (Hub* hub, Page page) {
-        super (hub,page);
-        hub.register (this);
+    this (Page page) {
+        super (page);
+        o.hub.register (this);
     }        
 }
 
 class
 Settings : Button {
-    this (Hub* hub, Page page) {
-        super (hub,page);
-        hub.register (this);
+    this (Page page) {
+        super (page);
+        o.hub.register (this);
     }        
 }
 
 class
 Lock : Button {
-    this (Hub* hub, Page page) {
-        super (hub,page);
-        hub.register (this);
+    this (Page page) {
+        super (page);
+        o.hub.register (this);
     }        
 }
 
 class
 Quit : Button {
-    this (Hub* hub, Page page) {
-        super (hub,page);
-        hub.register (this);
+    this (Page page) {
+        super (page);
+        o.hub.register (this);
     }        
 }
 
 class
 Volume__ : Slider {
-    this (Hub* hub, Page page) {
-        super (hub,page);
-        hub.register (this);
+    this (Page page) {
+        super (page);
+        o.hub.register (this);
     }        
 }
 
 class
 Bright : Slider {
-    this (Hub* hub, Page page) {
-        super (hub,page);
-        hub.register (this);
+    this (Page page) {
+        super (page);
+        o.hub.register (this);
     }        
 }
 
 class
 Lan : Check {
-    this (Hub* hub, Page page) {
-        super (hub,page);
-        hub.register (this);
+    this (Page page) {
+        super (page);
+        o.hub.register (this);
     }        
 }
 
 class
 Wifi : Check {
-    this (Hub* hub, Page page) {
-        super (hub,page);
-        hub.register (this);
+    this (Page page) {
+        super (page);
+        o.hub.register (this);
     }        
 }
 
 class
 Power : Check {
-    this (Hub* hub, Page page) {
-        super (hub,page);
-        hub.register (this);
+    this (Page page) {
+        super (page);
+        o.hub.register (this);
     }        
 }
 
 class
 Avia : Check {
-    this (Hub* hub, Page page) {
-        super (hub,page);
-        hub.register (this);
+    this (Page page) {
+        super (page);
+        o.hub.register (this);
     }        
 }

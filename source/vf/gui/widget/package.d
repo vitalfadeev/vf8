@@ -34,13 +34,9 @@ Widget {
     // childs
     Childs   childs;
 
-    this (Hub* hub, Page page) {
-        alias T = typeof (this);
-
+    this (Page page) {
         this.page = page;
         this.name = this.classinfo.name;
-        pragma (msg, "register inside Widget: ", typeid(this));
-        writeln ("register inside Widget: ", typeid(this));
     }        
 
     struct
