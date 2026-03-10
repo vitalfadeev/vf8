@@ -38,9 +38,9 @@ Widget {
         alias T = typeof (this);
 
         this.page = page;
-        this.name = T.stringof;
-        hub.register (this);
-        //on.register (this);
+        this.name = this.classinfo.name;
+        pragma (msg, "register inside Widget: ", typeid(this));
+        writeln ("register inside Widget: ", typeid(this));
     }        
 
     struct
@@ -50,17 +50,17 @@ Widget {
     }
 
     void
-    on_sdl_mousebuttondown (SDL_MouseButtonEvent* evt) {
+    sdl_mousebuttondown (SDL_MouseButtonEvent* evt) {
         //
     }
 
     void
-    on_sdl_mousebuttonup (SDL_MouseButtonEvent* evt) {
+    sdl_mousebuttonup (SDL_MouseButtonEvent* evt) {
         //
     }
 
     void
-    on_sdl_mousewheel (SDL_MouseWheelEvent* evt) {
+    sdl_mousewheel (SDL_MouseWheelEvent* evt) {
         //
     }    
 

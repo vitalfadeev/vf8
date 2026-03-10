@@ -228,6 +228,7 @@ class
 Main : Widget {
     this (Hub* hub, Page page) {
         super (hub,page);
+        hub.register (this);
     }        
 }
 
@@ -235,6 +236,7 @@ class
 Left_right : Widget {
     this (Hub* hub, Page page) {
         super (hub,page);
+        hub.register (this);
     }        
 }
 
@@ -242,6 +244,7 @@ class
 L1 : Widget {
     this (Hub* hub, Page page) {
         super (hub,page);
+        hub.register (this);
     }        
 }
 
@@ -249,6 +252,7 @@ class
 L2 : Widget {
     this (Hub* hub, Page page) {
         super (hub,page);
+        hub.register (this);
     }        
 }
 
@@ -256,6 +260,7 @@ class
 L3 : Widget {
     this (Hub* hub, Page page) {
         super (hub,page);
+        hub.register (this);
     }        
 }
 
@@ -263,6 +268,7 @@ class
 L4 : Widget {
     this (Hub* hub, Page page) {
         super (hub,page);
+        hub.register (this);
     }        
 }
 
@@ -271,6 +277,7 @@ class
 Battery : Button {
     this (Hub* hub, Page page) {
         super (hub,page);
+        hub.register (this);
     }        
 }
 
@@ -278,6 +285,7 @@ class
 Screenshot : Button {
     this (Hub* hub, Page page) {
         super (hub,page);
+        hub.register (this);
     }        
 }
 
@@ -285,6 +293,7 @@ class
 Settings : Button {
     this (Hub* hub, Page page) {
         super (hub,page);
+        hub.register (this);
     }        
 }
 
@@ -292,6 +301,7 @@ class
 Lock : Button {
     this (Hub* hub, Page page) {
         super (hub,page);
+        hub.register (this);
     }        
 }
 
@@ -299,6 +309,7 @@ class
 Quit : Button {
     this (Hub* hub, Page page) {
         super (hub,page);
+        hub.register (this);
     }        
 }
 
@@ -306,6 +317,7 @@ class
 Volume__ : Slider {
     this (Hub* hub, Page page) {
         super (hub,page);
+        hub.register (this);
     }        
 }
 
@@ -313,6 +325,7 @@ class
 Bright : Slider {
     this (Hub* hub, Page page) {
         super (hub,page);
+        hub.register (this);
     }        
 }
 
@@ -320,6 +333,7 @@ class
 Lan : Check {
     this (Hub* hub, Page page) {
         super (hub,page);
+        hub.register (this);
     }        
 }
 
@@ -327,6 +341,7 @@ class
 Wifi : Check {
     this (Hub* hub, Page page) {
         super (hub,page);
+        hub.register (this);
     }        
 }
 
@@ -334,6 +349,7 @@ class
 Power : Check {
     this (Hub* hub, Page page) {
         super (hub,page);
+        hub.register (this);
     }        
 }
 
@@ -341,5 +357,6 @@ class
 Avia : Check {
     this (Hub* hub, Page page) {
         super (hub,page);
+        hub.register (this);
     }        
 }

@@ -99,7 +99,7 @@ Page {
         auto xy = Xy (evt.x, evt.y);
         foreach (_widget; widget.recursive) {
             if (_widget.xywh.has (xy)) {
-                //_widget.on.sdl_mousebuttondown (evt);
+                _widget.sdl_mousebuttondown (evt);
             }
         }
     }
@@ -109,7 +109,7 @@ Page {
         auto xy = Xy (evt.x, evt.y);
         foreach (_widget; widget.recursive)
             if (_widget.xywh.has (xy)) {
-                //_widget.on.sdl_mousebuttonup (evt);
+                _widget.sdl_mousebuttonup (evt);
             }
     }
 
@@ -117,9 +117,8 @@ Page {
     sdl_mousewheel (SDL_MouseWheelEvent* evt) {
         auto xy = Xy (evt.mouseX, evt.mouseY);
         foreach (_widget; widget.recursive)
-            if (_widget.xywh.has (xy))
-            {
-                //_widget.on.sdl_mousewheel (evt);
+            if (_widget.xywh.has (xy)) {
+                _widget.sdl_mousewheel (evt);
             }
     }
 

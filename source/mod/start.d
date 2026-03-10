@@ -167,6 +167,7 @@ class
 Main : Widget {
     this (Hub* hub, Page page) {
         super (hub,page);
+        hub.register (this);
     }        
 }
 
@@ -174,6 +175,7 @@ class
 Left : Widget {
     this (Hub* hub, Page page) {
         super (hub,page);
+        hub.register (this);
     }        
 }
 
@@ -181,6 +183,7 @@ class
 Center : Widget {
     this (Hub* hub, Page page) {
         super (hub,page);
+        hub.register (this);
     }        
 }
 
@@ -188,6 +191,7 @@ class
 Right : Widget {
     this (Hub* hub, Page page) {
         super (hub,page);
+        hub.register (this);
     }        
 }
 
@@ -196,6 +200,7 @@ class
 Start_ : Button {
     this (Hub* hub, Page page) {
         super (hub,page);
+        hub.register (this);
     }        
 }
 
@@ -203,6 +208,7 @@ class
 Clock : Button {
     this (Hub* hub, Page page) {
         super (hub,page);
+        hub.register (this);
     }        
 }
 
@@ -210,6 +216,7 @@ class
 Lan : Button {
     this (Hub* hub, Page page) {
         super (hub,page);
+        hub.register (this);
     }        
 }
 
@@ -217,17 +224,20 @@ class
 Wifi : Button {
     this (Hub* hub, Page page) {
         super (hub,page);
+        hub.register (this);
     }        
 }
 
 class
-Volume_ : Button {
+Volume_ : Volume {
     this (Hub* hub, Page page) {
         super (hub,page);
+        hub.register (this);
     }        
 
+    override
     void
-    on_pressed () {
+    pressed () {
         with (o)
         hub.QUICK_SETTINGS ();
     }
@@ -237,5 +247,6 @@ class
 Battery : Button {
     this (Hub* hub, Page page) {
         super (hub,page);
+        hub.register (this);
     }        
 }

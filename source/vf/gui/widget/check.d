@@ -16,11 +16,12 @@ class
 Check : Button {
     this (Hub* hub, Page page) {
         super (hub,page);
+        hub.register (this);
     }        
 
     override
     void
-    on_sdl_mousebuttondown (SDL_MouseButtonEvent* evt) {
+    sdl_mousebuttondown (SDL_MouseButtonEvent* evt) {
         with (o)
         with (evt)
         switch (button) {
@@ -35,7 +36,7 @@ Check : Button {
 
     override
     void
-    on_sdl_mousebuttonup (SDL_MouseButtonEvent* evt) {
+    sdl_mousebuttonup (SDL_MouseButtonEvent* evt) {
         with (o)
         with (evt)
         switch (button) {

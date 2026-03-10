@@ -16,11 +16,12 @@ class
 Button : Widget {
     this (Hub* hub, Page page) {
         super (hub,page);
+        hub.register (this);
     }        
 
     override
     void
-    on_sdl_mousebuttondown (SDL_MouseButtonEvent* evt) {
+    sdl_mousebuttondown (SDL_MouseButtonEvent* evt) {
         with (o)
         with (evt)
         switch (button) {
@@ -35,7 +36,7 @@ Button : Widget {
 
     override
     void
-    on_sdl_mousebuttonup (SDL_MouseButtonEvent* evt) {
+    sdl_mousebuttonup (SDL_MouseButtonEvent* evt) {
         with (o)
         with (evt)
         switch (button) {
@@ -52,7 +53,7 @@ Button : Widget {
     press () {
         with (o) {
             flags.pressed = true;
-            //on.pressed ();
+            pressed ();
             redraw ();
         }
     }
@@ -61,9 +62,19 @@ Button : Widget {
     release () {
         with (o) {
             flags.pressed = false; 
-            //on.released ();
+            released ();
             redraw ();
         }
+    }
+
+    void
+    pressed () {
+        //
+    }
+
+    void
+    released () {
+        //
     }
 
     override

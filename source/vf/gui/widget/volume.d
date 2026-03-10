@@ -18,11 +18,12 @@ Volume : Button {
 
     this (Hub* hub, Page page) {
         super (hub,page);
+        hub.register (this);
     }        
 
     override
     void
-    on_sdl_mousewheel (SDL_MouseWheelEvent* evt) {
+    sdl_mousewheel (SDL_MouseWheelEvent* evt) {
         with (o)
         with (evt)
         switch (direction) with (SDL_MouseWheelDirection) {
