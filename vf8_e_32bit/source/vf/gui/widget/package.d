@@ -15,7 +15,7 @@ import vf.sdl.importc_sdl;
 import vf.sdl.renderer_sdl : Renderer;
 import std.stdio           : writeln;
 import app                 : o;
-import app;
+import hub                 : Hub;
 
 struct
 Widget {
@@ -35,6 +35,7 @@ Widget {
     // childs
     Childs   childs;
     // on_*
+    import vf.gui.widget : On;
     On       on;
 
     alias STYLE_DG = void delegate ();
@@ -142,52 +143,51 @@ Widget {
             return format!"Flags(%X)" (a);
         }
     }
+}
 
-    struct
-    On {
-        Vars2!(DG[]) _vars;
+struct
+On {
+    Vars2!(DG[]) _vars;
 
-        alias DG = void delegate ();
+    alias DG = void delegate ();
 
-        void
-        register (T) (T* t) {
-            writeln ("widget.on.register: ", T.stringof);
+    void
+    register (T) (T* t) {
+        writeln ("widget.on.register: ", T.stringof);
 
-            DG[]* _dgs;
-            static foreach (name; Functions_recursive!T) {
-                //static if (isDelegate!(__traits(getMember,T,name)))
-                static if (!__traits(isStaticFunction, __traits(getMember,T,name)))
-                static if (name.startsWith ("on_")) {
-                    writeln ("  widget.on.", name, " ", Parameters!(__traits(getMember,T,name)).stringof);
+        DG[]* _dgs;
+        static foreach (name; Functions_recursive!T) {
+            static if (!__traits(isStaticFunction, __traits(getMember,T,name)))
+            static if (name.startsWith ("on_")) {
+                writeln ("  widget.on.", name, " ", Parameters!(__traits(getMember,T,name)).stringof);
 
-                    _dgs = _vars.var!(name,Parameters!(__traits(getMember,T,name)));
-                    (*_dgs) ~= cast (DG) &__traits(getMember,t,name); // delegate                    
-                }
+                _dgs = _vars.var!(name,Parameters!(__traits(getMember,T,name)));
+                (*_dgs) ~= cast (DG) &__traits(getMember,t,name); // delegate                    
             }
         }
+    }
 
-        void
-        opDispatch (string name, ARGS...) (ARGS args) {
-            pragma (msg, "widget.opDispatch: ", name, " ", ARGS);
-            static if (ARGS.length)
-                writeln ("  widget.on.", name, " ", ARGS.stringof, " ", args);
-            else
-                writeln ("  widget.on.", name, " ", ARGS.stringof);
+    void
+    opDispatch (string name, ARGS...) (ARGS args) {
+        pragma (msg, "widget.opDispatch: ", name, " ", ARGS);
+        static if (ARGS.length)
+            writeln ("  widget.on.", name, " ", ARGS.stringof, " ", args);
+        else
+            writeln ("  widget.on.", name, " ", ARGS.stringof);
 
-            // delegates for name,args
-            DG[]* _dgs = _vars.var!("on_"~name,ARGS) ();
+        // delegates for name,args
+        DG[]* _dgs = _vars.var!("on_"~name,ARGS) ();
 
-            // do
-            if ((*_dgs).length > 0) {
-                foreach (dg; *_dgs) {
-                    (cast (void delegate (ARGS)) dg) (args);
-                }
+        // do
+        if ((*_dgs).length > 0) {
+            foreach (dg; *_dgs) {
+                (cast (void delegate (ARGS)) dg) (args);
             }
-            // info
-            else {
-                //assert (0, name~ " "~ ARGS.stringof~ ", no listener ");
-                writeln ("  widget.on.", name, " ", ARGS.stringof, ", no listener ");
-            }
+        }
+        // info
+        else {
+            //assert (0, name~ " "~ ARGS.stringof~ ", no listener ");
+            writeln ("  widget.on.", name, " ", ARGS.stringof, ", no listener ");
         }
     }
 }
@@ -287,3 +287,21 @@ Childs {
     }
 }
 
+mixin template
+_Widget (TPARENT=Widget) {
+    TPARENT _super;
+    alias _super this;
+
+    this (Hub* hub, Page* page) {
+        alias T = typeof (this);
+
+        this.page = page;
+        this.name = T.stringof;
+        static if (__traits(hasMember,T,"style"))
+            style_dg = &__traits(getMember,this,"style");
+        static if (__traits(hasMember,T,"draw"))
+            draw_dg  = &__traits(getMember,this,"draw");
+        hub.register (&this);
+        on.register (&this);
+    }        
+}

@@ -2,6 +2,7 @@ import std.stdio;
 
 import hub 								: Hub;
 import vf.gui.page                      : Page;
+import page1                            : Page1;
 import vf.gui.color                     : Color;
 import vf.std.xywh                      : Xy,Wh,Xywh;
 import vf.gui.widget    				: Widget;
@@ -34,16 +35,7 @@ main () {
 		hub.INIT ();
 
 		// Load page
-		auto page = new Page ();
-		page.wh.w = 1024;
-		page.wh.h = 600;
-		page.draw_dg = &page.draw;
-		hub.register (page);
-		pages ~= page;
-		page._init ();
-
-		// Layout
-		page.layout ();
+		auto page = new Page1 (&hub,&pages);
 
 		// Event loop
 		foreach (evt; input) {

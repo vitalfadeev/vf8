@@ -74,22 +74,3 @@ Check {
         _super.draw (renderer);
     }
 }
-
-Volume_type
-volume_type (ubyte volume) {
-    with (Volume_type) {
-        if (volume == 0)               return MUTE;
-        if (volume < volume.max/3)     return LOW;
-        if (volume < (volume.max/3)*2) return MID;
-        return HIGH;
-    }
-}
-
-enum
-Volume_type {
-    MUTE,
-    LOW,
-    MID,
-    HIGH,
-}
-

@@ -16,6 +16,7 @@ import vf.sdl.renderer_sdl  : Renderer;
 import vf.sdl.importc_sdl   : SDL_MouseButtonEvent,SDL_MouseWheelEvent;
 import std.stdio            : writeln;
 import app                  : o;
+import hub                  : Hub;
 import std.stdio            : writefln;
 
 struct
@@ -37,6 +38,7 @@ Page {
 
     void
     _init () {
+        style ();
         _init_colors  ();
         _init_fonts   ();
         _init_images  ();
@@ -75,24 +77,9 @@ Page {
         //
     }
 
-    TWIDGET*
-    create (TWIDGET,ARGS...) (ARGS args) {
-        auto twidget = new TWIDGET (args);
-        o.hub.register (twidget);
-        auto widget = cast (Widget*) twidget;
-        widget.page    = &this;
-        static if (__traits(hasMember,TWIDGET,"style"))
-            widget.style_dg = &__traits(getMember,twidget,"style");
-        static if (__traits(hasMember,TWIDGET,"draw"))
-            widget.draw_dg  = &__traits(getMember,twidget,"draw");
-        widget.on.register (twidget);
-        widget.name   = TWIDGET.stringof;
-        return twidget;
-    }        
-
     void
     _init_widgets () {
-        create_ui (&this);
+        // 
     }
 
     void
@@ -123,8 +110,7 @@ Page {
 
     void
     style () {
-        wh.w = W;
-        wh.h = 600;
+        //
     }
 
     void
@@ -167,148 +153,15 @@ Page {
     }
 }
 
-// w main
-//   w left
-//     w start
-//   w center
-//     w clock
-//   w right
-//     w lan
-//     w wifi
-//     w volume
-//     w battery
-
-enum W = 1024;
-enum S1 = 48;
-
-void
-create_ui (Page* page) {
-    // main
-    auto main = page.create!Main ();
-    main.xywh.w = W;
-    main.xywh.h = S1;
-    main.childs.layout_dg = &(new Lcr_layout (S1)).layout;
-
-    // layout
-    auto left = page.create!Left ();
-    left.xywh.w = S1*1;
-    left.xywh.h = S1;
-    left.childs.layout_dg = &(new Line_layout).layout;
-    main.childs.put (left);
-
-    auto center = page.create!Center ();
-    center.xywh.w = S1*1;
-    center.xywh.h = S1;
-    center.xywh.x = W/2 - S1*1/2;
-    center.childs.layout_dg = &(new Line_layout).layout;
-    main.childs.put (center);
-
-    auto right = page.create!Right ();
-    right.xywh.w = S1*4;
-    right.xywh.h = S1;
-    right.xywh.x = W - S1*4;
-    right.childs.layout_dg = &(new Line_layout).layout;
-    main.childs.put (right);
-
-    // buttons
-    auto start = page.create!Start ();
-    start.xywh.w = S1;
-    start.xywh.h = S1;
-    left.childs.put (start);
-
-    auto clock = page.create!Clock ();
-    clock.xywh.w = S1;
-    clock.xywh.h = S1;
-    center.childs.put (clock);
-
-    auto lan = page.create!Lan ();
-    lan.xywh.w = S1;
-    lan.xywh.h = S1;
-    right.childs.put (lan);
-
-    auto wifi = page.create!Wifi ();
-    wifi.xywh.w = S1;
-    wifi.xywh.h = S1;
-    right.childs.put (wifi);
-
-    auto volume = page.create!Volume_ ();
-    volume.xywh.w = S1;
-    volume.xywh.h = S1;
-    right.childs.put (volume);
-
-    auto battery = page.create!Battery ();
-    battery.xywh.w = S1;
-    battery.xywh.h = S1;
-    right.childs.put (battery);
-
-    //
-    page.widget = cast (Widget*) main;
-}
-
-//
-struct
-Main {
-    Widget _super;
+mixin template
+_Page (TPARENT=Page) {
+    TPARENT _super;
     alias _super this;    
-}
 
-struct
-Left {
-    Widget _super;
-    alias _super this;    
-}
-
-struct
-Center {
-    Widget _super;
-    alias _super this;    
-}
-
-struct
-Right {
-    Widget _super;
-    alias _super this;    
-}
-
-//
-struct
-Start {
-    Button _super;
-    alias _super this;    
-}
-
-struct
-Clock {
-    Button _super;
-    alias _super this;    
-}
-
-struct
-Lan {
-    Button _super;
-    alias _super this;    
-}
-
-struct
-Wifi {
-    Button _super;
-    alias _super this;    
-}
-
-struct
-Volume_ {
-    Volume _super;
-    alias _super this;
-
-    void
-    on_pressed () {
-        with (o)
-        hub.QUICK_SETTINGS ();
+    this (Hub* hub, Page*[]* pages) {
+        draw_dg = &draw;
+        hub.register (&this);
+        (*pages) ~= cast (Page*) &this;
+        _init ();
     }
-}
-
-struct
-Battery {
-    Button _super;
-    alias _super this;    
 }
