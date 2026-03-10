@@ -151,6 +151,12 @@ On {
 
     alias DG = void delegate ();
 
+    //DG pressed  ();
+    //DG released ();
+    //
+    // call on.released ()
+    // reg  on.released = &wg.on_released;
+
     void
     register (T) (T* t) {
         writeln ("widget.on.register: ", T.stringof);

@@ -1,5 +1,6 @@
 module mod.quick_settings;
 
+version (GUI):
 import vf.gui.widget        : Widget,_Widget;
 import vf.gui.widget.button : Button;
 import vf.gui.widget.check  : Check;
@@ -8,6 +9,7 @@ import vf.gui.color         : Color;
 import vf.gui.layout;
 import vf.std.xywh          : Xy,Wh,Xywh;
 import vf.gui.page          : Page,_Page;
+import vf.sdl.importc_sdl;
 import app                  : o;
 import hub                  : Hub;
 
@@ -26,7 +28,7 @@ Quick_settings {
         // Page_qs
         // window
         with (o) {
-            auto page = new Page_qs (&hub,&pages);
+            new Page_qs (&hub,&pages);
         }
     }
 }
@@ -50,7 +52,16 @@ Page_qs {
     _init_window () {
         import mod.sdl_wm;
         with (o)
-        window.create (wh.w, wh.h);
+        with (SDL_WindowFlags)
+        window.create (
+            1366-wh.w, 48, 
+            wh.w, wh.h, 
+            SDL_WINDOW_BORDERLESS
+            | SDL_WINDOW_ALWAYS_ON_TOP
+            | SDL_WINDOW_SKIP_TASKBAR
+            // | SDL_WINDOW_VULKAN
+            // | SDL_WINDOW_ALLOW_HIGHDPI
+            );
     }
 
     void

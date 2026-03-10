@@ -1,31 +1,38 @@
-module page1;
+module mod.start;
 
 version (GUI):
-import vf.gui.color         : Color;
-import vf.gui.layout        : Layout,Line_layout,Lcr_layout;
-import vf.std.xywh          : Xy,Wh,Xywh;
-import vf.gui.page_.colors  : Colors;
-import vf.gui.page_.fonts   : Fonts;
-import vf.gui.page_.strings : Strings;
-import vf.gui.window        : Window;
 import vf.gui.widget        : Widget,_Widget;
 import vf.gui.widget.button : Button;
 import vf.gui.widget.volume : Volume;
+import vf.gui.widget.check  : Check;
+import vf.gui.widget.slider : Slider;
+import vf.gui.color         : Color;
+import vf.gui.layout;
+import vf.std.xywh          : Xy,Wh,Xywh;
 import vf.gui.page          : Page,_Page;
-import std.traits           : EnumMembers;
-import vf.sdl.renderer_sdl  : Renderer;
-import vf.sdl.importc_sdl   : SDL_MouseButtonEvent,SDL_MouseWheelEvent;
-import std.stdio            : writeln;
+import vf.sdl.importc_sdl;
 import app                  : o;
 import hub                  : Hub;
-import std.stdio            : writefln;
 
-enum W = 1024;
-enum H = 600;
+enum W = 1366;
+enum H = 48;
 enum S1 = 48;
 
 struct
-Page1 {
+Start {
+    void
+    START () {
+        // Page_qs
+        // window
+        with (o) {
+            new Page_start (&hub,&pages);
+        }
+    }
+}
+
+
+struct
+Page_start {
     mixin _Page;
 
     void
@@ -42,6 +49,22 @@ Page1 {
     void
     _init_widgets () {
         widget = create_ui (&o.hub, cast (Page*) &this);
+    }
+
+    void
+    _init_window () {
+        import mod.sdl_wm;
+        with (o)
+        with (SDL_WindowFlags)
+        window.create (
+            0,0, 
+            wh.w, wh.h, 
+            SDL_WINDOW_BORDERLESS
+            | SDL_WINDOW_ALWAYS_ON_TOP
+            | SDL_WINDOW_SKIP_TASKBAR
+            // | SDL_WINDOW_VULKAN
+            // | SDL_WINDOW_ALLOW_HIGHDPI
+            );
     }
 
     void
@@ -92,7 +115,7 @@ create_ui (Hub* hub, Page* page) {
     main.childs.put (right);
 
     // buttons
-    auto start = new Start (hub,page);
+    auto start = new Start_ (hub,page);
     start.xywh.w = S1;
     start.xywh.h = S1;
     left.childs.put (start);
@@ -149,7 +172,7 @@ Right {
 
 //
 struct
-Start {
+Start_ {
     mixin _Widget!Button;
 }
 

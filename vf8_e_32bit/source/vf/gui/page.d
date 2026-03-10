@@ -13,7 +13,7 @@ import vf.gui.widget.button : Button;
 import vf.gui.widget.volume : Volume;
 import std.traits           : EnumMembers;
 import vf.sdl.renderer_sdl  : Renderer;
-import vf.sdl.importc_sdl   : SDL_MouseButtonEvent,SDL_MouseWheelEvent;
+import vf.sdl.importc_sdl;
 import std.stdio            : writeln;
 import app                  : o;
 import hub                  : Hub;
@@ -48,7 +48,14 @@ Page {
 
     void
     _init_window () {
-         window.create (wh.w, wh.h);
+        with (SDL_WindowFlags)
+        window.create (
+            SDL_WINDOWPOS_CENTERED_DISPLAY (0),SDL_WINDOWPOS_CENTERED_DISPLAY (0), 
+            wh.w, wh.h, 
+            SDL_WINDOW_RESIZABLE
+            // | SDL_WINDOW_VULKAN
+            // | SDL_WINDOW_ALLOW_HIGHDPI
+            );
     }
 
     void
@@ -163,5 +170,10 @@ _Page (TPARENT=Page) {
         hub.register (&this);
         (*pages) ~= cast (Page*) &this;
         _init ();
+    }
+
+    ~this () {
+        //import app : o;
+        //o.hub.unregister (&this);        
     }
 }

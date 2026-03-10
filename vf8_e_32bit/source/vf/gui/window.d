@@ -11,8 +11,8 @@ Window {
     SDL_Window* _sdl_window;
 
     void
-    create (int w, int h) {
-        _sdl_window = Sdl_wm ().new_window (w,h);
+    create (int x, int y, int w, int h, uint flags) {
+        _sdl_window = Sdl_wm ().new_window (x,y,w,h,flags);
     }
 
     Renderer*
@@ -39,3 +39,4 @@ Window {
         return new Renderer (_sdl_renderer);
     }    
 }
+

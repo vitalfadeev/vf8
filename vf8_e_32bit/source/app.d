@@ -2,7 +2,6 @@ import std.stdio;
 
 import hub 								: Hub;
 import vf.gui.page                      : Page;
-import page1                            : Page1;
 import vf.gui.color                     : Color;
 import vf.std.xywh                      : Xy,Wh,Xywh;
 import vf.gui.widget    				: Widget;
@@ -22,20 +21,20 @@ main () {
 		import mod.sdl;
 		import mod.sdl_wm;
 		import mod.volume;
+		import mod.start;
 		import mod.quick_settings;
 
 		hub.register (new Sdl);
 		hub.register (new Sdl_wm);
 		hub.register (new Volume);
+		hub.register (new Start);
 		hub.register (new Quick_settings);
 
 		writeln ("!!!START!!!");
 
 		// INIT
 		hub.INIT ();
-
-		// Load page
-		auto page = new Page1 (&hub,&pages);
+		hub.START ();
 
 		// Event loop
 		foreach (evt; input) {

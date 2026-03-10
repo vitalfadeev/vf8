@@ -77,15 +77,34 @@ Sdl_wm {
 
     void
     _close (uint windowID) {
-        auto _sdl_window = SDL_GetWindowFromID (windowID);
-        if (!_sdl_window) return;
+        with (o) {
+            auto _sdl_window = SDL_GetWindowFromID (windowID);
+            if (!_sdl_window) return;
 
-        SDL_DestroyWindow (_sdl_window);
+            SDL_DestroyWindow (_sdl_window);
 
+            _remove (_sdl_window);
+            _unregister_page (_sdl_window);
+            _quit_on_last_window ();
+        }
+    }
+
+    void
+    _remove (SDL_Window* _sdl_window) {
         auto _i = s.countUntil (_sdl_window);
-        if (_i != -1) s = s.remove (_i);
+        if (_i != -1) s = s.remove (_i);        
+    }
 
-        _quit_on_last_window ();
+    void
+    _unregister_page (SDL_Window* _sdl_window) {
+        with (o)
+        foreach (i,page; pages) {
+            if (page.window._sdl_window == _sdl_window) {
+                pages = pages.remove (i);
+                hub.unregister (page);
+                break;
+            }
+        }                
     }
 
     void
@@ -94,17 +113,14 @@ Sdl_wm {
     }
 
     SDL_Window*
-    new_window (int w, int h) {
+    new_window (int x, int y, int w, int h, uint flags) {
         // Window
         auto _sdl_window = 
             SDL_CreateWindow (
                 __FILE_FULL_PATH__, // "SDL2 Window",
-                SDL_WINDOWPOS_CENTERED_DISPLAY (0),
-                SDL_WINDOWPOS_CENTERED_DISPLAY (0),
+                x, y,
                 w, h,
-                SDL_WINDOW_RESIZABLE
-                // | SDL_WINDOW_VULKAN
-                // | SDL_WINDOW_ALLOW_HIGHDPI
+                flags
             );
 
         if (!_sdl_window)

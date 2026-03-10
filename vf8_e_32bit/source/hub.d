@@ -41,7 +41,6 @@ Hub {
 
         DG[]* _dgs;
         static foreach (name; Functions_recursive!T) {
-            //static if (isDelegate!(__traits(getMember,T,fn_name)))
             static if (!__traits(isStaticFunction, __traits(getMember,T,name)))
             static if (name == name.toUpper) {
                 writeln ("  ", name, " ", Parameters!(__traits(getMember,T,name)).stringof);
@@ -54,7 +53,7 @@ Hub {
                     }
                 }
                 if (for_remove.length > 0)
-                    (*_dgs).remove (for_remove);
+                    (*_dgs) = (*_dgs).remove (for_remove);
             }
         }
     }

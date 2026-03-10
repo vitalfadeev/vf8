@@ -101,6 +101,7 @@ Slider {
         // cusor
         with (xywh)
         if (w > 0 && h > 0) {
+            bg = 0xFF888888;  // 2
             auto cur_w = w * value/value.max;
             renderer.draw_rect (x,y,cur_w,h,fg,bg);
         }
