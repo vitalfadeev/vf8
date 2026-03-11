@@ -36,3 +36,16 @@ IMGException : Exception{
         );
     }
 }
+
+version (SDLMIXER)
+class 
+MixException : Exception{
+    this (string s) {
+        import vf.sdl.importc_sdl_mixer;
+        import std.string : fromStringz;
+        alias Mix_GetError = SDL_GetError;
+        super (
+            format!"%s: %s"(s, fromStringz(Mix_GetError()))
+        );
+    }
+}

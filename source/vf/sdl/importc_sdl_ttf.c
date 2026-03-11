@@ -1,9 +1,1 @@
-#undef SDL_DEPRECATED
-#define SDL_DEPRECATED
-#define SDL_DISABLE_IMMINTRIN_H
-#define SDL_DISABLE_MMINTRIN_H
-#define SDL_DISABLE_XMMINTRIN_H
-#define SDL_DISABLE_EMMINTRIN_H
-
-#include "SDL.h"
-#include <SDL2/SDL_ttf.h>
+#include <SDL_ttf.h>

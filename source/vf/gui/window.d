@@ -34,7 +34,7 @@ Window {
 
     Renderer* 
     get_renderer () {
-        auto _sdl_renderer = SDL_CreateRenderer (_sdl_window, -1, SDL_RENDERER_SOFTWARE);
+        auto _sdl_renderer = SDL_CreateRenderer (_sdl_window, null);
         if (_sdl_renderer is null) throw new SDLException ("SDL_CreateRenderer");
         return new Renderer (_sdl_renderer);
     }    

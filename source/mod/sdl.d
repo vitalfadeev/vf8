@@ -15,14 +15,38 @@ Sdl {
 
         with (o)
         switch (evt.type) with (SDL_EventType) {
-            case SDL_QUIT            : hub.SDL_QUIT            (&evt.quit); break;
-            case SDL_KEYDOWN         : hub.SDL_KEYDOWN         (&evt.key); break;
-            case SDL_KEYUP           : hub.SDL_KEYUP           (&evt.key); break;
-            case SDL_MOUSEWHEEL      : sdl_mousewheel          (&evt.wheel); break;
-            case SDL_MOUSEBUTTONDOWN : sdl_mousebuttondown     (&evt.button); break;
-            case SDL_MOUSEBUTTONUP   : sdl_mousebuttonup       (&evt.button); break;
-            case SDL_WINDOWEVENT     : hub.SDL_WINDOWEVENT     (&evt.window); break;
-            default                  :
+            case SDL_EVENT_QUIT                         : hub.SDL_QUIT            (&evt.quit); break;
+            case SDL_EVENT_KEY_DOWN                     : hub.SDL_KEYDOWN         (&evt.key); break;
+            case SDL_EVENT_KEY_UP                       : hub.SDL_KEYUP           (&evt.key); break;
+            case SDL_EVENT_MOUSE_WHEEL                  : sdl_mousewheel          (&evt.wheel); break;
+            case SDL_EVENT_MOUSE_BUTTON_DOWN            : sdl_mousebuttondown     (&evt.button); break;
+            case SDL_EVENT_MOUSE_BUTTON_UP              : sdl_mousebuttonup       (&evt.button); break;
+            case SDL_EVENT_WINDOW_SHOWN                 :
+            case SDL_EVENT_WINDOW_HIDDEN                :
+            case SDL_EVENT_WINDOW_EXPOSED               :
+            case SDL_EVENT_WINDOW_MOVED                 :
+            case SDL_EVENT_WINDOW_RESIZED               :
+            case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED    :
+            case SDL_EVENT_WINDOW_METAL_VIEW_RESIZED    :
+            case SDL_EVENT_WINDOW_MINIMIZED             :
+            case SDL_EVENT_WINDOW_MAXIMIZED             :
+            case SDL_EVENT_WINDOW_RESTORED              :
+            case SDL_EVENT_WINDOW_MOUSE_ENTER           :
+            case SDL_EVENT_WINDOW_MOUSE_LEAVE           :
+            case SDL_EVENT_WINDOW_FOCUS_GAINED          :
+            case SDL_EVENT_WINDOW_FOCUS_LOST            :
+            case SDL_EVENT_WINDOW_CLOSE_REQUESTED       :
+            case SDL_EVENT_WINDOW_HIT_TEST              :
+            case SDL_EVENT_WINDOW_ICCPROF_CHANGED       :
+            case SDL_EVENT_WINDOW_DISPLAY_CHANGED       :
+            case SDL_EVENT_WINDOW_DISPLAY_SCALE_CHANGED :
+            case SDL_EVENT_WINDOW_SAFE_AREA_CHANGED     :
+            case SDL_EVENT_WINDOW_OCCLUDED              :
+            case SDL_EVENT_WINDOW_ENTER_FULLSCREEN      :
+            case SDL_EVENT_WINDOW_LEAVE_FULLSCREEN      :
+            case SDL_EVENT_WINDOW_DESTROYED             :
+            case SDL_EVENT_WINDOW_HDR_STATE_CHANGED     : hub.SDL_WINDOWEVENT (&evt.window); break;
+            default                                     : 
         }
     }
 

@@ -1,6 +1,10 @@
 module mod.volume;
 
+import vf.sdl.importc_sdl_mixer;
+import std.conv : to;
 import app : o;
+
+//alias MIX_MAX_VOLUME = SDL_MIX_MAXVOLUME;
 
 struct
 Volume {
@@ -34,6 +38,9 @@ Volume {
     void
     VOLUME () {
         with (o) {
+            //auto _sdl_volume = MIX_MAX_VOLUME * volume / volume.max;
+            //Mix_MasterVolume (_sdl_volume);
+
             hub.VOLUME_INFO (volume);
         }
     }
@@ -48,6 +55,11 @@ Volume {
             } else {
                 volume = volume.max;
             }
+
+            //auto _sdl_volume = MIX_MAX_VOLUME * volume / volume.max;
+            //Mix_MasterVolume (_sdl_volume);
+            //Mix_VolumeMusic ();
+
             hub.VOLUME_INFO (volume);
         }
     }
@@ -61,6 +73,10 @@ Volume {
             } else {
                 volume = volume.min;
             }
+
+            //auto _sdl_volume = MIX_MAX_VOLUME * volume / volume.max;
+            //Mix_MasterVolume (_sdl_volume);
+
             hub.VOLUME_INFO (volume);
         }
     }
@@ -68,6 +84,9 @@ Volume {
     void
     VOLUME_GET_INFO () {
         with (o) {
+            //int _sdl_volume = Mix_MasterVolume(-1);
+            //volume = (volume.max * _sdl_volume / MIX_MAX_VOLUME).to!ubyte;
+
             hub.VOLUME_INFO (volume);
         }
     }

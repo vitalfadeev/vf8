@@ -10,6 +10,7 @@ import vf.gui.layout;
 import vf.std.xywh          : Xy,Wh,Xywh;
 import vf.gui.page          : Page;
 import vf.sdl.importc_sdl;
+import vf.sdl.window_flags;
 import app                  : o;
 import hub                  : Hub;
 
@@ -71,16 +72,13 @@ Page_qs : Page {
     override
     void
     _init_window () {
-        import mod.sdl_wm;
         with (o)
-        with (SDL_WindowFlags)
         window.create (
             1366-wh.w, 48, 
             wh.w, wh.h, 
             SDL_WINDOW_BORDERLESS
             | SDL_WINDOW_ALWAYS_ON_TOP
-            | SDL_WINDOW_SKIP_TASKBAR
-            | SDL_WINDOW_SHOWN
+            | SDL_WINDOW_UTILITY
             // | SDL_WINDOW_VULKAN
             // | SDL_WINDOW_ALLOW_HIGHDPI
             );
@@ -360,3 +358,4 @@ Avia : Check {
         o.hub.register (this);
     }        
 }
+

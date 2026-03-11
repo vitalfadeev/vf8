@@ -28,11 +28,11 @@ Sdl_wm {
     SDL_WINDOWEVENT (SDL_WindowEvent* evt) {
         with (o)
         with (evt)
-        switch (event) with (SDL_WindowEventID) {
-            case SDL_WINDOWEVENT_SHOWN   : _shown   (windowID); break;
-            case SDL_WINDOWEVENT_EXPOSED : _exposed (windowID); break;
-            case SDL_WINDOWEVENT_CLOSE   : _close   (windowID); break;
-            default                      :
+        switch (type) {
+            case SDL_EVENT_WINDOW_SHOWN           : _shown   (windowID); break;
+            case SDL_EVENT_WINDOW_EXPOSED         : _exposed (windowID); break;
+            case SDL_EVENT_WINDOW_CLOSE_REQUESTED : _close   (windowID); break;
+            default                               :
         }
     }
 
@@ -42,7 +42,7 @@ Sdl_wm {
         // SDL_KEYUP
         with (o)
         with (evt)
-        switch (keysym.scancode) {
+        switch (scancode) {
             case SDL_SCANCODE_ESCAPE : _close (windowID); break;
             case SDL_SCANCODE_Q      : _close (windowID); break;
             default                  :
@@ -118,7 +118,6 @@ Sdl_wm {
         auto _sdl_window = 
             SDL_CreateWindow (
                 __FILE_FULL_PATH__, // "SDL2 Window",
-                x, y,
                 w, h,
                 flags
             );

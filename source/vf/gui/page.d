@@ -14,6 +14,7 @@ import vf.gui.widget.volume : Volume;
 import std.traits           : EnumMembers;
 import vf.sdl.renderer_sdl  : Renderer;
 import vf.sdl.importc_sdl;
+import vf.sdl.window_flags;
 import std.stdio            : writeln;
 import app                  : o;
 import hub                  : Hub;
@@ -52,12 +53,10 @@ Page {
 
     void
     _init_window () {
-        with (SDL_WindowFlags)
         window.create (
             SDL_WINDOWPOS_CENTERED_DISPLAY (0),SDL_WINDOWPOS_CENTERED_DISPLAY (0), 
             wh.w, wh.h, 
             SDL_WINDOW_RESIZABLE
-            | SDL_WINDOW_SHOWN
             // | SDL_WINDOW_VULKAN
             // | SDL_WINDOW_ALLOW_HIGHDPI
             );
@@ -115,7 +114,7 @@ Page {
 
     void
     sdl_mousewheel (SDL_MouseWheelEvent* evt) {
-        auto xy = Xy (evt.mouseX, evt.mouseY);
+        auto xy = Xy (evt.mouse_x, evt.mouse_y);
         foreach (_widget; widget.recursive)
             if (_widget.xywh.has (xy)) {
                 _widget.sdl_mousewheel (evt);

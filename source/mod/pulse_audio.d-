@@ -1,0 +1,220 @@
+module mod.pulse_audio;
+
+/**
+ * Пример управления системной громкостью в Linux на языке D
+ * Компиляция с dub: dub run --compiler=ldc2
+ * 
+ * dub.json:
+ * {
+ *     "name": "pulse_volume",
+ *     "dependencies": {
+ *         "pulseaudio": "~>1.0.0"
+ *     }
+ * }
+ */
+
+import std.stdio;
+import std.string;
+import std.conv;
+import std.datetime;
+import core.time;
+
+// Состояния приложения
+enum 
+State {
+    GET_SINKS,
+    SET_VOLUME,
+    DONE
+}
+
+// Структура для хранения состояния
+struct 
+PulseData {
+    pa_mainloop* mainloop;
+    pa_context*  context;
+    bool         operationSuccess;
+    uint         sinkIndex;
+    pa_volume_t  newVolume;
+    State        state;
+}
+
+// Колбэк для получения информации о sink'ах
+extern(C) void 
+sinkCallback (pa_context* c, const pa_sink_info* i, int eol, void* userdata) {
+    PulseData* pd = cast(PulseData*)userdata;
+    
+    if (eol > 0) {
+        // Конец списка - переходим к установке громкости
+        pd.state = State.SET_VOLUME;
+        return;
+    }
+    
+    if (i !is null) {
+        writeln ("Найден sink: ", i.description.to!string, " (индекс: ", i.index, ")");
+        writeln ("  Текущая громкость: ", i.volume.values[0] * 100 / PA_VOLUME_NORM, "%");
+        writeln ("  Каналов: ", i.volume.channels);
+        
+        // Запоминаем индекс первого найденного sink'а
+        if (pd.sinkIndex == uint.max) {
+            pd.sinkIndex = i.index;
+        }
+    }
+}
+
+// Колбэк для результата установки громкости
+extern(C) void 
+volumeCallback (pa_context* c, int success, void* userdata) {
+    PulseData* pd = cast(PulseData*)userdata;
+    
+    if (success) {
+        writeln ("Громкость успешно изменена!");
+        pd.operationSuccess = true;
+    } else {
+        writeln ("Ошибка при изменении громкости");
+        pd.operationSuccess = false;
+    }
+    
+    pd.state = State.DONE;
+}
+
+// Колбэк для состояния контекста
+extern(C) void 
+contextStateCallback (pa_context* c, void* userdata) {
+    PulseData* pd = cast(PulseData*)userdata;
+    
+    switch (pa_context_get_state (c)) {
+        case PA_CONTEXT_READY:
+            writeln ("Соединение с PulseAudio установлено");
+            // Начинаем получение списка sink'ов
+            pd.state = State.GET_SINKS;
+            pa_context_get_sink_info_list (c, &sinkCallback, pd);
+            break;
+            
+        case PA_CONTEXT_FAILED:
+        case PA_CONTEXT_TERMINATED:
+            writeln ("Соединение с PulseAudio прервано");
+            pd.state = State.DONE;
+            break;
+            
+        default:
+            break;
+    }
+}
+
+// Функция для установки громкости
+int 
+setSystemVolume (int percent) {
+    PulseData pd;
+    
+    // Инициализация структуры
+    pd.mainloop = null;
+    pd.context = null;
+    pd.operationSuccess = false;
+    pd.sinkIndex = uint.max;
+    pd.newVolume = cast (pa_volume_t) (PA_VOLUME_NORM * percent / 100.0);
+    pd.state = State.DONE;
+    
+    // Создание mainloop
+    pd.mainloop = pa_mainloop_new ();
+    if (pd.mainloop is null) {
+        stderr.writeln ("Ошибка создания mainloop");
+        return -1;
+    }
+    
+    auto mainloop_api = pa_mainloop_get_api (pd.mainloop);
+    
+    // Создание контекста
+    pd.context = pa_context_new (mainloop_api, "Volume Control");
+    if (pd.context is null) {
+        stderr.writeln ("Ошибка создания контекста");
+        pa_mainloop_free (pd.mainloop);
+        return -1;
+    }
+    
+    // Установка колбэка для контекста
+    pa_context_set_state_callback (pd.context, &contextStateCallback, &pd);
+    
+    // Подключение к PulseAudio серверу
+    if (pa_context_connect (pd.context, null, PA_CONTEXT_NOFLAGS, null) < 0) {
+        stderr.writeln ("Ошибка подключения: ", 
+              pa_strerror (pa_context_errno (pd.context)).to!string);
+        pa_context_unref (pd.context);
+        pa_mainloop_free (pd.mainloop);
+        return -1;
+    }
+    
+    pd.state = State.GET_SINKS;
+    
+    // Запуск цикла обработки
+    while (pd.state != State.DONE) {
+        pa_mainloop_iterate (pd.mainloop, 1, null);
+        
+        if (pd.state == State.SET_VOLUME && pd.sinkIndex != uint.max) {
+            writefln ("Устанавливаем громкость %d%% для sink %d", percent, pd.sinkIndex);
+            
+            // Создаем структуру для новой громкости (2 канала - стерео)
+            pa_cvolume volume;
+            pa_cvolume_set (&volume, 2, pd.newVolume);
+            
+            // Устанавливаем громкость
+            auto op = pa_context_set_sink_volume_by_index (
+                pd.context, 
+                pd.sinkIndex, 
+                &volume, 
+                &volumeCallback, 
+                &pd
+            );
+            if (op !is null) {
+                pa_operation_unref (op);
+            }
+            
+            pd.state = State.DONE;
+        }
+    }
+    
+    // Очистка
+    if (pd.context !is null) {
+        pa_context_disconnect (pd.context);
+        pa_context_unref (pd.context);
+    }
+    
+    if (pd.mainloop !is null) {
+        pa_mainloop_free (pd.mainloop);
+    }
+    
+    return pd.operationSuccess ? 0 : -1;
+}
+
+// Получение текущей громкости (дополнительная функция)
+int 
+getSystemVolume () {
+    // Аналогичная реализация, но с получением громкости
+    // Возвращает текущую громкость в процентах
+    return 50; // Заглушка
+}
+
+void 
+main_ (string[] args) {
+    int volume = 50; // Значение по умолчанию
+    
+    if (args.length > 1) {
+        try {
+            volume = args[1].to!int;
+            if (volume < 0 || volume > 100) {
+                stderr.writeln ("Громкость должна быть от 0 до 100");
+                return;
+            }
+        } catch (Exception e) {
+            stderr.writeln ("Ошибка парсинга аргумента: ", e.msg);
+            return;
+        }
+    }
+    
+    writefln ("Установка системной громкости на %d%%", volume);
+    
+    if (setSystemVolume (volume) == 0) {
+        writeln ("Готово!");
+    } else {
+        stderr.writeln ("Не удалось изменить громкость");
+    }
+}

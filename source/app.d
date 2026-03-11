@@ -7,8 +7,7 @@ import vf.std.xywh                      : Xy,Wh,Xywh;
 import vf.gui.widget    				: Widget;
 import std.string 						: startsWith;
 version (SDL) import vf.sdl.input       : Input;
-version (SDL) import vf.sdl.importc_sdl : SDL_Event,SDL_EventType, SDL_WindowEventID;
-version (SDL) import vf.sdl.importc_sdl : SDL_GetWindowFromID, SDL_DestroyWindow;
+version (SDL) import vf.sdl.importc_sdl;
 
 
 static O o;
@@ -37,7 +36,7 @@ main () {
 		hub.START ();
 
 		// Event loop
-		foreach (evt; input) {
+		foreach (ref evt; input) {
 			hub.DO_SWITCH (evt);
 			if (quit) break;
 		}
@@ -47,10 +46,10 @@ main () {
 
 class
 O {
-    Input!SDL_Event input;
-    bool 		    quit;
-    Page[]          pages;
-    Hub             hub;
+    Input  input;
+    bool   quit;
+    Page[] pages;
+    Hub    hub;
 }
 
 // SDL_Event sdl_event

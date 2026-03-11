@@ -13,6 +13,12 @@ struct {
         this.x = x;
         this.y = y;
     }
+    this (float x, float y) {
+        import std.conv;
+        import std.math;
+        this.x = x.round.to!uint;
+        this.y = y.round.to!uint;
+    }
 }
 
 struct

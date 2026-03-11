@@ -23,11 +23,11 @@ Renderer {
 
     void
     draw_rect (uint x, uint y, uint w, uint h, Color fg, Color bg) {
-        auto rect = SDL_Rect (x,y,w,h);
+        auto rect = SDL_FRect (1.0*x/1024, 1.0*y/48, 1.0*w/1024, 1.0*h/48);
         SDL_SetRenderDrawColor (_renderer, bg.r, bg.g, bg.b, bg.a);
         SDL_RenderFillRect (_renderer,&rect);
         SDL_SetRenderDrawColor (_renderer, fg.r, fg.g, fg.b, fg.a);
-        SDL_RenderDrawRect (_renderer,&rect);
+        SDL_RenderRect (_renderer,&rect);
     }
 
     void
@@ -39,7 +39,7 @@ Renderer {
         int size_w,size_h;
         auto surface = 
             _draw_text (font,x,y,w,h,fg,bg,text, &size_w,&size_h);
-        scope (exit) SDL_FreeSurface (surface);
+        scope (exit) SDL_DestroySurface (surface);
 
         SDL_Texture* texture = SDL_CreateTextureFromSurface (_renderer, surface);
         if (texture is null) {
@@ -53,12 +53,12 @@ Renderer {
         if (w > size_w) centered_x += (w-size_w)/2;
         if (h > size_h) centered_y += (h-size_h)/2;
 
-        SDL_Rect dst;
+        SDL_FRect dst;
         dst.x = centered_x;
         dst.y = centered_y;
         dst.w = size_w;
         dst.h = size_h;
-        SDL_RenderCopy (_renderer,texture,null,&dst);
+        SDL_RenderTexture (_renderer,texture,null,&dst);
     }
 
     version (SDLTTF) import vf.sdl.importc_sdl_ttf;
@@ -69,14 +69,14 @@ Renderer {
         SDL_Color sdl_fg = cast (SDL_Color) fg.sdl_color;  // struct rgba
 
         // TTF_RenderGlyph32_Blended
-        auto surface = TTF_RenderGlyph32_Blended (font,text[0],sdl_fg);
+        auto surface = TTF_RenderGlyph_Blended (font,text[0],sdl_fg);
         //auto surface = TTF_RenderUNICODE_Solid (font,textz,sdl_fg);
 
         if (surface is null)
             throw new TTFException ("TTF_RenderUTF8_Solid");        
 
         int minx, maxx, miny, maxy, advance;
-        TTF_GlyphMetrics32 (font,text[0], &minx, &maxx, &miny, &maxy, &advance);
+        TTF_GetGlyphMetrics (font,text[0], &minx, &maxx, &miny, &maxy, &advance);
         *size_w = maxx - minx;
         *size_h = maxy - miny;
         //TTF_SizeUTF8 (font,textz,size_w,size_h);

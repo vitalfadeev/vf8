@@ -8,7 +8,7 @@ import vf.sdl.importc_sdl;
 void 
 init_sdl () {
     // SDL_Init (SDL_INIT_AUDIO | SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_EVERYTHING);
-    if (SDL_Init (SDL_INIT_VIDEO | SDL_INIT_EVENTS) < 0) {
+    if (SDL_Init (SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_AUDIO) < 0) {
         printf ("Failed to initialize SDL video: %s\n", SDL_GetError ());
         abort ();
     }
@@ -26,5 +26,27 @@ init_sdl () {
         import vf.sdl.exceptions      : TTFException;
         if (TTF_Init () == -1)
             throw new TTFException ("Failed to initialise SDL_TTF");
+    }
+
+    // Mixer
+    version (SDLMIXER) {
+        import vf.sdl.importc_sdl_mixer;
+        import vf.sdl.exceptions;
+
+        enum SAMPLE_RATE  = 44100;
+        enum AUDIO_FORMAT = 0x8010; // MIX_DEFAULT_FORMAT;  // Обычно AUDIO_S16SYS
+        enum CHANNELS     = 2;
+        enum CHUNK_SIZE   = 2048;
+
+        with (MIX_InitFlags)
+        if (Mix_Init (MIX_INIT_MP3 | MIX_INIT_OGG | MIX_INIT_FLAC) == -1)
+            throw new SDLException ("Failed to initialise SDL_Mixer");
+
+        // Открытие аудиоустройства
+        if (Mix_OpenAudio (SAMPLE_RATE, AUDIO_FORMAT, CHANNELS, CHUNK_SIZE) < 0) {
+            throw new SDLException ("Mix_OpenAudio failed");
+        }
+
+        Mix_AllocateChannels (16);
     }
 }
