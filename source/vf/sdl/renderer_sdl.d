@@ -23,7 +23,9 @@ Renderer {
 
     void
     draw_rect (uint x, uint y, uint w, uint h, Color fg, Color bg) {
-        auto rect = SDL_FRect (1.0*x/1024, 1.0*y/48, 1.0*w/1024, 1.0*h/48);
+        SDL_FRect rect;
+        SDL_RenderCoordinatesFromWindow (_renderer, x,y, &rect.x,&rect.y);
+        SDL_RenderCoordinatesFromWindow (_renderer, w,h, &rect.w,&rect.h);
         SDL_SetRenderDrawColor (_renderer, bg.r, bg.g, bg.b, bg.a);
         SDL_RenderFillRect (_renderer,&rect);
         SDL_SetRenderDrawColor (_renderer, fg.r, fg.g, fg.b, fg.a);
@@ -54,10 +56,8 @@ Renderer {
         if (h > size_h) centered_y += (h-size_h)/2;
 
         SDL_FRect dst;
-        dst.x = centered_x;
-        dst.y = centered_y;
-        dst.w = size_w;
-        dst.h = size_h;
+        SDL_RenderCoordinatesFromWindow (_renderer, centered_x,centered_y, &dst.x,&dst.y);
+        SDL_RenderCoordinatesFromWindow (_renderer, size_w,size_h, &dst.w,&dst.h);
         SDL_RenderTexture (_renderer,texture,null,&dst);
     }
 
