@@ -167,7 +167,6 @@ class
 Main : Widget {
     this (Page page) {
         super (page);
-        o.hub.register (this);
     }        
 }
 
@@ -175,7 +174,6 @@ class
 Left : Widget {
     this (Page page) {
         super (page);
-        o.hub.register (this);
     }        
 }
 
@@ -183,7 +181,6 @@ class
 Center : Widget {
     this (Page page) {
         super (page);
-        o.hub.register (this);
     }        
 }
 
@@ -191,7 +188,6 @@ class
 Right : Widget {
     this (Page page) {
         super (page);
-        o.hub.register (this);
     }        
 }
 
@@ -200,7 +196,6 @@ class
 Start_ : Button {
     this (Page page) {
         super (page);
-        o.hub.register (this);
     }        
 }
 
@@ -208,7 +203,6 @@ class
 Clock : Button {
     this (Page page) {
         super (page);
-        o.hub.register (this);
     }        
 }
 
@@ -216,7 +210,6 @@ class
 Lan : Button {
     this (Page page) {
         super (page);
-        o.hub.register (this);
     }        
 }
 
@@ -224,7 +217,6 @@ class
 Wifi : Button {
     this (Page page) {
         super (page);
-        o.hub.register (this);
     }        
 }
 
@@ -232,7 +224,6 @@ class
 Volume_ : Volume {
     this (Page page) {
         super (page);
-        o.hub.register (this);
     }        
 
     override
@@ -247,6 +238,5 @@ class
 Battery : Button {
     this (Page page) {
         super (page);
-        o.hub.register (this);
     }        
 }

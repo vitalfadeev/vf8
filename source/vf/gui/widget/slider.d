@@ -18,7 +18,6 @@ Slider : Button {
 
     this (Page page) {
         super (page);
-        o.hub.register (this);
     }        
 
     override

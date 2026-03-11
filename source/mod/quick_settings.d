@@ -227,7 +227,6 @@ class
 Main : Widget {
     this (Page page) {
         super (page);
-        o.hub.register (this);
     }        
 }
 
@@ -235,7 +234,6 @@ class
 Left_right : Widget {
     this (Page page) {
         super (page);
-        o.hub.register (this);
     }        
 }
 
@@ -243,7 +241,6 @@ class
 L1 : Widget {
     this (Page page) {
         super (page);
-        o.hub.register (this);
     }        
 }
 
@@ -251,7 +248,6 @@ class
 L2 : Widget {
     this (Page page) {
         super (page);
-        o.hub.register (this);
     }        
 }
 
@@ -259,7 +255,6 @@ class
 L3 : Widget {
     this (Page page) {
         super (page);
-        o.hub.register (this);
     }        
 }
 
@@ -267,7 +262,6 @@ class
 L4 : Widget {
     this (Page page) {
         super (page);
-        o.hub.register (this);
     }        
 }
 
@@ -276,7 +270,6 @@ class
 Battery : Button {
     this (Page page) {
         super (page);
-        o.hub.register (this);
     }        
 }
 
@@ -284,7 +277,6 @@ class
 Screenshot : Button {
     this (Page page) {
         super (page);
-        o.hub.register (this);
     }        
 }
 
@@ -292,7 +284,6 @@ class
 Settings : Button {
     this (Page page) {
         super (page);
-        o.hub.register (this);
     }        
 }
 
@@ -300,7 +291,6 @@ class
 Lock : Button {
     this (Page page) {
         super (page);
-        o.hub.register (this);
     }        
 }
 
@@ -308,7 +298,6 @@ class
 Quit : Button {
     this (Page page) {
         super (page);
-        o.hub.register (this);
     }        
 }
 
@@ -316,7 +305,6 @@ class
 Volume__ : Slider {
     this (Page page) {
         super (page);
-        o.hub.register (this);
     }        
 }
 
@@ -324,7 +312,6 @@ class
 Bright : Slider {
     this (Page page) {
         super (page);
-        o.hub.register (this);
     }        
 }
 
@@ -332,7 +319,6 @@ class
 Lan : Check {
     this (Page page) {
         super (page);
-        o.hub.register (this);
     }        
 }
 
@@ -340,7 +326,6 @@ class
 Wifi : Check {
     this (Page page) {
         super (page);
-        o.hub.register (this);
     }        
 }
 
@@ -348,7 +333,6 @@ class
 Power : Check {
     this (Page page) {
         super (page);
-        o.hub.register (this);
     }        
 }
 
@@ -356,7 +340,6 @@ class
 Avia : Check {
     this (Page page) {
         super (page);
-        o.hub.register (this);
     }        
 }
 
