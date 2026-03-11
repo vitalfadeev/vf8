@@ -79,6 +79,7 @@ Page_qs : Page {
             SDL_WINDOW_BORDERLESS
             | SDL_WINDOW_ALWAYS_ON_TOP
             | SDL_WINDOW_UTILITY
+            | SDL_WINDOW_OPENGL
             // | SDL_WINDOW_VULKAN
             // | SDL_WINDOW_ALLOW_HIGHDPI
             );
