@@ -21,7 +21,7 @@ Button : Widget {
 
     override
     void
-    sdl_mousebuttondown (SDL_MouseButtonEvent* evt) {
+    sdl_event_mouse_button_down (SDL_MouseButtonEvent* evt) {
         with (o)
         with (evt)
         switch (button) {
@@ -36,7 +36,7 @@ Button : Widget {
 
     override
     void
-    sdl_mousebuttonup (SDL_MouseButtonEvent* evt) {
+    sdl_event_mouse_button_up (SDL_MouseButtonEvent* evt) {
         with (o)
         with (evt)
         switch (button) {

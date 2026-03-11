@@ -34,7 +34,14 @@ Window {
 
     Renderer* 
     get_renderer () {
-        auto _sdl_renderer = SDL_CreateRenderer (_sdl_window, null);
+        //1. opengl
+        //2. opengles2
+        //3. vulkan
+        //4. gpu
+        //5. software
+        auto _sdl_renderer = SDL_CreateRenderer (_sdl_window, "opengl");
+        //auto _sdl_renderer = SDL_CreateRenderer (_sdl_window, "software");
+        //auto _sdl_renderer =SDL_CreateSoftwareRenderer (_sdl_window);
         if (_sdl_renderer is null) throw new SDLException ("SDL_CreateRenderer");
         return new Renderer (_sdl_renderer);
     }    

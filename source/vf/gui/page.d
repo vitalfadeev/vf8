@@ -54,9 +54,10 @@ Page {
     void
     _init_window () {
         window.create (
-            SDL_WINDOWPOS_CENTERED_DISPLAY (0),SDL_WINDOWPOS_CENTERED_DISPLAY (0), 
+            0,0, 
             wh.w, wh.h, 
             SDL_WINDOW_RESIZABLE
+            | SDL_WINDOW_OPENGL
             // | SDL_WINDOW_VULKAN
             // | SDL_WINDOW_ALLOW_HIGHDPI
             );
@@ -94,30 +95,30 @@ Page {
     }
 
     void
-    sdl_mousebuttondown (SDL_MouseButtonEvent* evt) {
+    sdl_event_mouse_button_down (SDL_MouseButtonEvent* evt) {
         auto xy = Xy (evt.x, evt.y);
         foreach (_widget; widget.recursive) {
             if (_widget.xywh.has (xy)) {
-                _widget.sdl_mousebuttondown (evt);
+                _widget.sdl_event_mouse_button_down (evt);
             }
         }
     }
 
     void
-    sdl_mousebuttonup (SDL_MouseButtonEvent* evt) {
+    sdl_event_mouse_button_up (SDL_MouseButtonEvent* evt) {
         auto xy = Xy (evt.x, evt.y);
         foreach (_widget; widget.recursive)
             if (_widget.xywh.has (xy)) {
-                _widget.sdl_mousebuttonup (evt);
+                _widget.sdl_event_mouse_button_up (evt);
             }
     }
 
     void
-    sdl_mousewheel (SDL_MouseWheelEvent* evt) {
+    sdl_event_mouse_wheel (SDL_MouseWheelEvent* evt) {
         auto xy = Xy (evt.mouse_x, evt.mouse_y);
         foreach (_widget; widget.recursive)
             if (_widget.xywh.has (xy)) {
-                _widget.sdl_mousewheel (evt);
+                _widget.sdl_event_mouse_wheel (evt);
             }
     }
 

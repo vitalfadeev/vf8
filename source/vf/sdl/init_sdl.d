@@ -49,4 +49,21 @@ init_sdl () {
 
         Mix_AllocateChannels (16);
     }
+
+    able_rendering_drivers ();
+}
+
+void
+able_rendering_drivers () {
+    SDL_Log ("Available renderer drivers:");
+
+    for (int i = 0; i < SDL_GetNumRenderDrivers (); i++) {
+        SDL_Log ("%d. %s", i + 1, SDL_GetRenderDriver (i));
+    }
+
+    //1. opengl
+    //2. opengles2
+    //3. vulkan
+    //4. gpu
+    //5. software    
 }

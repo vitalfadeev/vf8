@@ -25,21 +25,22 @@ Sdl_wm {
     }
 
     void
-    SDL_WINDOWEVENT (SDL_WindowEvent* evt) {
-        with (o)
-        with (evt)
-        switch (type) {
-            case SDL_EVENT_WINDOW_SHOWN           : _shown   (windowID); break;
-            case SDL_EVENT_WINDOW_EXPOSED         : _exposed (windowID); break;
-            case SDL_EVENT_WINDOW_CLOSE_REQUESTED : _close   (windowID); break;
-            default                               :
-        }
+    SDL_EVENT_WINDOW_SHOWN (SDL_WindowEvent* evt) {
+        _shown (evt.windowID);
     }
 
     void
-    SDL_KEYDOWN (SDL_KeyboardEvent* evt) {
-        // SDL_KEYDOWN
-        // SDL_KEYUP
+    SDL_EVENT_WINDOW_EXPOSED (SDL_WindowEvent* evt) {
+        _exposed (evt.windowID);
+    }
+
+    void
+    SDL_EVENT_WINDOW_CLOSE_REQUESTED (SDL_WindowEvent* evt) {
+        _close (evt.windowID);
+    }
+
+    void
+    SDL_EVENT_KEY_DOWN (SDL_KeyboardEvent* evt) {
         with (o)
         with (evt)
         switch (scancode) {
@@ -124,6 +125,8 @@ Sdl_wm {
 
         if (!_sdl_window)
             throw new SDLException ("Failed to create window");
+
+        SDL_SetWindowPosition (_sdl_window,x,y);
 
         // Update
         SDL_UpdateWindowSurface (_sdl_window);

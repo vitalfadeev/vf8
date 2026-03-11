@@ -37,7 +37,7 @@ main () {
 
 		// Event loop
 		foreach (ref evt; input) {
-			hub.DO_SWITCH (evt);
+			hub.DO_SWITCH (&evt);
 			if (quit) break;
 		}
 	}

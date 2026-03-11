@@ -23,7 +23,7 @@ Volume : Button {
 
     override
     void
-    sdl_mousewheel (SDL_MouseWheelEvent* evt) {
+    sdl_event_mouse_wheel (SDL_MouseWheelEvent* evt) {
         with (o)
         with (evt)
         switch (direction) with (SDL_MouseWheelDirection) {

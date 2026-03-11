@@ -46,17 +46,17 @@ Widget {
     }
 
     void
-    sdl_mousebuttondown (SDL_MouseButtonEvent* evt) {
+    sdl_event_mouse_button_down (SDL_MouseButtonEvent* evt) {
         //
     }
 
     void
-    sdl_mousebuttonup (SDL_MouseButtonEvent* evt) {
+    sdl_event_mouse_button_up (SDL_MouseButtonEvent* evt) {
         //
     }
 
     void
-    sdl_mousewheel (SDL_MouseWheelEvent* evt) {
+    sdl_event_mouse_wheel (SDL_MouseWheelEvent* evt) {
         //
     }    
 
